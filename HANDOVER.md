@@ -19,7 +19,7 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 ## Status per board
 **PCB1 (Vest)**: skematik sudah diperbaiki (RA-02 pin 1 = ANT bukan GND, GND pin 2/9/16, GPS_EN tersambung, gating MOSFET). PCB di-update, auto-route, DRC 0 error, 0 ratline.
 **PCB2 (Helmet)**: belum diubah. Risiko brownout CR2032 (tambah 100-220 uF low-ESR di 3V0).
-**PCB3 (Gateway)**: EN pull-up + 100 nF, header program J1 1x6, ANT RA-02 diperbaiki, EP ke GND, pull-down gate sirine R3. DRC 0 error. Masih ESP32 **modul polos** WROOM-32.
+**PCB3 (Gateway, sudah diganti ke DevKitC, lihat blocker 2)**: EN pull-up + 100 nF, header program J1 1x6, ANT RA-02 diperbaiki, EP ke GND, pull-down gate sirine R3. DRC 0 error. Masih ESP32 **modul polos** WROOM-32.
 
 ## BLOCKER (urut prioritas)
 1. **[SELESAI di PCB1, 2 Okt malam]** Footprint ESP32 PCB1 sudah diganti ke DevKitC V4 (part LCSC C571181, designator U3, jarak baris resmi 1,0"). Skematik PCB1 tersimpan, PCB di-update, auto-route 0 ratline, DRC 0 error. Yang masih harus dicek: ukuran fisik board klon, dan USB micro DevKit sekarang menghadap ke dalam papan (perhatikan akses di casing). Teks lama:
@@ -50,3 +50,8 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 - `weekly/WEEK_6/PANDU_VestNode_Casing.scad` (+ png render), `PCB1_Verifikasi_Skematik.md` (versi lama), `Audit_Skematik_Status.md` (status terbaru), `Riwayat_Progres_Pekan2-5.md`.
 - `weekly/WEEK_6/Gerber/` (LAMA, jangan dipesan).
 - `APP/` (di luar repo ini) = dashboard wireframe, repo `pandu-dashboard`.
+
+## Pemetaan pin final
+- Vest (U3 DevKitC): PWR_BTN=IO13, BTN_SOS=IO27, WATER_SIG=IO34, GPS_EN=IO4, **XKC_EN=IO32** (bukan IO2, strapping), SPI MOSI/MISO/SCK=IO23/19/18, LORA_CS=IO5, LORA_RST=IO25, LORA_DIO0=IO26, I2C SDA/SCL=IO21/22, GPS RX/TX=IO17/16.
+- Gateway (U5 DevKitC): SPI IO23/19/18, LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SD_CS=IO13, SIREN_DRV=IO4, 3V3 dan 5V_SYS dari/ke pin DevKit.
+- Modul baru yang akan dibeli (kata Calvin): XKC-Y25, boost 5 V; sebaiknya LoRa tipe Ra-02 agar footprint cocok.
