@@ -1,8 +1,11 @@
 // ============================================================
 // P.A.N.D.U — Vest Node Master Casing
-// v4: disesuaikan ke PCB1 final (EasyEDA, 4250x4250 mil) --
-//     baterai 18650 sekarang di holder BH-18650-1 DI ATAS PCB,
-//     buzzer dihapus, jendela GPS dihapus.
+// v5 (3 Okt 2026): disesuaikan ke PCB1 DevKitC V4 (EasyEDA, 4250x3750 mil)
+//     - TP4056 di sisi BAWAH PCB, USB-C menghadap dinding kiri (standoff dinaikkan)
+//     - ESP32 DevKitC V4 38 pin; port micro-USB-nya menghadap ke DALAM papan,
+//       dijangkau lewat kabel ekstensi panel-mount micro-USB di dinding bawah
+//     - boost digantung di tutup, di atas bagian bawah DevKit (bukan di atas antena)
+//     - baterai 18650 di holder DI ATAS PCB, buzzer dan jendela GPS dihapus
 // assembly (shell+lid+PCB+holder baterai) + exploded view + DXF 2D export
 // ============================================================
 // CARA PAKAI (semua lewat GUI OpenSCAD, nggak perlu command line):
@@ -33,7 +36,9 @@ pcb_t = 1.6;
 wall      = 2;    // asumsi tebal dinding cetak 3D (PETG)
 lid_t     = 2;    // tebal tutup/lid atas
 pcb_gap   = 1;    // clearance PCB ke dinding tiap sisi
-standoff  = 3;    // tinggi tiang penyangga PCB dari lantai casing
+// TP4056 dipasang di SISI BAWAH PCB: butuh ruang di bawah PCB. ASUMSI tinggi
+// modul + header ~8.5 mm. VERIFIKASI ke modul yang dibeli.
+standoff  = 9;    // tinggi tiang penyangga PCB dari lantai casing
 corner_r  = 8;    // radius sudut (sesuai blueprint awal R8)
 
 /* [Holder baterai BH-18650-1 di atas PCB] */
@@ -52,14 +57,14 @@ case_h = pcb_h + 2*(wall + pcb_gap);
 // lantai + standoff + PCB + komponen tertinggi + clearance + lid
 
 /* [Modul boost MT3608 -- dipasang pakai KABEL] */
-// Modul TIDAK dicolok ke header U2. Header 1x4 U2 di PCB1 (pusat 3500,2000 mil)
+// Modul TIDAK dicolok ke header U2. Header 1x4 U2 di PCB1 (pusat 700,2250 mil = x 17.8, y 87.7 mm)
 // cuma titik sambung kabel 4 pin (IN+ IN- OUT- OUT+). Modul sendiri ditempel
 // (double tape / lem) di SISI BAWAH TUTUP, digantung di atas area kosong
 // pojok kanan-bawah, jauh dari GPS (antena) dan plunger tombol SOS.
 // Koordinat dari pojok kiri-atas PCB (mm), toleransi +-1.5 mm
-boost_pos = [86, 78];      // pusat modul
-boost_l = 37;               // panjang modul (sejajar sumbu X)
-boost_w = 17;               // lebar modul
+boost_pos = [46, 45];      // pusat modul, di atas bagian bawah DevKit (antena di y<20)
+boost_l = 17;               // dimensi sejajar sumbu X (modul diputar 90 derajat)
+boost_w = 37;               // dimensi sejajar sumbu Y
 boost_h = 5.5;              // tebal modul termasuk induktor (ASUMSI)
 header_top = 8.5;           // tinggi header U2 + pin di atas PCB (ASUMSI)
 
@@ -88,15 +93,21 @@ pcb_top_z = wall + standoff + pcb_t;   // permukaan atas PCB dari lantai
 
 // USB-C (ukuran plug + overmold; blueprint lama 8x4 terlalu pas)
 usb_w = 10;   usb_h = 5;
-usb_pos = pcb_xy(18, 90);              // y tengah modul U7; x tidak dipakai
-usb_z   = pcb_top_z + 3;               // tengah colokan ~3 mm di atas PCB
+usb_pos = pcb_xy(17.8, 55.9);            // TP4056 U7 (700,3500 mil), USB-C ke kiri
+// modul di sisi BAWAH PCB: tengah colokan ~4 mm di bawah permukaan bawah PCB (ASUMSI)
+usb_z   = (wall + standoff) - 4;
 // SMA / pigtail antena LoRa
 sma_d   = 8;
 sma_pos = pcb_xy(62.4, 0);             // x di dekat pad ANT RA-02
 sma_z   = pcb_top_z + 6;
+// Port micro-USB ESP32 DevKit menghadap ke dalam papan (x 45.6, y ~59 mm): lubang bulat
+// di dinding bawah untuk kabel EKSTENSI panel-mount micro-USB (female panel -> micro-B male)
+dk_usb_d   = 12;
+dk_usb_pos = pcb_xy(45.6, 95.25);
+dk_usb_z   = pcb_top_z + 6;
 // Tombol (tact switch di PCB, ditekan lewat plunger di tutup)
-sw_power = pcb_xy(33.5, 65.4);         // SW1
-sw_sos   = pcb_xy(72.2, 87.1);         // SW2 (SOSButton)
+sw_power = pcb_xy(34.0, 65.3);         // SW1 (1340,3130 mil)
+sw_sos   = pcb_xy(72.5, 87.3);         // SW2 (SOSButton) (2855,2270 mil)
 sw_h       = 3.5;                      // ASUMSI tinggi tact switch di atas PCB
 btn_hole_d = 6;                        // lubang di tutup
 plunger_d  = 5;                        // batang plunger (celah 0.5 mm)
@@ -121,6 +132,9 @@ module bottom_shell() {
         // USB-C di dinding kiri (-X): kotak membujur menembus dinding
         translate([-case_w/2, usb_pos[1], usb_z])
             cube([wall*4, usb_w, usb_h], center = true);
+        // ekstensi micro-USB DevKit di dinding bawah (-Y)
+        translate([dk_usb_pos[0], -case_h/2, dk_usb_z])
+            rotate([90, 0, 0]) cylinder(d = dk_usb_d, h = wall*4, center = true, $fn = 48);
         // SMA di dinding bawah (-Y): silinder membujur menembus dinding
         translate([sma_pos[0], -case_h/2, sma_z])
             rotate([90, 0, 0]) cylinder(d = sma_d, h = wall*4, center = true, $fn = 48);
@@ -237,5 +251,6 @@ echo(str("Modul boost di dalam rongga casing: ",
     boost_in_pcb ? "MUAT" : "KELUAR dari rongga -- geser atau perkecil modul"));
 echo(str("Modul boost: dasar ", boost_z0, "mm di atas PCB, header U2 setinggi ", header_top,
     "mm -- ", boost_z0 > header_top ? "AMAN, tidak menimpa header" : "BENTUR header"));
+echo(str("TP4056 di bawah PCB: standoff=", standoff, "mm (modul + header ~8.5 mm ASUMSI, tengah USB-C ", usb_z, "mm dari lantai)"));
 echo(str("PERLU VERIFIKASI: hold_h (tinggi holder), tinggi modul boost, dan tinggi ESP32 DevKit + header."));
 echo(str("PERLU VERIFIKASI: tinggi komponen di bawah modul boost (ESP32/GPS/switch) harus < ", boost_z0, "mm; panjang kabel 4 pin dari U2 ke modul ~", 40, "mm."));
