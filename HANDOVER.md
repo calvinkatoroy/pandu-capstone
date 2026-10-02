@@ -55,3 +55,9 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 - Vest (U3 DevKitC): PWR_BTN=IO13, BTN_SOS=IO27, WATER_SIG=IO34, GPS_EN=IO4, **XKC_EN=IO32** (bukan IO2, strapping), SPI MOSI/MISO/SCK=IO23/19/18, LORA_CS=IO5, LORA_RST=IO25, LORA_DIO0=IO26, I2C SDA/SCL=IO21/22, GPS RX/TX=IO17/16.
 - Gateway (U5 DevKitC): SPI IO23/19/18, LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SD_CS=IO13, SIREN_DRV=IO4, 3V3 dan 5V_SYS dari/ke pin DevKit.
 - Modul baru yang akan dibeli (kata Calvin): XKC-Y25, boost 5 V; sebaiknya LoRa tipe Ra-02 agar footprint cocok.
+
+## Update 3 Okt 2026 (akhir sesi lokal)
+- Gerber ketiga board baru ada di `hardware/gerber/` (DRC 0 error). PCB1: TP4056 diputar 180 (USB-C ke dinding kiri). PCB2: +C2 100 uF tantalum.
+- Casing `weekly/WEEK_6/PANDU_VestNode_Casing.scad` v5 (standoff 9 mm, boost di atas DevKit, ekstensi micro-USB DevKit di dinding bawah). Asumsi yang perlu diverifikasi: tinggi modul TP4056 + header (~8,5 mm), tinggi holder baterai.
+- Draft laporan Pekan 6: `weekly/WEEK_6/draft_isian_Pekan6.md` (butuh keputusan tim di bagian [ISI]).
+- Sisa: cek fisik modul (LoRa bukan Ra-02, TP4056, boost), pesan modul kurang (XKC-Y25, boost), VBOOST_5V masih 10 mil, casing Helmet dan Gateway belum, firmware belum.
