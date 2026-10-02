@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 820" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#1a2744"/>
+    </marker>
+    <marker id="arrowStart" markerWidth="8" markerHeight="8" refX="0" refY="3" orient="auto">
+      <path d="M6,0 L0,3 L6,6 Z" fill="#1a2744"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="820" fill="#ffffff"/>
+  <rect x="10" y="10" width="880" height="800" fill="none" stroke="#1a2744" stroke-width="2"/>
+
+  <text x="450" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a2744">PANDU WEARABLE — VEST NODE MASTER (REVISI)</text>
+  <text x="450" y="60" text-anchor="middle" font-size="12" fill="#555">Draft dimension check — belum final, verifikasi dgn layout PCB &amp; keputusan baterai</text>
+
+  <!-- ================= FRONT VIEW ================= -->
+  <text x="100" y="100" font-size="13" font-weight="bold" fill="#1a2744">FRONT VIEW</text>
+  <g>
+    <rect x="100" y="115" width="220" height="260" rx="32" ry="32" fill="#eef2f8" stroke="#1a2744" stroke-width="2"/>
+    <!-- width dimension -->
+    <line x1="100" y1="395" x2="320" y2="395" stroke="#1a2744" stroke-width="1" marker-start="url(#arrowStart)" marker-end="url(#arrow)"/>
+    <line x1="100" y1="380" x2="100" y2="400" stroke="#1a2744" stroke-width="1"/>
+    <line x1="320" y1="380" x2="320" y2="400" stroke="#1a2744" stroke-width="1"/>
+    <text x="210" y="412" text-anchor="middle" font-size="13" fill="#1a2744">55 mm</text>
+    <!-- height dimension -->
+    <line x1="75" y1="115" x2="75" y2="375" stroke="#1a2744" stroke-width="1" marker-start="url(#arrowStart)" marker-end="url(#arrow)"/>
+    <line x1="60" y1="115" x2="90" y2="115" stroke="#1a2744" stroke-width="1"/>
+    <line x1="60" y1="375" x2="90" y2="375" stroke="#1a2744" stroke-width="1"/>
+    <text x="55" y="245" text-anchor="middle" font-size="13" fill="#1a2744" transform="rotate(-90 55 245)">65 mm</text>
+    <!-- corner radius note -->
+    <text x="330" y="130" font-size="11" fill="#e8792a">R8 (sudut depan)</text>
+    <line x1="328" y1="132" x2="300" y2="130" stroke="#e8792a" stroke-width="1"/>
+  </g>
+
+  <!-- ================= TOP VIEW (cross-section, shows internal layout) ================= -->
+  <text x="100" y="450" font-size="13" font-weight="bold" fill="#1a2744">TOP VIEW — potongan internal (indikatif)</text>
+  <g>
+    <rect x="100" y="465" width="220" height="80" fill="#eef2f8" stroke="#1a2744" stroke-width="2"/>
+    <!-- battery bay -->
+    <circle cx="145" cy="505" r="38" fill="#fdf1e7" stroke="#e8792a" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <text x="145" y="509" text-anchor="middle" font-size="10" fill="#e8792a">18650</text>
+    <!-- pcb zone -->
+    <rect x="196" y="473" width="116" height="64" fill="#e9f7ee" stroke="#2f9e5c" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <text x="254" y="509" text-anchor="middle" font-size="10" fill="#2f9e5c">zona PCB</text>
+    <text x="254" y="521" text-anchor="middle" font-size="9" fill="#2f9e5c">~29mm lebar</text>
+    <!-- thickness dimension -->
+    <line x1="100" y1="560" x2="320" y2="560" stroke="#1a2744" stroke-width="1"/>
+    <line x1="330" y1="465" x2="330" y2="545" stroke="#1a2744" stroke-width="1" marker-start="url(#arrowStart)" marker-end="url(#arrow)"/>
+    <line x1="320" y1="465" x2="340" y2="465" stroke="#1a2744" stroke-width="1"/>
+    <line x1="320" y1="545" x2="340" y2="545" stroke="#1a2744" stroke-width="1"/>
+    <text x="360" y="509" font-size="13" fill="#1a2744">23 mm</text>
+    <text x="360" y="524" font-size="9" fill="#c0392b">(direvisi dari 18mm)</text>
+  </g>
+
+  <!-- ================= SIDE VIEW ================= -->
+  <text x="480" y="100" font-size="13" font-weight="bold" fill="#1a2744">SIDE VIEW</text>
+  <g>
+    <rect x="480" y="115" width="80" height="260" fill="#eef2f8" stroke="#1a2744" stroke-width="2"/>
+    <line x1="480" y1="395" x2="560" y2="395" stroke="#1a2744" stroke-width="1" marker-start="url(#arrowStart)" marker-end="url(#arrow)"/>
+    <line x1="480" y1="380" x2="480" y2="400" stroke="#1a2744" stroke-width="1"/>
+    <line x1="560" y1="380" x2="560" y2="400" stroke="#1a2744" stroke-width="1"/>
+    <text x="520" y="412" text-anchor="middle" font-size="13" fill="#1a2744">23 mm</text>
+    <text x="440" y="245" text-anchor="middle" font-size="12" fill="#1a2744" transform="rotate(-90 440 245)">65 mm</text>
+  </g>
+
+  <!-- ================= NOTES ================= -->
+  <g>
+    <text x="620" y="130" font-size="12" font-weight="bold" fill="#1a2744">CATATAN REVISI:</text>
+    <text x="620" y="150" font-size="11" fill="#333">1. Ketebalan (thickness) dinaikkan 18mm -&gt; 23mm.</text>
+    <text x="620" y="168" font-size="11" fill="#333">   Baterai 18650 (Ø18mm) butuh dinding bawah +</text>
+    <text x="620" y="186" font-size="11" fill="#333">   lid, jadi shell wall minimal 20mm + lid 2-3mm.</text>
+    <text x="620" y="212" font-size="11" fill="#333">2. Zona PCB tersisa ~29mm lebar. Modul GPS</text>
+    <text x="620" y="230" font-size="11" fill="#333">   breakout (GY-NEO6MV2, 22x30mm) MUAT, tapi</text>
+    <text x="620" y="248" font-size="11" fill="#333">   WAJIB diputar 90 derajat (sisi 22mm ngadep</text>
+    <text x="620" y="266" font-size="11" fill="#333">   ke lebar) -- infokan ke Gibran/Rifat.</text>
+    <text x="620" y="292" font-size="11" fill="#333">3. Layout internal masih indikatif, belum</text>
+    <text x="620" y="310" font-size="11" fill="#333">   diverifikasi ke layout PCB final (Gibran/Rifat).</text>
+    <text x="620" y="336" font-size="11" fill="#c0392b" font-weight="bold">4. Alternatif: ganti baterai 18650 ke LiPo pouch</text>
+    <text x="620" y="354" font-size="11" fill="#c0392b">   pipih (mis. 503759) supaya thickness bisa</text>
+    <text x="620" y="372" font-size="11" fill="#c0392b">   tetap 18mm sesuai desain awal.</text>
+  </g>
+
+  <!-- ================= TITLE BLOCK ================= -->
+  <g>
+    <rect x="580" y="620" width="290" height="160" fill="#ffffff" stroke="#1a2744" stroke-width="1.5"/>
+    <line x1="580" y1="650" x2="870" y2="650" stroke="#1a2744" stroke-width="1"/>
+    <line x1="580" y1="680" x2="870" y2="680" stroke="#1a2744" stroke-width="1"/>
+    <line x1="580" y1="710" x2="870" y2="710" stroke="#1a2744" stroke-width="1"/>
+    <line x1="580" y1="740" x2="870" y2="740" stroke="#1a2744" stroke-width="1"/>
+    <line x1="725" y1="620" x2="725" y2="780" stroke="#1a2744" stroke-width="1"/>
+
+    <text x="590" y="638" font-size="11" font-weight="bold" fill="#1a2744">PROJECT</text>
+    <text x="590" y="668" font-size="10" fill="#333">PANDU Wearable — Vest Node Master</text>
+    <text x="590" y="698" font-size="10" fill="#333">Casing dimension check (draft revisi)</text>
+
+    <text x="590" y="726" font-size="10" fill="#333">Drawn by: __________</text>
+    <text x="590" y="756" font-size="10" fill="#333">Date: __________</text>
+
+    <text x="735" y="638" font-size="11" font-weight="bold" fill="#1a2744">UNITS</text>
+    <text x="735" y="668" font-size="10" fill="#333">mm</text>
+    <text x="735" y="698" font-size="11" font-weight="bold" fill="#1a2744">SCALE</text>
+    <text x="735" y="726" font-size="10" fill="#333">NTS</text>
+    <text x="735" y="756" font-size="10" fill="#333">Sheet 1 of 1</text>
+  </g>
+
+  <text x="30" y="800" font-size="9" fill="#888">Catatan: seluruh dimensi adalah nilai desain yang diusulkan -- verifikasi terhadap kebutuhan proyek final sebelum fabrikasi.</text>
+</svg>

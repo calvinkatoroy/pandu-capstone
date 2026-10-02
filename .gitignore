@@ -1,0 +1,6 @@
+# auto-captured working screenshots (hundreds, not deliverables)
+docs/screenshots/
+# Office lock/temp files
+~$*
+*.tmp
+Thumbs.db

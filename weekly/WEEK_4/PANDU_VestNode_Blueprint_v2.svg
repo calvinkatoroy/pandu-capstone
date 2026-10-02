@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1060" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#1a2744"/></marker>
+    <marker id="as" markerWidth="8" markerHeight="8" refX="0" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6 Z" fill="#1a2744"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1500" height="1060" fill="#ffffff"/>
+  <rect x="8" y="8" width="1484" height="1044" fill="none" stroke="#1a2744" stroke-width="2"/>
+
+  <text x="750" y="34" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a2744">PANDU VEST NODE MASTER — CASING</text>
+  <text x="750" y="54" text-anchor="middle" font-size="11" fill="#c0392b">Disesuaikan dari draft awal — kamera / display / SOS button / speaker dihapus (tidak ada di skematik)</text>
+
+  <line x1="30" y1="72" x2="1470" y2="72" stroke="#1a2744" stroke-width="1"/>
+
+  <!-- ================= ROW 1: ORTHOGRAPHIC VIEWS ================= -->
+  <text x="170" y="98" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a2744">FRONT VIEW</text>
+  <text x="385" y="98" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a2744">RIGHT SIDE VIEW</text>
+  <text x="610" y="98" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a2744">TOP VIEW</text>
+  <text x="900" y="98" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a2744">REAR VIEW</text>
+  <text x="1195" y="98" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a2744">ISOMETRIC (indikatif)</text>
+
+  <!-- FRONT VIEW -->
+  <g>
+    <rect x="60" y="115" width="220" height="260" rx="32" ry="32" fill="#1a2744" stroke="#0f1830" stroke-width="2"/>
+    <rect x="66" y="121" width="208" height="248" rx="28" ry="28" fill="none" stroke="#e8792a" stroke-width="1.5"/>
+    <text x="170" y="320" text-anchor="middle" font-size="16" font-weight="bold" fill="#e8792a">PANDU</text>
+    <circle cx="170" cy="350" r="6" fill="#333"/>
+    <text x="170" y="367" text-anchor="middle" font-size="8" fill="#ccc">buzzer</text>
+
+    <line x1="60" y1="392" x2="280" y2="392" stroke="#1a2744" marker-start="url(#as)" marker-end="url(#a)"/>
+    <text x="170" y="409" text-anchor="middle" font-size="13" fill="#1a2744">55 mm</text>
+    <line x1="42" y1="115" x2="42" y2="375" stroke="#1a2744" marker-start="url(#as)" marker-end="url(#a)"/>
+    <text x="34" y="245" text-anchor="middle" font-size="13" fill="#1a2744" transform="rotate(-90 34 245)">65 mm</text>
+    <text x="286" y="130" font-size="10" fill="#e8792a">R8</text>
+  </g>
+
+  <!-- RIGHT SIDE VIEW -->
+  <g>
+    <rect x="352" y="115" width="66" height="260" fill="#1a2744" stroke="#0f1830" stroke-width="2"/>
+    <rect x="352" y="115" width="7" height="260" fill="#e8792a"/>
+    <rect x="363" y="288" width="26" height="14" rx="3" fill="#111"/>
+    <circle cx="382" cy="175" r="12" fill="#111" stroke="#e8792a" stroke-width="1"/>
+    <rect x="413" y="205" width="12" height="55" rx="4" fill="#e8792a" stroke="#0f1830"/>
+
+    <line x1="352" y1="392" x2="418" y2="392" stroke="#1a2744" marker-start="url(#as)" marker-end="url(#a)"/>
+    <text x="385" y="409" text-anchor="middle" font-size="13" fill="#1a2744">23 mm</text>
+
+    <g font-size="9" fill="#333">
+      <line x1="389" y1="295" x2="440" y2="295" stroke="#1a2744" stroke-width="0.75"/>
+      <text x="443" y="292">USB charging</text>
+      <text x="443" y="303">8 x 4 mm</text>
+
+      <line x1="394" y1="175" x2="440" y2="175" stroke="#1a2744" stroke-width="0.75"/>
+      <text x="443" y="167">Konektor SMA</text>
+      <text x="443" y="178">(antena LoRa)</text>
+
+      <text x="443" y="235">Clip mount</text>
+    </g>
+  </g>
+
+  <!-- TOP VIEW (dipusatkan vertikal spy sejajar panel lain) -->
+  <g>
+    <rect x="500" y="205" width="220" height="80" fill="#1a2744" stroke="#0f1830" stroke-width="2"/>
+    <rect x="590" y="193" width="40" height="24" rx="6" fill="#e8792a" stroke="#0f1830"/>
+    <line x1="500" y1="303" x2="720" y2="303" stroke="#1a2744" marker-start="url(#as)" marker-end="url(#a)"/>
+    <text x="610" y="320" text-anchor="middle" font-size="12" fill="#1a2744">55 mm</text>
+    <g font-size="9" fill="#333">
+      <line x1="630" y1="205" x2="670" y2="205" stroke="#1a2744" stroke-width="0.75"/>
+      <text x="500" y="185" text-anchor="middle">GPS antenna menghadap atas</text>
+      <text x="500" y="196" text-anchor="middle">(internal patch, jendela PETG)</text>
+    </g>
+  </g>
+
+  <!-- REAR VIEW -->
+  <g>
+    <rect x="790" y="115" width="220" height="260" rx="32" ry="32" fill="#33507a" stroke="#0f1830" stroke-width="2"/>
+    <rect x="860" y="130" width="80" height="26" rx="6" fill="#e8792a" stroke="#0f1830"/>
+    <text x="900" y="148" text-anchor="middle" font-size="9" fill="#0f1830">clip webbing</text>
+    <circle cx="815" cy="140" r="5" fill="#0f1830"/>
+    <circle cx="985" cy="140" r="5" fill="#0f1830"/>
+    <circle cx="815" cy="350" r="5" fill="#0f1830"/>
+    <circle cx="985" cy="350" r="5" fill="#0f1830"/>
+    <text x="900" y="368" text-anchor="middle" font-size="8" fill="#dfe6f0">4x screw M2 (tutup casing)</text>
+  </g>
+
+  <!-- ISOMETRIC -->
+  <g>
+    <polygon points="1120,175 1260,175 1295,150 1155,150" fill="#33507a" stroke="#0f1830" stroke-width="1.5"/>
+    <rect x="1120" y="175" width="140" height="180" rx="16" fill="#1a2744" stroke="#0f1830" stroke-width="1.5"/>
+    <polygon points="1260,175 1295,150 1295,330 1260,355" fill="#0f1830" stroke="#0f1830" stroke-width="1.5"/>
+    <rect x="1126" y="181" width="128" height="168" rx="12" fill="none" stroke="#e8792a" stroke-width="1"/>
+    <text x="1190" y="270" text-anchor="middle" font-size="14" font-weight="bold" fill="#e8792a">PANDU</text>
+    <rect x="1267" y="270" width="22" height="12" fill="#111"/>
+    <circle cx="1278" cy="205" r="8" fill="#111"/>
+  </g>
+
+  <line x1="30" y1="400" x2="1470" y2="400" stroke="#1a2744" stroke-width="1"/>
+
+  <!-- ================= ROW 2 ================= -->
+  <text x="280" y="422" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a2744">SECTION VIEW (internal)</text>
+  <text x="765" y="422" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a2744">DETAIL</text>
+  <text x="1250" y="422" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a2744">KEY DIMENSIONS</text>
+
+  <!-- SECTION VIEW -->
+  <g>
+    <rect x="60" y="440" width="440" height="230" rx="16" fill="#eef2f8" stroke="#1a2744" stroke-width="2"/>
+    <rect x="90" y="460" width="60" height="190" rx="30" fill="#fdf1e7" stroke="#e8792a" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <text x="120" y="560" text-anchor="middle" font-size="10" fill="#e8792a" transform="rotate(-90 120 560)">Baterai 18650</text>
+    <rect x="180" y="590" width="280" height="14" fill="#2f9e5c"/>
+    <text x="320" y="583" text-anchor="middle" font-size="9" fill="#2f9e5c">PCB + komponen (ESP32, LoRa, GPS, sensor)</text>
+    <line x1="60" y1="440" x2="500" y2="440" stroke="#e8792a" stroke-width="3" stroke-dasharray="6,3"/>
+    <text x="330" y="453" text-anchor="middle" font-size="9" fill="#c0392b">seam + gasket IP67</text>
+    <text x="280" y="650" text-anchor="middle" font-size="9" fill="#333">Body housing: PETG (cetak 3D), tahan -10&#176;C s/d +60&#176;C</text>
+  </g>
+
+  <!-- DETAIL -->
+  <g>
+    <rect x="545" y="440" width="440" height="230" fill="#fff" stroke="#1a2744" stroke-width="1.5"/>
+    <text x="565" y="465" font-size="10" font-weight="bold" fill="#1a2744">Gasket groove (IP67)</text>
+    <rect x="565" y="478" width="60" height="30" fill="none" stroke="#1a2744" stroke-width="1"/>
+    <rect x="575" y="483" width="8" height="20" fill="#e8792a"/>
+    <text x="645" y="490" font-size="9" fill="#333">lebar 1.2mm, dalam 1.5mm</text>
+
+    <text x="565" y="535" font-size="10" font-weight="bold" fill="#1a2744">Konektor SMA (potongan)</text>
+    <circle cx="595" cy="570" r="16" fill="none" stroke="#1a2744" stroke-width="1"/>
+    <circle cx="595" cy="570" r="8" fill="#111"/>
+    <text x="630" y="567" font-size="9" fill="#333">O.D. hole ~8mm,</text>
+    <text x="630" y="579" font-size="9" fill="#333">o-ring seal</text>
+
+    <text x="565" y="625" font-size="10" font-weight="bold" fill="#1a2744">Buzzer outlet</text>
+    <circle cx="583" cy="650" r="4" fill="#111"/>
+    <text x="630" y="647" font-size="9" fill="#333">1x lubang &#8709;3mm</text>
+    <text x="630" y="659" font-size="9" fill="#333">(bukan grid speaker 5-lubang)</text>
+  </g>
+
+  <!-- KEY DIMENSIONS (tabel merangkum, gantiin notes) -->
+  <g font-size="10.5">
+    <rect x="1030" y="440" width="440" height="230" fill="#fff" stroke="#1a2744" stroke-width="1.5"/>
+    <line x1="1030" y1="468" x2="1470" y2="468" stroke="#1a2744"/>
+    <line x1="1180" y1="440" x2="1180" y2="670" stroke="#1a2744"/>
+    <text x="1050" y="460" font-weight="bold" fill="#1a2744">Item</text>
+    <text x="1200" y="460" font-weight="bold" fill="#1a2744">Nilai</text>
+
+    <line x1="1030" y1="496" x2="1470" y2="496" stroke="#dfe3ea"/>
+    <text x="1050" y="488">Height (H)</text><text x="1200" y="488">65 mm</text>
+    <line x1="1030" y1="524" x2="1470" y2="524" stroke="#dfe3ea"/>
+    <text x="1050" y="516">Width (W)</text><text x="1200" y="516">55 mm</text>
+    <line x1="1030" y1="552" x2="1470" y2="552" stroke="#dfe3ea"/>
+    <text x="1050" y="544">Depth (D)</text><text x="1200" y="544">23 mm (revisi dari 18mm)</text>
+    <line x1="1030" y1="580" x2="1470" y2="580" stroke="#dfe3ea"/>
+    <text x="1050" y="572">Corner radius</text><text x="1200" y="572">R8 depan / R6 belakang</text>
+    <line x1="1030" y1="608" x2="1470" y2="608" stroke="#dfe3ea"/>
+    <text x="1050" y="600">Material</text><text x="1200" y="600">PETG (cetak 3D)</text>
+    <line x1="1030" y1="636" x2="1470" y2="636" stroke="#dfe3ea"/>
+    <text x="1050" y="628">Buzzer</text><text x="1200" y="628">1x piezo, outlet &#8709;3mm</text>
+    <text x="1050" y="656">Antena</text><text x="1200" y="656">SMA (LoRa) / internal patch (GPS)</text>
+  </g>
+
+  <!-- ================= TITLE BLOCK ================= -->
+  <g>
+    <rect x="30" y="920" width="1440" height="110" fill="#fff" stroke="#1a2744" stroke-width="1.5"/>
+    <line x1="30" y1="975" x2="1470" y2="975" stroke="#1a2744"/>
+    <line x1="620" y1="920" x2="620" y2="1030" stroke="#1a2744"/>
+    <line x1="1000" y1="920" x2="1000" y2="1030" stroke="#1a2744"/>
+    <line x1="1000" y1="975" x2="1000" y2="1030" stroke="#1a2744"/>
+    <line x1="1235" y1="920" x2="1235" y2="1030" stroke="#1a2744"/>
+
+    <text x="45" y="945" font-size="12" font-weight="bold" fill="#1a2744">PROJECT:</text>
+    <text x="45" y="965" font-size="14" font-weight="bold" fill="#1a2744">PANDU WEARABLE — VEST NODE MASTER</text>
+    <text x="45" y="995" font-size="11" fill="#333">CASING — ORTHOGRAPHIC DRAWING (revisi v2, disesuaikan skematik)</text>
+
+    <text x="635" y="940" font-size="11" font-weight="bold" fill="#1a2744">DESCRIPTION:</text>
+    <text x="635" y="958" font-size="10" fill="#333">Wearable device rompi pandu kapal —</text>
+    <text x="635" y="972" font-size="10" fill="#333">sensor IMU/ToF/water/GPS, LoRa,</text>
+    <text x="635" y="986" font-size="10" fill="#333">buzzer, IP67 sealed PETG housing.</text>
+    <text x="635" y="1010" font-size="9" fill="#c0392b">Tanpa kamera/layar/tombol SOS.</text>
+
+    <text x="1015" y="940" font-size="11" font-weight="bold" fill="#1a2744">UNITS</text>
+    <text x="1015" y="958" font-size="10" fill="#333">mm</text>
+    <text x="1015" y="995" font-size="11" font-weight="bold" fill="#1a2744">SCALE</text>
+    <text x="1015" y="1013" font-size="10" fill="#333">NTS (do not scale)</text>
+
+    <text x="1250" y="940" font-size="11" font-weight="bold" fill="#1a2744">SHEET:</text>
+    <text x="1250" y="958" font-size="10" fill="#333">1 OF 1</text>
+    <text x="1250" y="995" font-size="11" font-weight="bold" fill="#1a2744">DATE:</text>
+    <text x="1250" y="1013" font-size="10" fill="#333">19 Sept 2026</text>
+  </g>
+</svg>
