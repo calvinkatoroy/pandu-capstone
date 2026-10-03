@@ -74,29 +74,21 @@ cell(0, 1, 1, 'Order PCB (ditunda, lihat bagian 10)')
 cell(0, 1, 2, ' ☐ Tercapai ☒ Belum')
 cell(0, 2, 1, 'Simulasi Assembly 3D (casing Vest Node, OpenSCAD)')
 cell(0, 2, 2, ' ☒ Tercapai ☐ Belum')
-cell(0, 3, 2, ' [ISI oleh Rafif/Calvin: Tercapai / Belum]')
 
 # 4 realisasi
 cell(1, 1, 1, 'Revisi skematik dan PCB, persiapan order PCB')
 cell(1, 1, 2, 'Gibran, Rifat, Calvin')
-cell(1, 1, 3,
- "Rancangan skematik direvisi untuk mengurangi false positive: sensor jarak anti-crushing dihilangkan (rawan false positive saat pandu menempel dinding kapal), "
- "dan sensor kontak air diganti ke sensor non-kontak XKC-Y25 karena sensor kontak berisiko kemasukan air sehingga sulit mencapai IP67. "
- "Skematik tiga unit diaudit pin per pin dan diperbaiki: AMS1117 dihapus (diganti modul boost 5 V), saklar daya dijadikan input GPIO (deep sleep di firmware), "
- "GPS dan sensor air dikendalikan via MOSFET untuk menghemat daya, pin antena dan GND modul LoRa dikoreksi, rangkaian pemrograman/EN ESP32 Gateway dilengkapi, "
- "serta pull-down gate sirine ditambahkan. Footprint ESP32 disesuaikan dengan board yang dibeli (DevKitC V4). "
- "Hasil: PCB1, PCB2, PCB3 lolos DRC (0 error, semua net ter-route) dan Gerber diekspor pada 3 Oktober 2026. Order PCB ditunda sampai verifikasi fisik modul selesai.")
+orig1 = T[1].rows[1].cells[3].text
+cell(1, 1, 3, orig1 + "\n\nTambahan Pekan 6 (audit dan perbaikan, Calvin): skematik tiga unit diaudit pin per pin dan diperbaiki (AMS1117 dihapus dan diganti modul boost 5 V, saklar daya jadi input GPIO, GPS dan sensor air via MOSFET, pin antena dan GND modul LoRa dikoreksi, rangkaian EN/pemrograman ESP32 Gateway dilengkapi, pull-down gate sirine). Footprint ESP32 disesuaikan dengan board yang dibeli (DevKitC V4). PCB1, PCB2, PCB3 lolos DRC (0 error) dan Gerber diekspor 3 Oktober 2026; order PCB ditunda sampai verifikasi fisik modul.")
 cell(1, 2, 1, '3D model casing')
 cell(1, 2, 2, 'Calvin, Yoga')
 cell(1, 2, 3,
  "Casing Vest Node dibuat ulang mengikuti PCB final dengan model parametrik OpenSCAD (PETG, dinding 2 mm): dimensi luar 114 x 101 x 36,6 mm, "
  "bukaan USB-C pengisian (dinding kiri), ekstensi micro-USB ESP32 dan SMA antena LoRa (dinding bawah), plunger tombol power dan SOS pada tutup, "
  "serta modul boost digantung pada tutup. Validasi dimensi otomatis lulus (Gambar 11). Draft 3D awal di Autodesk Fusion 360 (Gambar 1) menjadi referensi bentuk. "
- "[ISI oleh Yoga: status sinkronisasi model Fusion 360 dengan dimensi baru]")
-cell(1, 3, 2, 'Rafif, Calvin')
+)
 
 # 5 anggota
-cell(2, 1, 1, T[2].rows[1].cells[1].text + "\n[ISI oleh Rafif: kegiatan Pekan 6, mis. konfirmasi pembelian modul dan pembaruan BOM]")
 cell(2, 2, 1,
  "Mengaudit skematik tiga unit (Vest Node, Helmet Node, Edge Gateway) pin per pin dan memperbaiki temuan: AMS1117 dihapus (diganti boost 5 V), saklar daya dijadikan input GPIO, "
  "gating GPS dan sensor air via MOSFET, pin antena dan GND modul LoRa, rangkaian ESP32 Gateway, dan pull-down gate sirine.\n"
@@ -104,10 +96,6 @@ cell(2, 2, 1,
  "Membuat ulang casing Vest Node (OpenSCAD) mengikuti PCB final 114 x 101 x 36,6 mm beserta validasi dimensi otomatis.\n"
  "Melakukan cross-check BOM terhadap desain, serta menyusun dokumen audit dan handover.")
 cell(2, 2, 2, '90%')
-cell(2, 3, 1, T[2].rows[3].cells[1].text + "\n[UPDATE oleh Gibran: status skematik/PCB final dan rencana order PCB]")
-cell(2, 4, 1, T[2].rows[4].cells[1].text + "\n[UPDATE oleh Rifat: status PCB Helmet Node dan Edge Gateway]")
-cell(2, 5, 1, "[ISI oleh Yoga: kegiatan Pekan 6, mis. sinkronisasi model Fusion 360 dengan dimensi casing terbaru 114 x 101 x 36,6 mm]")
-cell(2, 5, 2, '[ISI]')
 
 # 6 hasil implementasi
 set_par(find('PCB Design untuk seluruh'),
@@ -123,7 +111,7 @@ set_par(find('Draft 3D casing P.A.N.D.U selesai dibuat di'),
  "Draft 3D awal di Autodesk Fusion 360 (Gambar 1) menjadi referensi bentuk.")
 set_par(find('Blueprint 2D presisi dengan dimensi 55 x 65 x 23'),
  "Blueprint 2D awal (55 x 65 x 18 mm) tidak lagi berlaku karena PCB final berukuran 107,95 x 95,25 mm; model casing telah disesuaikan. "
- "[ISI oleh Yoga: sinkronisasi model Fusion 360 dengan dimensi baru]")
+)
 
 # 7 dokumentasi
 for pre, suf in (('Gambar 1.', ' (arsip Pekan 3)'), ('Gambar 2.', ' (arsip Pekan 3)'),
@@ -196,7 +184,7 @@ for it in issues:
 
 # 10 deviasi
 row_set(T[5].rows[5], ['Finalisasi 3D casing', 'Minggu 5', 'Minggu 6',
-                       'Casing Vest Node dibuat ulang mengikuti PCB final (114 x 101 x 36,6 mm, OpenSCAD). [ISI oleh Yoga: sinkronisasi model Fusion 360]'])
+                       'Casing Vest Node dibuat ulang mengikuti PCB final (114 x 101 x 36,6 mm, OpenSCAD).'])
 row_set(add_row(5), ['Order PCB', 'Minggu 5 (target 26 Sep, lalu 3 Okt)', 'Diundur ke Minggu 7',
                      'Audit skematik menemukan kesalahan desain dan footprint ESP32/modul LoRa harus disesuaikan dengan komponen yang dibeli; Gerber sudah siap, order menunggu verifikasi fisik modul.'])
 set_par(find('Analisis Deviasi'),
@@ -213,7 +201,7 @@ plan = [
     ("Membeli modul yang kurang (XKC-Y25, boost 5 V, komponen SMD) dan memperbarui BOM", "Rafif", "10 Oktober 2026"),
     ("Sinkronisasi model casing Fusion 360 dan casing Helmet Node/Gateway ke PCB baru", "Yoga, Calvin", "17 Oktober 2026"),
     ("Finalisasi fitur dashboard dan tech stack setelah endpoint ESP32 ditetapkan", "Rafif, Calvin", "17 Oktober 2026"),
-    ("Perakitan uji (breadboard/perfboard) dan mulai firmware (deep sleep, kontrol GPS/sensor air, deteksi jatuh)", "[ISI]", "24 Oktober 2026"),
+    ("Perakitan uji (breadboard/perfboard) dan mulai firmware (deep sleep, kontrol GPS/sensor air, deteksi jatuh)", "Calvin", "24 Oktober 2026"),
 ]
 for i, pv in enumerate(plan, 1):
     row = T[6].rows[i] if i < len(T[6].rows) else add_row(6)
