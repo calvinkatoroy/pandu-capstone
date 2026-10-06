@@ -61,3 +61,8 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 - Casing `weekly/WEEK_6/PANDU_VestNode_Casing.scad` v5 (standoff 9 mm, boost di atas DevKit, ekstensi micro-USB DevKit di dinding bawah). Asumsi yang perlu diverifikasi: tinggi modul TP4056 + header (~8,5 mm), tinggi holder baterai.
 - Draft laporan Pekan 6: `weekly/WEEK_6/draft_isian_Pekan6.md` (butuh keputusan tim di bagian [ISI]).
 - Sisa: cek fisik modul (LoRa bukan Ra-02, TP4056, boost), pesan modul kurang (XKC-Y25, boost), VBOOST_5V masih 10 mil, casing Helmet dan Gateway belum, firmware belum.
+
+## Versi (6 Okt 2026)
+- **v1** = kondisi sebelum perbaikan netlist: tag git `v1` (Gerber 3 Okt, netlist 6 Okt) dan version node EasyEDA `v1-sebelum-perbaikan` (File > Version Control > Version Management; buka node itu untuk revert).
+- **v2** = branch git `v2` untuk perbaikan: konektor antena PCB1/PCB3, backfeed 5V, pull-up SD_CS, kapasitor bulk 3V3 PCB1. Di EasyEDA, v2 dikerjakan di `main` (revert lewat node v1).
+- Temuan lengkap: `hardware/netlist/` (PCB1-3 .tel + check_netlist.py).
