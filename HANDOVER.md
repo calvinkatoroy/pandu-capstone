@@ -82,3 +82,6 @@ Gerber v2: `hardware/gerber/Gerber_PCB1_2026-10-06.zip` dan `Gerber_PCB3_2026-10
 
 ## Status Vest Node (6 Okt 2026, v2)
 Firmware: SOS bangun dari sleep dan langsung kirim (3x ulang), alert baru dikirim segera (tanpa tunggu 5 s), FALL/MOB 2x ulang, baterai mV di tiap paket. Casing v5 tidak perlu diubah untuk v2 (SMA bulkhead sudah ada; header antena/dioda/pembagi rendah). Belum: lebarkan trek VBAT_RAW (auto-router + clearance bentrok, 10 mil cukup untuk ~0,5 A rata-rata), uji perangkat nyata, kalibrasi ambang jatuh dan BAT_DIV.
+
+## Firmware Helmet (6 Okt 2026)
+`firmware/helmet_node/` (PlatformIO, ESP32-C3 SuperMini, NimBLE). Hanya BLE advertising 'PANDU-HELM', manufacturer data `FF FF 'P' 'H' worn counter`. Dipakai = TOUCH_SIG (GPIO2) stabil 1 s, lepas = 5 s. Tombol GPIO4 = toggle deep sleep (wake GPIO aktif-LOW). Advertising 1 s, 0 dBm, refresh tiap 10 s. Kompilasi OK, belum diuji perangkat. Belum ada: Vest men-scan BLE ini (field 'helm dipakai' di paket LoRa). Tidak ada sensor baterai di Helmet.
