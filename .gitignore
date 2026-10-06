@@ -4,3 +4,5 @@ docs/screenshots/
 ~$*
 *.tmp
 Thumbs.db
+
+firmware/**/.pio/
