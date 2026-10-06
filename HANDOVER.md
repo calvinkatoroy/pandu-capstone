@@ -73,3 +73,5 @@ Gerber v2: `hardware/gerber/Gerber_PCB1_2026-10-06.zip` dan `Gerber_PCB3_2026-10
 - PCB3: USB-C (USB1) dihapus, hanya micro-USB DevKit (satu port); + R2 10k pull-up SD_CS ke 3V3; + H2 header antena; Q1 IRFZ44N diganti IRLZ44N (logic-level, footprint TO-220 vertikal).
 - Catatan: sirine di PCB3 sekarang disuplai lewat jalur 5V DevKit/USB (arus sirine lewat konektor micro-USB; cek rating adaptor dan jalur DevKit). Antena: sambung pigtail U.FL/SMA ke H1/H2 manual.
 - Belum: modul fisik belum diverifikasi, PCB2 (dioda D1 + CR2032 vs ESP32), casing Helmet/Gateway, firmware Gateway.
+
+- PCB2 (v2): dioda D1 1N5819 dihapus (drop 0,3-0,45 V membuat modul < 3,0 V dari CR2032); SAW1.OUTPUT langsung ke `3V0_HELMET`. DRC 0 error, Gerber `hardware/gerber/Gerber_PCB2_2026-10-06.zip`. Arus puncak BLE vs CR2032 tetap perlu uji nyata (cadangan: Li-ion kecil / 2xCR2032).
