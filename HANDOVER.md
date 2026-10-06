@@ -66,3 +66,10 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 - **v1** = kondisi sebelum perbaikan netlist: tag git `v1` (Gerber 3 Okt, netlist 6 Okt) dan version node EasyEDA `v1-sebelum-perbaikan` (File > Version Control > Version Management; buka node itu untuk revert).
 - **v2** = branch git `v2` untuk perbaikan: konektor antena PCB1/PCB3, backfeed 5V, pull-up SD_CS, kapasitor bulk 3V3 PCB1. Di EasyEDA, v2 dikerjakan di `main` (revert lewat node v1).
 - Temuan lengkap: `hardware/netlist/` (PCB1-3 .tel + check_netlist.py).
+
+## v2 (6 Okt 2026): perbaikan dari cek netlist (branch `v2`, EasyEDA `main`)
+Gerber v2: `hardware/gerber/Gerber_PCB1_2026-10-06.zip` dan `Gerber_PCB3_2026-10-06.zip` (DRC 0 error). PCB2 tidak berubah (pakai Gerber 3 Okt). Netlist terbaru: `hardware/netlist/` (cek: `python check_netlist.py`).
+- PCB1: + header 2 pin H1 untuk antena (pigtail ke SMA, `LORA_ANT` sekarang terhubung ke RA-02 pin 1, `GND`); + C1 100 uF tantalum di 3V3_SYS; + D1 SS14 antara `VBOOST_5V` (anoda) dan pin 5V DevKit (`5V_DK`, katoda) agar USB DevKit tidak backfeed ke boost/baterai.
+- PCB3: USB-C (USB1) dihapus, hanya micro-USB DevKit (satu port); + R2 10k pull-up SD_CS ke 3V3; + H2 header antena; Q1 IRFZ44N diganti IRLZ44N (logic-level, footprint TO-220 vertikal).
+- Catatan: sirine di PCB3 sekarang disuplai lewat jalur 5V DevKit/USB (arus sirine lewat konektor micro-USB; cek rating adaptor dan jalur DevKit). Antena: sambung pigtail U.FL/SMA ke H1/H2 manual.
+- Belum: modul fisik belum diverifikasi, PCB2 (dioda D1 + CR2032 vs ESP32), casing Helmet/Gateway, firmware Gateway.
