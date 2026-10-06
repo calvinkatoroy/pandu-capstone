@@ -102,6 +102,8 @@ void sendPkt(const char *type) {
 enum Alert { NONE, FALL, MOB, SOS };
 const char *alertName[] = {"", "FALL", "MOB", "SOS"};
 Alert active = NONE;
+bool sosWake = false;
+int repeatsLeft = 0;  // SOS dikirim ulang min. 3x (LoRa tanpa ACK)
 uint32_t lastSend = 0, lastBeat = 0;
 
 Alert detectFall() {  // free-fall >= FREEFALL_MS lalu benturan dalam IMPACT_WIN
@@ -139,7 +141,7 @@ void setup() {
   mpuOk = mpuInit();
   LoRa.setPins(PIN_LORA_CS, PIN_LORA_RST, PIN_LORA_DIO0);
   loraOk = LoRa.begin(LORA_FREQ);
-  bool sosWake = esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1;
+  sosWake = esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1;
   Serial.printf("Boot: MPU=%d LoRa=%d wake=%s\n", mpuOk, loraOk, sosWake ? "SOS" : "other");
 }
 
@@ -149,16 +151,18 @@ void loop() {
   // tombol power: tekan sebentar = tidur
   if (digitalRead(PIN_PWR_BTN) == LOW) { delay(30); if (digitalRead(PIN_PWR_BTN) == LOW) goToSleep(); }
 
+  if (sosWake) { active = SOS; repeatsLeft = 3; lastSend = millis() - ALERT_REPEAT_MS; sosWake = false; }  // bangun karena SOS = langsung kirim, tanpa tahan 2 detik
   Alert a = detectSos();
   if (a == NONE) a = detectMob();
   if (a == NONE && mpuOk) a = detectFall();
-  if (a != NONE) active = a;
+  if (a != NONE) { if (a != active) { repeatsLeft = (a == SOS ? 3 : 2); lastSend = millis() - ALERT_REPEAT_MS; } active = a; }  // alert baru: kirim segera
 
   uint32_t now = millis();
   if (active != NONE && now - lastSend >= ALERT_REPEAT_MS) {
     sendPkt(alertName[active]); lastSend = now;
-    if (digitalRead(PIN_SOS) == LOW && !digitalRead(PIN_WATER) && active != FALL) active = NONE;  // alert hilang saat kondisi berakhir
-    else if (active == FALL) active = NONE;  // FALL dikirim sekali per kejadian (ulang tiap deteksi baru)
+    if (repeatsLeft > 0) repeatsLeft--;
+    bool still = (active == SOS && digitalRead(PIN_SOS) == HIGH) || (active == MOB && digitalRead(PIN_WATER));
+    if (repeatsLeft == 0 && !still) active = NONE;  // berhenti setelah kirim ulang & kondisi berakhir
   }
   if (now - lastBeat >= HEARTBEAT_MS) { sendPkt("HB"); lastBeat = now; }
   delay(10);

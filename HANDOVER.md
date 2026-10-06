@@ -79,3 +79,6 @@ Gerber v2: `hardware/gerber/Gerber_PCB1_2026-10-06.zip` dan `Gerber_PCB3_2026-10
 - PCB1 (v2, +pembagi baterai): R6/R7 100k + C2 100 nF, `VBAT_RAW` > `BAT_SENSE` > IO35 (ADC1_CH7). Firmware menambah kolom mV baterai di semua paket LoRa: `PANDU,V1,<jenis>,<lat>,<lon>,<mV>`. Drain pembagi ~21 uA. Kalibrasi `BAT_DIV` dengan multimeter. DRC 0 error; Gerber PCB1 tanggal 6 Okt diganti versi terbaru.
 
 - PCB2 (v2, +tombol on/off): tact switch SW1 (tanpa saklar geser tambahan) antara `PWR_BTN` dan GND, pull-up R1 100k ke `3V0_HELMET`, `PWR_BTN` = GPIO4 SuperMini (pin RTC/deep sleep C3 = GPIO0-5). Firmware Helmet (belum ada) harus toggle deep sleep seperti Vest: tekan = tidur, tekan lagi = bangun (`esp_deep_sleep_enable_gpio_wakeup` aktif-LOW). SAW1 (saklar geser) tetap sebagai isolasi baterai penuh. DRC 0 error, Gerber `Gerber_PCB2_2026-10-06.zip` diganti, netlist `PCB2.tel` diperbarui.
+
+## Status Vest Node (6 Okt 2026, v2)
+Firmware: SOS bangun dari sleep dan langsung kirim (3x ulang), alert baru dikirim segera (tanpa tunggu 5 s), FALL/MOB 2x ulang, baterai mV di tiap paket. Casing v5 tidak perlu diubah untuk v2 (SMA bulkhead sudah ada; header antena/dioda/pembagi rendah). Belum: lebarkan trek VBAT_RAW (auto-router + clearance bentrok, 10 mil cukup untuk ~0,5 A rata-rata), uji perangkat nyata, kalibrasi ambang jatuh dan BAT_DIV.
