@@ -10,6 +10,7 @@
 // ---- Pin ----
 constexpr int PIN_PWR_BTN  = 13;  // tact (ke GND), RTC: toggle deep sleep
 constexpr int PIN_SOS      = 27;  // tact ke 3V3, pull-down R2 10k di PCB (aktif HIGH), tahan SOS_HOLD_MS
+constexpr int PIN_BAT      = 35;  // BAT_SENSE: pembagi 100k/100k dari VBAT_RAW (ADC1_CH7, input-only)
 constexpr int PIN_WATER    = 34;  // output XKC-Y25 (input-only, tanpa pull internal)
 constexpr int PIN_GPS_EN   = 4;   // gate P-MOSFET Q1: LOW=ON, hi-Z=OFF (JANGAN drive HIGH)
 constexpr int PIN_XKC_EN   = 32;  // via Q5: HIGH=ON, LOW/hi-Z=OFF
@@ -28,6 +29,7 @@ constexpr uint32_t WATER_MS    = 3000;    // sensor air harus aktif sebanyak ini
 constexpr uint32_t SOS_HOLD_MS = 2000;
 constexpr uint32_t HEARTBEAT_MS = 30000;
 constexpr uint32_t ALERT_REPEAT_MS = 5000;
+constexpr float BAT_DIV = 2.0f;     // KALIBRASI: faktor pembagi (cek dengan multimeter)
 constexpr uint8_t MPU = 0x68;
 
 TinyGPSPlus gps;
@@ -75,14 +77,22 @@ float accelG() {
   return sqrtf(ax * ax + ay * ay + az * az);
 }
 
+// ---- Baterai ----
+int batMilliVolts() {  // rata-rata 8 sampel, analogReadMilliVolts memakai kalibrasi eFuse ESP32
+  uint32_t sum = 0;
+  for (int i = 0; i < 8; i++) sum += analogReadMilliVolts(PIN_BAT);
+  return (int)(sum / 8 * BAT_DIV);
+}
+
 // ---- LoRa ----
 void sendPkt(const char *type) {
   while (gpsSerial.available()) gps.encode(gpsSerial.read());
-  char buf[96];
+  char buf[112];
+  int bat = batMilliVolts();  // format: PANDU,V1,<jenis>,<lat>,<lon>,<mV baterai>
   if (gps.location.isValid())
-    snprintf(buf, sizeof buf, "PANDU,V1,%s,%.6f,%.6f", type, gps.location.lat(), gps.location.lng());
+    snprintf(buf, sizeof buf, "PANDU,V1,%s,%.6f,%.6f,%d", type, gps.location.lat(), gps.location.lng(), bat);
   else
-    snprintf(buf, sizeof buf, "PANDU,V1,%s,NOFIX,NOFIX", type);
+    snprintf(buf, sizeof buf, "PANDU,V1,%s,NOFIX,NOFIX,%d", type, bat);
   Serial.println(buf);
   if (!loraOk) return;
   LoRa.beginPacket(); LoRa.print(buf); LoRa.endPacket();
@@ -121,6 +131,7 @@ void setup() {
   pinMode(PIN_PWR_BTN, INPUT_PULLUP);
   pinMode(PIN_SOS, INPUT);  // pull-down eksternal R2
   pinMode(PIN_WATER, INPUT);
+  analogSetPinAttenuation(PIN_BAT, ADC_11db);  // 0-3,1 V; baterai 4,2 V / 2 = 2,1 V
   while (digitalRead(PIN_PWR_BTN) == LOW) delay(10);   // abaikan tekanan yang membangunkan
   gpsPower(true); xkcPower(true);
   gpsSerial.begin(9600, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);

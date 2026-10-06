@@ -75,3 +75,5 @@ Gerber v2: `hardware/gerber/Gerber_PCB1_2026-10-06.zip` dan `Gerber_PCB3_2026-10
 - Belum: modul fisik belum diverifikasi, PCB2 (dioda D1 + CR2032 vs ESP32), casing Helmet/Gateway, firmware Gateway.
 
 - PCB2 (v2): dioda D1 1N5819 dihapus (drop 0,3-0,45 V membuat modul < 3,0 V dari CR2032); SAW1.OUTPUT langsung ke `3V0_HELMET`. DRC 0 error, Gerber `hardware/gerber/Gerber_PCB2_2026-10-06.zip`. Arus puncak BLE vs CR2032 tetap perlu uji nyata (cadangan: Li-ion kecil / 2xCR2032).
+
+- PCB1 (v2, +pembagi baterai): R6/R7 100k + C2 100 nF, `VBAT_RAW` > `BAT_SENSE` > IO35 (ADC1_CH7). Firmware menambah kolom mV baterai di semua paket LoRa: `PANDU,V1,<jenis>,<lat>,<lon>,<mV>`. Drain pembagi ~21 uA. Kalibrasi `BAT_DIV` dengan multimeter. DRC 0 error; Gerber PCB1 tanggal 6 Okt diganti versi terbaru.
