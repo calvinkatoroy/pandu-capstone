@@ -6,6 +6,7 @@
 #include <LoRa.h>
 #include <TinyGPSPlus.h>
 #include "driver/rtc_io.h"
+#include <NimBLEDevice.h>
 
 // ---- Pin ----
 constexpr int PIN_PWR_BTN  = 13;  // tact (ke GND), RTC: toggle deep sleep
@@ -36,6 +37,8 @@ TinyGPSPlus gps;
 HardwareSerial gpsSerial(2);
 bool loraOk = false, mpuOk = false;
 
+void helmScanStop();  // didefinisikan di bagian Helm
+
 // ---- Power gating ----
 void gpsPower(bool on) {
   if (on) { pinMode(PIN_GPS_EN, OUTPUT); digitalWrite(PIN_GPS_EN, LOW); }
@@ -47,6 +50,7 @@ void xkcPower(bool on) { pinMode(PIN_XKC_EN, OUTPUT); digitalWrite(PIN_XKC_EN, o
 void goToSleep() {
   Serial.println("Sleep...");
   gpsPower(false); xkcPower(false);
+  helmScanStop();
   if (loraOk) LoRa.sleep();
   while (digitalRead(PIN_PWR_BTN) == LOW || digitalRead(PIN_SOS) == HIGH) delay(10);   // tunggu lepas agar tidak langsung bangun
   delay(50);
@@ -77,6 +81,42 @@ float accelG() {
   return sqrtf(ax * ax + ay * ay + az * az);
 }
 
+// ---- Helm (BLE scanner) ----
+// Helmet menyiarkan manufacturer data {FF FF 'P' 'H' worn counter} tiap ~8 s (burst 400 ms).
+constexpr uint32_t HELM_TIMEOUT_MS = 30000;   // tidak terdengar > 30 s = helm tidak terjangkau (KALIBRASI)
+volatile uint32_t helmSeenAt = 0;             // millis() terakhir paket valid; 0 = belum pernah
+volatile uint8_t helmWorn = 0;
+
+class HelmCb : public NimBLEAdvertisedDeviceCallbacks {
+  void onResult(NimBLEAdvertisedDevice *d) override {
+    if (!d->haveManufacturerData()) return;
+    std::string m = d->getManufacturerData();
+    if (m.size() >= 5 && (uint8_t)m[0] == 0xFF && (uint8_t)m[1] == 0xFF && m[2] == 'P' && m[3] == 'H') {
+      helmWorn = (uint8_t)m[4] ? 1 : 0;
+      helmSeenAt = millis() ? millis() : 1;
+    }
+  }
+};
+HelmCb helmCb;
+
+void helmScanStart() {
+  NimBLEDevice::init("");
+  NimBLEScan *scan = NimBLEDevice::getScan();
+  scan->setAdvertisedDeviceCallbacks(&helmCb, true);
+  scan->setActiveScan(false);                  // pasif: hemat daya, manufacturer data ada di paket iklan
+  scan->setInterval(100);                      // satuan 0,625 ms -> 62,5 ms
+  scan->setWindow(50);                         // ~50% radio aktif (KALIBRASI: turunkan jika boros, helm hanya 400 ms/8 s)
+  scan->setDuplicateFilter(false);
+  scan->start(0, nullptr, false);              // scan terus-menerus
+}
+void helmScanStop() { NimBLEDevice::getScan()->stop(); NimBLEDevice::deinit(true); }
+
+// 1 = dipakai, 0 = terdengar tapi tidak dipakai, 2 = tidak terjangkau
+int helmState() {
+  if (!helmSeenAt || millis() - helmSeenAt > HELM_TIMEOUT_MS) return 2;
+  return helmWorn;
+}
+
 // ---- Baterai ----
 int batMilliVolts() {  // rata-rata 8 sampel, analogReadMilliVolts memakai kalibrasi eFuse ESP32
   uint32_t sum = 0;
@@ -87,12 +127,12 @@ int batMilliVolts() {  // rata-rata 8 sampel, analogReadMilliVolts memakai kalib
 // ---- LoRa ----
 void sendPkt(const char *type) {
   while (gpsSerial.available()) gps.encode(gpsSerial.read());
-  char buf[112];
-  int bat = batMilliVolts();  // format: PANDU,V1,<jenis>,<lat>,<lon>,<mV baterai>
+  char buf[120];
+  int bat = batMilliVolts();  // format: PANDU,V1,<jenis>,<lat>,<lon>,<mV baterai>,<helm 0/1/2>
   if (gps.location.isValid())
-    snprintf(buf, sizeof buf, "PANDU,V1,%s,%.6f,%.6f,%d", type, gps.location.lat(), gps.location.lng(), bat);
+    snprintf(buf, sizeof buf, "PANDU,V1,%s,%.6f,%.6f,%d,%d", type, gps.location.lat(), gps.location.lng(), bat, helmState());
   else
-    snprintf(buf, sizeof buf, "PANDU,V1,%s,NOFIX,NOFIX,%d", type, bat);
+    snprintf(buf, sizeof buf, "PANDU,V1,%s,NOFIX,NOFIX,%d,%d", type, bat, helmState());
   Serial.println(buf);
   if (!loraOk) return;
   LoRa.beginPacket(); LoRa.print(buf); LoRa.endPacket();
@@ -141,6 +181,7 @@ void setup() {
   mpuOk = mpuInit();
   LoRa.setPins(PIN_LORA_CS, PIN_LORA_RST, PIN_LORA_DIO0);
   loraOk = LoRa.begin(LORA_FREQ);
+  helmScanStart();
   sosWake = esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1;
   Serial.printf("Boot: MPU=%d LoRa=%d wake=%s\n", mpuOk, loraOk, sosWake ? "SOS" : "other");
 }
