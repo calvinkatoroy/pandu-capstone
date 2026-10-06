@@ -9,7 +9,7 @@
 
 // ---- Pin ----
 constexpr int PIN_PWR_BTN  = 13;  // tact (ke GND), RTC: toggle deep sleep
-constexpr int PIN_SOS      = 27;  // tact (ke GND), tahan SOS_HOLD_MS
+constexpr int PIN_SOS      = 27;  // tact ke 3V3, pull-down R2 10k di PCB (aktif HIGH), tahan SOS_HOLD_MS
 constexpr int PIN_WATER    = 34;  // output XKC-Y25 (input-only, tanpa pull internal)
 constexpr int PIN_GPS_EN   = 4;   // gate P-MOSFET Q1: LOW=ON, hi-Z=OFF (JANGAN drive HIGH)
 constexpr int PIN_XKC_EN   = 32;  // via Q5: HIGH=ON, LOW/hi-Z=OFF
@@ -37,7 +37,7 @@ bool loraOk = false, mpuOk = false;
 // ---- Power gating ----
 void gpsPower(bool on) {
   if (on) { pinMode(PIN_GPS_EN, OUTPUT); digitalWrite(PIN_GPS_EN, LOW); }
-  else    { pinMode(PIN_GPS_EN, INPUT); }  // hi-Z: pull-up 100k mematikan Q1 (HIGH 3,3 V bocor di VBAT 4,2 V)
+  else    { pinMode(PIN_GPS_EN, INPUT); }  // hi-Z: pull-up R3 100k ke 3V3_SYS mematikan Q1
 }
 void xkcPower(bool on) { pinMode(PIN_XKC_EN, OUTPUT); digitalWrite(PIN_XKC_EN, on); }
 
@@ -107,7 +107,7 @@ Alert detectMob() {  // sensor air aktif kontinu WATER_MS (anti-percikan)
 }
 Alert detectSos() {
   static uint32_t since = 0;
-  if (digitalRead(PIN_SOS) == LOW) { if (!since) since = millis(); return millis() - since >= SOS_HOLD_MS ? SOS : NONE; }
+  if (digitalRead(PIN_SOS) == HIGH) { if (!since) since = millis(); return millis() - since >= SOS_HOLD_MS ? SOS : NONE; }
   since = 0; return NONE;
 }
 
@@ -115,7 +115,7 @@ void setup() {
   Serial.begin(115200);
   rtc_gpio_deinit((gpio_num_t)PIN_PWR_BTN);
   pinMode(PIN_PWR_BTN, INPUT_PULLUP);
-  pinMode(PIN_SOS, INPUT_PULLUP);
+  pinMode(PIN_SOS, INPUT);  // pull-down eksternal R2
   pinMode(PIN_WATER, INPUT);
   while (digitalRead(PIN_PWR_BTN) == LOW) delay(10);   // abaikan tekanan yang membangunkan
   gpsPower(true); xkcPower(true);
@@ -141,7 +141,7 @@ void loop() {
   uint32_t now = millis();
   if (active != NONE && now - lastSend >= ALERT_REPEAT_MS) {
     sendPkt(alertName[active]); lastSend = now;
-    if (digitalRead(PIN_SOS) == HIGH && !digitalRead(PIN_WATER) && active != FALL) active = NONE;  // alert hilang saat kondisi berakhir
+    if (digitalRead(PIN_SOS) == LOW && !digitalRead(PIN_WATER) && active != FALL) active = NONE;  // alert hilang saat kondisi berakhir
     else if (active == FALL) active = NONE;  // FALL dikirim sekali per kejadian (ulang tiap deteksi baru)
   }
   if (now - lastBeat >= HEARTBEAT_MS) { sendPkt("HB"); lastBeat = now; }
