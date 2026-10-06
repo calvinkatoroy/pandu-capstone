@@ -46,11 +46,14 @@ void goToSleep() {
   Serial.println("Sleep...");
   gpsPower(false); xkcPower(false);
   if (loraOk) LoRa.sleep();
-  while (digitalRead(PIN_PWR_BTN) == LOW) delay(10);   // tunggu lepas agar tidak langsung bangun
+  while (digitalRead(PIN_PWR_BTN) == LOW || digitalRead(PIN_SOS) == HIGH) delay(10);   // tunggu lepas agar tidak langsung bangun
   delay(50);
   rtc_gpio_pullup_en((gpio_num_t)PIN_PWR_BTN);
   rtc_gpio_pulldown_dis((gpio_num_t)PIN_PWR_BTN);
-  esp_sleep_enable_ext0_wakeup((gpio_num_t)PIN_PWR_BTN, 0);
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)PIN_PWR_BTN, 0);          // tombol power: aktif-LOW
+  rtc_gpio_pulldown_en((gpio_num_t)PIN_SOS);                         // SOS: aktif-HIGH (R2 10k juga menahan LOW)
+  rtc_gpio_pullup_dis((gpio_num_t)PIN_SOS);
+  esp_sleep_enable_ext1_wakeup(1ULL << PIN_SOS, ESP_EXT1_WAKEUP_ANY_HIGH);  // SOS membangunkan alat saat sleep
   esp_deep_sleep_start();
 }
 
@@ -114,6 +117,7 @@ Alert detectSos() {
 void setup() {
   Serial.begin(115200);
   rtc_gpio_deinit((gpio_num_t)PIN_PWR_BTN);
+  rtc_gpio_deinit((gpio_num_t)PIN_SOS);
   pinMode(PIN_PWR_BTN, INPUT_PULLUP);
   pinMode(PIN_SOS, INPUT);  // pull-down eksternal R2
   pinMode(PIN_WATER, INPUT);
@@ -124,7 +128,8 @@ void setup() {
   mpuOk = mpuInit();
   LoRa.setPins(PIN_LORA_CS, PIN_LORA_RST, PIN_LORA_DIO0);
   loraOk = LoRa.begin(LORA_FREQ);
-  Serial.printf("Boot: MPU=%d LoRa=%d\n", mpuOk, loraOk);
+  bool sosWake = esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1;
+  Serial.printf("Boot: MPU=%d LoRa=%d wake=%s\n", mpuOk, loraOk, sosWake ? "SOS" : "other");
 }
 
 void loop() {
