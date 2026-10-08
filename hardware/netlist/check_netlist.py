@@ -30,7 +30,16 @@ def check(path, expect):
 
 pcb1 = dict(PWR_BTN="IO13", BTN_SOS="IO27", WATER_SIG="IO34", GPS_EN="IO4", XKC_EN="IO32", GPS_RX="IO17", GPS_TX="IO16",
             LORA_CS="IO5", LORA_RST="IO25", LORA_DIO0="IO26", SPI_MOSI="IO23", SPI_MISO="IO19", SPI_SCK="IO18", I2C_SDA="IO21", I2C_SCL="IO22")
-pcb3 = dict(LORA_CS="IO5", LORA_RST="IO14", LORA_DIO0="IO26", SD_CS="IO13", SIREN_DRV="IO4", SPI_MOSI="IO23", SPI_MISO="IO19", SPI_SCK="IO18")
+pcb3 = dict(LORA_CS="IO5", LORA_RST="IO14", LORA_DIO0="IO26", SD_CS="IO33", SD_SCK="IO25", SD_MISO="IO35", SD_MOSI="IO32", SIREN_DRV="IO4", SPI_MOSI="IO23", SPI_MISO="IO19", SPI_SCK="IO18")
 print("PCB1"); e = check("PCB1.tel", pcb1)
 print("PCB3"); e += check("PCB3.tel", pcb3)
+
+# PCB2: tidak ada TTP223/TOUCH_SIG, negatif baterai terpisah dari GND (proteksi TP4056)
+print("PCB2"); n2 = parse("PCB2.tel"); bad2 = 0
+for name, must in {"BAT_NEG": {"H2.2", "U7.3"}, "VBAT_RAW": {"J1.1", "U7.1"}, "VBAT_SW": {"J1.2", "U1.16"}}.items():
+    ok = must <= set(n2.get(name, [])); bad2 += not ok
+    print(f"  {'OK ' if ok else 'ERR'} {name} {sorted(n2.get(name, []))}")
+if "TOUCH_SIG" in n2: bad2 += 1; print("  ERR TOUCH_SIG masih ada")
+if {"H2.2", "U7.3"} & set(n2.get("GND", [])): bad2 += 1; print("  ERR B- atau baterai negatif masih di GND")
+e += bad2
 sys.exit(1 if e else 0)

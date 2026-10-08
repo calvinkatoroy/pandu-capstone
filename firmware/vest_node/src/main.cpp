@@ -7,6 +7,10 @@
 #include <TinyGPSPlus.h>
 #include "driver/rtc_io.h"
 #include <NimBLEDevice.h>
+#ifdef DEMO_NO_BROWNOUT
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
+#endif
 
 // ---- Pin ----
 constexpr int PIN_PWR_BTN  = 13;  // tact (ke GND), RTC: toggle deep sleep
@@ -178,6 +182,9 @@ Alert detectSos() {
 
 void setup() {
   Serial.begin(115200);
+#ifdef DEMO_NO_BROWNOUT
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);   // HANYA demo di USB tanpa kapasitor: mematikan detektor brownout (jangan dipakai di produk)
+#endif
   rtc_gpio_deinit((gpio_num_t)PIN_PWR_BTN);
   rtc_gpio_deinit((gpio_num_t)PIN_SOS);
   pinMode(PIN_PWR_BTN, INPUT_PULLUP);

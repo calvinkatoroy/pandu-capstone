@@ -128,3 +128,11 @@ Fase 0 → Fase 1 (paralel: Fase 3 F-1 s/d F-3) → Fase 2 (PCB2, lalu PCB3, lal
 - XKC terhadap keringat dan hujan hanya terbukti lewat tes nyata.
 - Umur baterai Vest kemungkinan sekitar 4-5 jam (perkiraan kasar), di bawah target satu shift.
 - Auto-router PCB1 padat; tiap perubahan dapat memerlukan penempatan ulang.
+
+## Status pelaksanaan (8 Okt 2026, malam)
+- Fase 0 selesai: tag `v2.1`, branch `v3`, Gerber lama dipindah ke `hardware/gerber/_obsolete/`, backup project EasyEDA `Pandu-Capstone-v2.1-backup`.
+- PCB2: P2-1 (SAW1 diganti header jumper `J1`), P2-2 (`BAT_NEG`), P2-3 (TTP223 dan `TOUCH_SIG` dihapus) selesai di EasyEDA, DRC 0, `hardware/netlist/PCB2.tel` diperbarui. Sisa: P2-4 (cek pin SuperMini fisik), P2-6 (kecilkan outline), hapus stub `$1N31` di `U1` pin 11.
+- PCB3: P3-2 selesai (SD di bus sendiri: SCK=IO25, MISO=IO35, MOSI=IO32, CS=IO33), DRC 0, `PCB3.tel` diperbarui, firmware Gateway disesuaikan. Sisa: P3-1 (footprint LoRa RFM95), P3-3 (tombol mute), P3-4 (dioda flyback opsional), P3-5, P3-6.
+- PCB1: belum disentuh (P1-1 `BAT_NEG`, P1-2 footprint LoRa, P1-3 sensor air, dst).
+- Gerber BELUM diekspor ulang untuk revisi ini; tunggu gerbang pesan PCB.
+- `check_netlist.py` kini mencakup PCB2 dan pin map PCB3 baru (semua OK).

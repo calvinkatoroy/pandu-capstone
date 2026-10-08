@@ -1,12 +1,14 @@
 // PANDU Edge Gateway: ESP32-DevKitC V4. Terima paket LoRa dari Vest, bunyikan sirine, log ke SD, keluarkan JSON ke serial.
-// Pin (PCB3 v2): LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SPI=IO23/19/18, SD_CS=IO13, SIREN_DRV=IO4 (HIGH = sirine ON via IRLZ44N).
+// Pin (PCB3 v3): LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SPI LoRa=IO23/19/18, SD: SCK=IO25 MISO=IO35 MOSI=IO32 CS=IO33, SIREN_DRV=IO4 (HIGH = sirine ON via IRLZ44N).
 // Paket Vest: PANDU,V1,<jenis>,<lat>,<lon>,<mV>,<helm>[,<usia posisi detik>]   jenis: SOS|MOB|FALL|HB   helm: 1 dipakai, 0 tidak, 2 tidak terjangkau
 #include <Arduino.h>
 #include <SPI.h>
 #include <LoRa.h>
 #include <SD.h>
 
-constexpr int PIN_LORA_CS = 5, PIN_LORA_RST = 14, PIN_LORA_DIO0 = 26, PIN_SD_CS = 13, PIN_SIREN = 4;
+constexpr int PIN_LORA_CS = 5, PIN_LORA_RST = 14, PIN_LORA_DIO0 = 26, PIN_SIREN = 4;
+constexpr int PIN_SD_SCK = 25, PIN_SD_MISO = 35, PIN_SD_MOSI = 32, PIN_SD_CS = 33;   // SD di bus SPI sendiri (PCB3 v3), terpisah dari LoRa
+SPIClass sdSpi(HSPI);
 constexpr long LORA_FREQ = 915E6;                 // harus sama dengan Vest
 constexpr uint32_t SIREN_MAX_MS   = 60000;        // sirine otomatis berhenti jika tidak ada alert baru selama ini (KALIBRASI)
 constexpr uint32_t VEST_LOST_MS   = 90000;        // tidak ada paket sama sekali selama ini = peringatan "VEST LOST" (serial saja)
@@ -63,7 +65,8 @@ void setup() {
 
   LoRa.setPins(PIN_LORA_CS, PIN_LORA_RST, PIN_LORA_DIO0);
   loraOk = LoRa.begin(LORA_FREQ);
-  sdOk = SD.begin(PIN_SD_CS);
+  sdSpi.begin(PIN_SD_SCK, PIN_SD_MISO, PIN_SD_MOSI, PIN_SD_CS);
+  sdOk = SD.begin(PIN_SD_CS, sdSpi);
   if (sdOk) { File f = SD.open("/pandu.csv", FILE_APPEND); if (f) { if (f.size() == 0) f.println("ms,type,lat,lon,bat_mv,helm,pos_age_s,rssi,snr"); f.close(); } }
   Serial.printf("{\"boot\":true,\"lora\":%d,\"sd\":%d}\n", loraOk, sdOk);
   lastRxAt = millis();
