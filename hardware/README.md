@@ -1,6 +1,6 @@
 # hardware/
 
-Gerber terbaru (3 Okt 2026), diekspor dari EasyEDA Pro, DRC 0 error:
+PERHATIAN: Gerber di sini belum boleh dipesan, lihat gerber/README.md dan docs/AUDIT_V2.md. (Teks lama di bawah, usang:)
 - `gerber/Gerber_PCB1_2026-10-03.zip`  Vest Node (ESP32 DevKitC V4, 107,95 x 95,25 mm)
 - `gerber/Gerber_PCB3_2026-10-03.zip`  Edge Gateway (ESP32 DevKitC V4)
 
