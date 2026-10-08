@@ -23,7 +23,7 @@ Pakai bersama [CHECKLIST_UJI_RAKIT.md](CHECKLIST_UJI_RAKIT.md). Setiap tahap pun
 - Opsional untuk uji gating: MOSFET P-channel logic-level (mis. AO3401A di adapter SOT-23) dan 2N7000
 
 **Helmet**
-- ESP32-C3 SuperMini, CR2032 + holder, saklar geser, modul TTP223, tact switch, resistor 100 k, 10 µF dan 100 µF
+- ESP32-C3 SuperMini, LiPo 3,7 V berproteksi (±400-500 mAh) + modul TP4056 USB-C, saklar geser, modul TTP223, tact switch, resistor 100 k, 10 µF dan 100 µF
 
 **Gateway**
 - ESP32-DevKitC V4, modul LoRa + antena, modul microSD (SPI), kartu microSD (FAT32)
@@ -148,12 +148,13 @@ python -m platformio device monitor
 |---|---|---|
 | Sensor sentuh | **GPIO2** | OUT TTP223 (aktif-HIGH) |
 | Tombol on/off | **GPIO4** | tact → GND, pull-up 100 k ke 3V3 |
-| 3V3 | pin 3V3 | `+` dari CR2032 lewat saklar geser, 10 µF + 100 µF ke GND |
+| Daya masuk | pin **5V** | LiPo `+` > TP4056 `B+`; TP4056 `OUT+` > saklar geser > pin 5V SuperMini (net `VBAT_SW`). Jangan ke pin 3V3 (4,2 V terlalu tinggi) |
+| 3V3 | pin 3V3 (output) | catu TTP223, 10 µF + 100 µF ke GND |
 | GND | GND | `−` CR2032, TTP223 GND |
 | TTP223 VCC | 3V3 | |
 
-- **Aturan keras:** saat SuperMini dicolok USB, **saklar geser OFF** dan CR2032 terlepas atau saklar OFF. Kalau tidak, regulator board bisa mengisi baterai primer.
-- Upload dengan USB dan baterai dilepas:
+- **Daya:** baterai masuk lewat pin 5V (bukan 3V3). Cek di board fisik bahwa pin 5V melewati regulator 3,3 V dan ada dioda ke VBUS; ukur 3V3 = 3,3 V dengan baterai 3,3-4,2 V. Isi baterai lewat USB-C TP4056, bukan lewat USB SuperMini.
+- Upload lewat USB SuperMini (saklar geser OFF supaya aman):
 ```
 cd firmware/helmet_node
 python -m platformio run -t upload

@@ -52,8 +52,9 @@ Firmware: `firmware/vest_node`, `firmware/helmet_node`, `firmware/gateway` (buil
 - [ ] Paket asing (kirim string acak dari modul lain) diabaikan (`bad_packet`).
 
 ## 5. Helmet
-- [ ] Setel dan ukur 3V0_HELMET dari CR2032 saat SAW1 ON: ____ V (CR2032 baru ≈ 3,0).
-- [ ] **JANGAN colok USB** SuperMini saat CR2032 terpasang dan SAW1 ON. Untuk programming: SAW1 OFF atau lepas baterai.
+- [ ] LiPo + TP4056: ukur `VBAT_SW` (setelah saklar) ≈ tegangan baterai ____ V; ukur 3V3 output SuperMini = ____ V (harus 3,3 V, di baterai 3,3-4,2 V).
+- [ ] Cek di board SuperMini: pin 5V melewati regulator (jangan memberi 4,2 V ke pin 3V3). Colok USB SuperMini sambil baterai terpasang: tidak ada arus balik ke USB (ukur arus), tidak ada panas.
+- [ ] Isi baterai lewat TP4056 USB-C: LED charging menyala, suhu normal.
 - [ ] Upload `helmet_node`. Serial: `helm dipakai=0`.
 - [ ] Sentuh sensor TTP223: setelah 2 siklus (≈ 8–16 s) `helm dipakai=1`. Lepas: berubah ke 0 setelah 3 siklus.
 - [ ] Tombol GPIO4: tekan = OFF (tidur tanpa timer), tekan lagi = ON.
