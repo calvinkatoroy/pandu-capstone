@@ -22,11 +22,13 @@ constexpr int PIN_LORA_CS = 5, PIN_LORA_RST = 25, PIN_LORA_DIO0 = 26;
 
 // ---- Parameter (KALIBRASI) ----
 constexpr long LORA_FREQ       = 915E6;   // modul dibeli 915 MHz (regulasi ID 920-923 MHz)
-constexpr float FREEFALL_G     = 0.4f;    // |a| di bawah ini = jatuh bebas
+constexpr float FREEFALL_G     = 0.6f;    // |a| di bawah ini = jatuh bebas (tes nyata: terbaca 0,3-0,5 g karena offset sensor)
 constexpr uint32_t FREEFALL_MS = 120;
 constexpr float IMPACT_G       = 2.5f;    // benturan setelah jatuh bebas
 constexpr uint32_t IMPACT_WIN  = 1000;    // jendela benturan setelah free-fall
+constexpr uint32_t MOB_WINDOW_MS = 60000;   // MOB = jatuh DAN basah dalam jendela ini setelah jatuh
 constexpr uint32_t WATER_MS    = 3000;    // sensor air harus aktif sebanyak ini = MOB
+constexpr int WATER_WET_MV     = 1000;    // KALIBRASI: sensor murah analog, kering 140-230 mV, basah 1700-2070 mV
 constexpr uint32_t SOS_HOLD_MS = 2000;
 constexpr uint32_t HEARTBEAT_MS = 30000;
 constexpr uint32_t ALERT_REPEAT_MS = 5000;
@@ -86,6 +88,8 @@ float accelG() {
 constexpr uint32_t HELM_TIMEOUT_MS = 30000;   // tidak terdengar > 30 s = helm tidak terjangkau (KALIBRASI)
 volatile uint32_t helmSeenAt = 0;             // millis() terakhir paket valid; 0 = belum pernah
 volatile uint8_t helmWorn = 0;
+constexpr int HELM_RSSI_MIN = -85;            // KALIBRASI: RSSI (dBm, dirata-rata) minimum agar worn=1 dihitung "dipakai"; lebih lemah = helm jauh = tidak dipakai
+volatile float helmRssi = -127;               // rata-rata bergerak RSSI paket helm (EMA)
 
 class HelmCb : public NimBLEAdvertisedDeviceCallbacks {
   void onResult(NimBLEAdvertisedDevice *d) override {
@@ -93,6 +97,7 @@ class HelmCb : public NimBLEAdvertisedDeviceCallbacks {
     std::string m = d->getManufacturerData();
     if (m.size() >= 5 && (uint8_t)m[0] == 0xFF && (uint8_t)m[1] == 0xFF && m[2] == 'P' && m[3] == 'H') {
       helmWorn = (uint8_t)m[4] ? 1 : 0;
+      helmRssi = helmSeenAt ? helmRssi * 0.8f + d->getRSSI() * 0.2f : d->getRSSI();   // RSSI BLE naik-turun +-10 dB: dirata-ratakan
       helmSeenAt = millis() ? millis() : 1;
     }
   }
@@ -114,7 +119,7 @@ void helmScanStop() { NimBLEDevice::getScan()->stop(); NimBLEDevice::deinit(true
 // 1 = dipakai, 0 = terdengar tapi tidak dipakai, 2 = tidak terjangkau
 int helmState() {
   if (!helmSeenAt || millis() - helmSeenAt > HELM_TIMEOUT_MS) return 2;
-  return helmWorn;
+  return helmWorn && helmRssi >= HELM_RSSI_MIN;   // dipakai = sentuh terdeteksi DAN dekat
 }
 
 // ---- Baterai ----
@@ -127,12 +132,14 @@ int batMilliVolts() {  // rata-rata 8 sampel, analogReadMilliVolts memakai kalib
 // ---- LoRa ----
 void sendPkt(const char *type) {
   while (gpsSerial.available()) gps.encode(gpsSerial.read());
+  static double lastLat, lastLon; static uint32_t lastFixAt = 0;  // posisi valid terakhir (RAM, hilang saat deep sleep)
+  if (gps.location.isValid() && gps.location.age() < 3000) { lastLat = gps.location.lat(); lastLon = gps.location.lng(); lastFixAt = millis() ? millis() : 1; }
   char buf[120];
-  int bat = batMilliVolts();  // format: PANDU,V1,<jenis>,<lat>,<lon>,<mV baterai>,<helm 0/1/2>
-  if (gps.location.isValid())
-    snprintf(buf, sizeof buf, "PANDU,V1,%s,%.6f,%.6f,%d,%d", type, gps.location.lat(), gps.location.lng(), bat, helmState());
+  int bat = batMilliVolts();  // format: PANDU,V1,<jenis>,<lat>,<lon>,<mV baterai>,<helm 0/1/2>,<usia posisi detik; 0 = baru>
+  if (lastFixAt)
+    snprintf(buf, sizeof buf, "PANDU,V1,%s,%.6f,%.6f,%d,%d,%lu", type, lastLat, lastLon, bat, helmState(), (unsigned long)((millis() - lastFixAt) / 1000));
   else
-    snprintf(buf, sizeof buf, "PANDU,V1,%s,NOFIX,NOFIX,%d,%d", type, bat, helmState());
+    snprintf(buf, sizeof buf, "PANDU,V1,%s,NOFIX,NOFIX,%d,%d,0", type, bat, helmState());
   Serial.println(buf);
   if (!loraOk) return;
   LoRa.beginPacket(); LoRa.print(buf); LoRa.endPacket();
@@ -155,9 +162,12 @@ Alert detectFall() {  // free-fall >= FREEFALL_MS lalu benturan dalam IMPACT_WIN
   if (ffEnd && now - ffEnd >= IMPACT_WIN) ffEnd = 0;
   return NONE;
 }
-Alert detectMob() {  // sensor air aktif kontinu WATER_MS (anti-percikan)
+bool waterWet() { return analogReadMilliVolts(PIN_WATER) > WATER_WET_MV; }
+uint32_t fallAt = 0;  // millis() jatuh terakhir; 0 = belum pernah
+Alert detectMob() {  // MOB = jatuh DAN sensor air aktif kontinu WATER_MS dalam MOB_WINDOW_MS setelah jatuh (basah saja tanpa jatuh = bukan alarm)
   static uint32_t since = 0;
-  if (digitalRead(PIN_WATER)) { if (!since) since = millis(); return millis() - since >= WATER_MS ? MOB : NONE; }
+  if (!fallAt || millis() - fallAt > MOB_WINDOW_MS) { since = 0; return NONE; }
+  if (waterWet()) { if (!since) since = millis(); return millis() - since >= WATER_MS ? MOB : NONE; }
   since = 0; return NONE;
 }
 Alert detectSos() {
@@ -173,6 +183,7 @@ void setup() {
   pinMode(PIN_PWR_BTN, INPUT_PULLUP);
   pinMode(PIN_SOS, INPUT);  // pull-down eksternal R2
   pinMode(PIN_WATER, INPUT);
+  analogSetPinAttenuation(PIN_WATER, ADC_11db);
   analogSetPinAttenuation(PIN_BAT, ADC_11db);  // 0-3,1 V; baterai 4,2 V / 2 = 2,1 V
   while (digitalRead(PIN_PWR_BTN) == LOW) delay(10);   // abaikan tekanan yang membangunkan
   gpsPower(true); xkcPower(true);
@@ -196,14 +207,23 @@ void loop() {
   Alert a = detectSos();
   if (a == NONE) a = detectMob();
   if (a == NONE && mpuOk) a = detectFall();
+  if (a == FALL) fallAt = millis() ? millis() : 1;
   if (a != NONE) { if (a != active) { repeatsLeft = (a == SOS ? 3 : 2); lastSend = millis() - ALERT_REPEAT_MS; } active = a; }  // alert baru: kirim segera
 
   uint32_t now = millis();
   if (active != NONE && now - lastSend >= ALERT_REPEAT_MS) {
     sendPkt(alertName[active]); lastSend = now;
     if (repeatsLeft > 0) repeatsLeft--;
-    bool still = (active == SOS && digitalRead(PIN_SOS) == HIGH) || (active == MOB && digitalRead(PIN_WATER));
+    bool still = (active == SOS && digitalRead(PIN_SOS) == HIGH) || (active == MOB && waterWet());
     if (repeatsLeft == 0 && !still) active = NONE;  // berhenti setelah kirim ulang & kondisi berakhir
+  }
+  static uint32_t lastStat = 0;   // ringkasan status untuk demo/serial monitor
+  if (now - lastStat >= 2000) {
+    lastStat = now;
+    uint32_t left = (fallAt && now - fallAt <= MOB_WINDOW_MS) ? (MOB_WINDOW_MS - (now - fallAt)) / 1000 : 0;
+    Serial.printf("[status] helm=%d rssi=%d dBm | air=%s (%d mV) | jendela MOB=%lus | gps=%s sat=%d | g=%.2f\n", helmState(), (int)helmRssi,
+                  waterWet() ? "ADA AIR" : "kering", analogReadMilliVolts(PIN_WATER), (unsigned long)left,
+                  gps.location.isValid() ? "FIX" : "NOFIX", gps.satellites.isValid() ? (int)gps.satellites.value() : 0, mpuOk ? accelG() : 0.0f);
   }
   if (now - lastBeat >= HEARTBEAT_MS) { sendPkt("HB"); lastBeat = now; }
   delay(10);

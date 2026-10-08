@@ -5,6 +5,25 @@ Pakai bersama [CHECKLIST_UJI_RAKIT.md](CHECKLIST_UJI_RAKIT.md). Setiap tahap pun
 
 > **Penting.** Nomor pin modul di bawah memakai **label yang tercetak di modul**, bukan nomor pin footprint EasyEDA. Selalu baca label di modul fisik kamu. Kalau tidak cocok dengan tabel, **berhenti dan catat**: itu temuan yang harus diperbaiki di PCB.
 
+## Jalur cepat: prototipe hanya dengan bahan BOM (tanpa boost, MOSFET, LiPo)
+Untuk bukti konsep sebelum belanja tambahan. Firmware tidak diubah. Lewati bagian yang disebut "lewati".
+Butuh tambahan murah: 2 resistor 10 k (SOS), beberapa jumper, 1 LED + resistor 330 Ω.
+
+**Vest**: daya dari **power bank lewat micro-USB DevKit** (lewati 2.1, 2.2, 2.3, 2.9; tanpa baterai, boost, SS14, TP4056).
+- MPU6050 (2.5), GPS langsung ke 3V3 (2.6), LoRa + antena pegas bawaan (2.7), tombol power IO13 dan SOS IO27 (2.8) tetap sama.
+- IO4 dan IO32 dibiarkan kosong (firmware tetap jalan, GPS selalu hidup).
+- **Sensor air murah**: pinnya biasanya analog, bukan HIGH/LOW bersih. Untuk uji MOB, sambungkan IO34 ke 3V3 pakai jumper selama 3 detik (= basah), lepas (= kering); tambah resistor 10 k IO34 ke GND supaya tidak mengambang. Pakai sensor asli hanya setelah diukur: tegangan pin S saat basah harus > ±2 V.
+- Angka baterai (mV) di paket tidak berarti tanpa baterai/pembagi; abaikan.
+
+**Gateway**: daya dari adaptor 5 V lewat micro-USB DevKit. Pin LoRa dan SD sesuai tabel di bagian 3.
+- Lewati IRLZ44N dan sirine. Pengganti: **IO4 → LED + 330 Ω → GND** (LED nyala = sirine ON). Jangan sambungkan sirine 85 dB langsung ke pin.
+
+**Helmet**: daya dari **USB SuperMini** (lewati LiPo, TP4056, saklar; CR2032 tidak kuat untuk BLE). TTP223 VCC → 3V3, OUT → GPIO2, tombol GPIO4 ke GND (pull-up internal sudah ada).
+- Pada C3 dengan USB, serial putus-sambung tiap siklus deep sleep (8 s). Normal; buka ulang monitor atau baca lewat paket Vest.
+
+**Urutan uji**: Gateway sendiri (`lora":1,"sd":1`) → Vest sendiri (`MPU=1 LoRa=1`) → heartbeat Vest ke Gateway → SOS (LED Gateway menyala) → jatuh dan MOB → Helmet (`helm` di paket berubah `2 → 0 → 1`).
+Yang **belum** terbukti dengan jalur ini: daya baterai Vest, gating GPS/XKC, siren daya penuh, helm dengan baterai.
+
 ## 0. Keselamatan dan aturan
 1. Baterai 18650 **harus berproteksi** (ada PCB proteksi) atau lewat TP4056 modul berproteksi (DW01). Jangan pernah korsleting baterai. Pasang sekring/polyfuse kalau ada.
 2. **Jangan transmit LoRa tanpa antena** (merusak chip RF). Pasang antena sebelum upload firmware yang memanggil `LoRa.begin`.
@@ -185,4 +204,5 @@ Setiap kali pinout/ukuran modul tidak cocok dengan skematik, tulis di sini lalu 
 
 | Modul | Temuan | Dampak PCB |
 |---|---|---|
-| | | |
+| LoRa XL1276-P01 (chip SX1276) | Dari foto sisi pad: kolom kiri atas ke bawah `DIO2, DIO1, DIO0, VCC, DIO4, DIO3, GND, ANT`; kolom kanan `GND, MISO, MOSI, SCK, NSS, REST, DIO5, GND`. Urutan ini = pinout **RFM95**, bukan RA-02 (RA-02: 1 ANT, 2 GND, 3 3,3V, 4 RST, 5 DIO0, ... 15 NSS). | Footprint `WIRELM-SMD_RA-02-BL` di PCB1/PCB3 **tidak cocok** dengan modul ini. Ganti footprint ke RFM95 (atau beli Ra-01H) sebelum order PCB. Cek juga jarak antar deret pad. |
+| LoRa XL1276-P01 | Di foto sisi pad, kotak pita frekuensi (915M/868M/433M/315M/169M) yang terisi/ditandai hitam adalah **868M**. Belum dicek di modul fisik. | Kalau modul fisik juga 868M, matching RF-nya untuk 868 MHz, bukan 915/920 MHz. Cek modul dan listing. |

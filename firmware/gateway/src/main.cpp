@@ -1,6 +1,6 @@
 // PANDU Edge Gateway: ESP32-DevKitC V4. Terima paket LoRa dari Vest, bunyikan sirine, log ke SD, keluarkan JSON ke serial.
 // Pin (PCB3 v2): LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SPI=IO23/19/18, SD_CS=IO13, SIREN_DRV=IO4 (HIGH = sirine ON via IRLZ44N).
-// Paket Vest: PANDU,V1,<jenis>,<lat>,<lon>,<mV>,<helm>   jenis: SOS|MOB|FALL|HB   helm: 1 dipakai, 0 tidak, 2 tidak terjangkau
+// Paket Vest: PANDU,V1,<jenis>,<lat>,<lon>,<mV>,<helm>[,<usia posisi detik>]   jenis: SOS|MOB|FALL|HB   helm: 1 dipakai, 0 tidak, 2 tidak terjangkau
 #include <Arduino.h>
 #include <SPI.h>
 #include <LoRa.h>
@@ -17,7 +17,7 @@ uint32_t lastAlertAt = 0, lastRxAt = 0, sirenPhaseAt = 0;
 uint32_t rxCount = 0;
 bool lostReported = false;
 
-struct Pkt { char type[8]; char lat[16]; char lon[16]; int mv; int helm; int rssi; float snr; };
+struct Pkt { char type[8]; char lat[16]; char lon[16]; int mv; int helm; int age; int rssi; float snr; };
 
 bool parse(const String &s, Pkt &p) {
   char buf[128];
@@ -30,6 +30,7 @@ bool parse(const String &s, Pkt &p) {
   strlcpy(p.lon, tok[4], sizeof p.lon);
   p.mv = atoi(tok[5]);
   p.helm = atoi(tok[6]);
+  p.age = n > 7 ? atoi(tok[7]) : 0;               // usia posisi (detik); 0 = baru atau tidak ada
   return true;
 }
 
@@ -48,7 +49,7 @@ void logSd(const Pkt &p) {
   if (!sdOk) return;
   File f = SD.open("/pandu.csv", FILE_APPEND);
   if (!f) return;
-  f.printf("%lu,%s,%s,%s,%d,%d,%d,%.1f\n", millis(), p.type, p.lat, p.lon, p.mv, p.helm, p.rssi, p.snr);
+  f.printf("%lu,%s,%s,%s,%d,%d,%d,%d,%.1f\n", millis(), p.type, p.lat, p.lon, p.mv, p.helm, p.age, p.rssi, p.snr);
   f.close();
 }
 
@@ -63,7 +64,7 @@ void setup() {
   LoRa.setPins(PIN_LORA_CS, PIN_LORA_RST, PIN_LORA_DIO0);
   loraOk = LoRa.begin(LORA_FREQ);
   sdOk = SD.begin(PIN_SD_CS);
-  if (sdOk) { File f = SD.open("/pandu.csv", FILE_APPEND); if (f) { if (f.size() == 0) f.println("ms,type,lat,lon,bat_mv,helm,rssi,snr"); f.close(); } }
+  if (sdOk) { File f = SD.open("/pandu.csv", FILE_APPEND); if (f) { if (f.size() == 0) f.println("ms,type,lat,lon,bat_mv,helm,pos_age_s,rssi,snr"); f.close(); } }
   Serial.printf("{\"boot\":true,\"lora\":%d,\"sd\":%d}\n", loraOk, sdOk);
   lastRxAt = millis();
 }
@@ -77,8 +78,8 @@ void loop() {
     Pkt p; p.rssi = LoRa.packetRssi(); p.snr = LoRa.packetSnr();
     if (parse(s, p)) {
       rxCount++; lastRxAt = now; lostReported = false;
-      Serial.printf("{\"type\":\"%s\",\"lat\":\"%s\",\"lon\":\"%s\",\"bat_mv\":%d,\"helm\":%d,\"rssi\":%d,\"snr\":%.1f}\n",
-                    p.type, p.lat, p.lon, p.mv, p.helm, p.rssi, p.snr);
+      Serial.printf("{\"type\":\"%s\",\"lat\":\"%s\",\"lon\":\"%s\",\"bat_mv\":%d,\"helm\":%d,\"pos_age_s\":%d,\"rssi\":%d,\"snr\":%.1f}\n",
+                    p.type, p.lat, p.lon, p.mv, p.helm, p.age, p.rssi, p.snr);
       logSd(p);
       if (isAlert(p.type)) { lastAlertAt = now; strlcpy(activeKind, p.type, sizeof activeKind) ; }
     } else Serial.printf("{\"ignored\":\"bad_packet\",\"rssi\":%d}\n", p.rssi);

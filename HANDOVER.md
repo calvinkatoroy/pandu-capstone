@@ -54,7 +54,7 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 ## Pemetaan pin final
 - Vest (U3 DevKitC): PWR_BTN=IO13, BTN_SOS=IO27, WATER_SIG=IO34, GPS_EN=IO4, **XKC_EN=IO32** (bukan IO2, strapping), SPI MOSI/MISO/SCK=IO23/19/18, LORA_CS=IO5, LORA_RST=IO25, LORA_DIO0=IO26, I2C SDA/SCL=IO21/22, GPS RX/TX=IO17/16.
 - Gateway (U5 DevKitC): SPI IO23/19/18, LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SD_CS=IO13, SIREN_DRV=IO4, 3V3 dan 5V_SYS dari/ke pin DevKit.
-- Modul baru yang akan dibeli (kata Calvin): XKC-Y25, boost 5 V; sebaiknya LoRa tipe Ra-02 agar footprint cocok.
+- Modul baru yang akan dibeli (kata Calvin): XKC-Y25, boost 5 V; CATATAN KOREKSI: RA-02 itu SX1278 (433 MHz), BUKAN 915 MHz. Footprint "RA-02" di PCB hanya mewakili pinout 16 pin 2 mm. Untuk 915 MHz pakai modul SX1276 (mis. Ra-01H atau RFM95W) dan cek pinout + jarak antar deret pad terhadap footprint, bukan membeli RA-02.
 
 ## Update 3 Okt 2026 (akhir sesi lokal)
 - Gerber ketiga board baru ada di `hardware/gerber/` (DRC 0 error). PCB1: TP4056 diputar 180 (USB-C ke dinding kiri). PCB2: +C2 100 uF tantalum.
@@ -95,3 +95,13 @@ Firmware: SOS bangun dari sleep dan langsung kirim (3x ulang), alert baru dikiri
 
 ## PCB2 v2.1 (8 Okt 2026): Helmet pakai LiPo + TP4056 (keputusan Calvin)
 CR2032 dan holder dihapus. Rangkaian: LiPo (header H2 2-pin, `VBAT_POS`/GND) > modul TP4056 USB-C berproteksi (U7, OUT+ = `VBAT_RAW`) > saklar geser SAW1 > `VBAT_SW` > pin **5V** SuperMini (regulator onboard 3,3 V). 3V3 dari board memberi daya TTP223 (net `3V0_HELMET`, sebenarnya 3,3 V). Tombol tact GPIO4 dan sensor sentuh GPIO2 tidak berubah. Outline diperpanjang jadi 1245 x 3900 mil. DRC 0, tanpa ratline. Gerber: `hardware/gerber/Gerber_PCB2_2026-10-08.zip` (menggantikan versi 6 Okt). Netlist `PCB2.tel` diperbarui. USB SuperMini aman dicolok bersama baterai karena baterai masuk lewat pin 5V (diode onboard SuperMini ke VBUS harus diverifikasi di board fisik). Belum: casing Helmet, cek apakah pin 5V SuperMini benar-benar lewat LDO (bukan terhubung langsung ke 3V3), arus TP4056 saat beban.
+
+
+## Temuan modul LoRa (foto pad, 8 Okt 2026)
+- Modul XL1276-P01 (SX1276) berpinout **RFM95**, bukan RA-02: footprint PCB1/PCB3 (`WIRELM-SMD_RA-02-BL`) tidak cocok. Pinout dari foto: kiri atas-bawah DIO2, DIO1, DIO0, VCC, DIO4, DIO3, GND, ANT; kanan GND, MISO, MOSI, SCK, NSS, REST, DIO5, GND.
+- Kotak pita frekuensi di foto menandai **868M** (belum dicek di modul fisik). Firmware memakai 915 MHz.
+- Tindakan: ganti footprint ke RFM95 di EasyEDA (PCB1 dan PCB3) dan netlist ulang; cek pita 868/915 pada modul; jangan order PCB sebelum itu.
+
+
+## Koreksi desain Helmet (8 Okt 2026)
+Deteksi helm TIDAK memakai sensor sentuh. Alur: tombol ON/OFF di Helmet (GPIO4) -> Helmet menyiarkan BLE `PANDU-HELM` -> Vest menilai dekat/jauh dari RSSI (`HELM_RSSI_MIN`, default -85 dBm, dikalibrasi). Field helm di paket LoRa: 1 = beacon terdengar dan dekat, 0 = terdengar tapi jauh, 2 = tidak terdengar (OFF atau jauh > 30 s). Firmware `helmet_node` sudah disederhanakan (tanpa TTP223/GPIO2). TODO PCB2: hapus TTP223 (H1), net `TOUCH_SIG`, dan ganti `SAW1` (salah, bukan saklar). Catatan: checklist dan tutorial breadboard masih menyebut sensor sentuh; abaikan bagian itu.
