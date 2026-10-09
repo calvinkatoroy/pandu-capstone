@@ -6,9 +6,11 @@
 // (dengan BLE) tidak tersedia. Pengganti: duty-cycle deep sleep. Tiap WAKE_PERIOD_S detik bangun,
 // siaran BLE singkat (ADV_BURST_MS), lalu deep sleep lagi. State ON/OFF disimpan di memori RTC.
 // Tombol (GPIO4) = toggle ON/OFF: bangun dari tidur kapan saja; OFF = tidur tanpa timer (tidak menyiarkan = Vest menilai "tidak terjangkau").
+// #define TEST_BEACON
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 #include "esp_sleep.h"
+#include "driver/gpio.h"  // <--- TAMBAHKAN INI UNTUK MENGONTROL PIN
 
 constexpr int PIN_PWR   = 4;                       // GPIO0-5 bisa wake deep sleep di C3
 constexpr uint32_t WAKE_PERIOD_S = 8;              // KALIBRASI: makin kecil makin responsif, makin boros
@@ -62,10 +64,17 @@ void loop() {
   }
   delay(20);
 }
+
 #else
 void sleepNow(bool withTimer) {
   while (digitalRead(PIN_PWR) == LOW) delay(10);   // tunggu tombol dilepas agar tidak langsung bangun
   delay(50);
+  
+  // KUNCI PERBAIKAN: Paksa internal pull-up tetap menyala & ditahan selama tidur
+  gpio_pullup_en((gpio_num_t)PIN_PWR);
+  gpio_hold_en((gpio_num_t)PIN_PWR);
+  gpio_deep_sleep_hold_en();
+
   esp_deep_sleep_enable_gpio_wakeup(1ULL << PIN_PWR, ESP_GPIO_WAKEUP_GPIO_LOW);
   if (withTimer) esp_sleep_enable_timer_wakeup((uint64_t)WAKE_PERIOD_S * 1000000ULL);
   esp_deep_sleep_start();
@@ -86,6 +95,9 @@ void advertiseBurst() {
 
 void setup() {
   Serial.begin(115200);
+  
+  // Lepas status "hold" (tahan) saat bangun agar pin bisa dibaca normal oleh sistem
+  gpio_hold_dis((gpio_num_t)PIN_PWR); 
   pinMode(PIN_PWR, INPUT_PULLUP);
 
   if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_GPIO) {   // tombol ditekan: toggle ON/OFF
