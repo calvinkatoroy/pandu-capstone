@@ -56,7 +56,7 @@ void xkcPower(bool on) { pinMode(PIN_XKC_EN, OUTPUT); digitalWrite(PIN_XKC_EN, o
 void goToSleep() {
   Serial.println("Sleep...");
   gpsPower(false); xkcPower(false);
-  helmScanStop();
+  NimBLEDevice::getScan()->stop();   // tanpa deinit: deinit(true) crash (PC=0) di NimBLE 1.4.3, deep sleep me-reset radio sendiri
   if (loraOk) LoRa.sleep();
   while (digitalRead(PIN_PWR_BTN) == LOW || digitalRead(PIN_SOS) == HIGH) delay(10);   // tunggu lepas agar tidak langsung bangun
   delay(50);
@@ -193,13 +193,19 @@ void setup() {
   analogSetPinAttenuation(PIN_WATER, ADC_11db);
   analogSetPinAttenuation(PIN_BAT, ADC_11db);  // 0-3,1 V; baterai 4,2 V / 2 = 2,1 V
   while (digitalRead(PIN_PWR_BTN) == LOW) delay(10);   // abaikan tekanan yang membangunkan
+  Serial.println("[1] gpio ok");
   gpsPower(true); xkcPower(true);
+  Serial.println("[2] gps+xkc power on");
   gpsSerial.begin(9600, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
   Wire.begin(PIN_SDA, PIN_SCL);
+  Serial.println("[3] i2c");
   mpuOk = mpuInit();
+  Serial.println("[4] mpu done");
   LoRa.setPins(PIN_LORA_CS, PIN_LORA_RST, PIN_LORA_DIO0);
   loraOk = LoRa.begin(LORA_FREQ);
+  Serial.println("[5] lora done");
   helmScanStart();
+  Serial.println("[6] ble scan on");
   sosWake = esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1;
   Serial.printf("Boot: MPU=%d LoRa=%d wake=%s\n", mpuOk, loraOk, sosWake ? "SOS" : "other");
 }
