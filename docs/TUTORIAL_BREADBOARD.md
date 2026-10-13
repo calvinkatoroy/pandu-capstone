@@ -10,18 +10,18 @@ Untuk bukti konsep sebelum belanja tambahan. Firmware tidak diubah. Lewati bagia
 Butuh tambahan murah: 2 resistor 10 k (SOS), beberapa jumper, 1 LED + resistor 330 Ω.
 
 **Vest**: daya dari **power bank lewat micro-USB DevKit** (lewati 2.1, 2.2, 2.3, 2.9; tanpa baterai, boost, SS14, TP4056).
-- MPU6050 (2.5), GPS langsung ke 3V3 (2.6), LoRa + antena pegas bawaan (2.7), tombol power IO13 dan SOS IO27 (2.8) tetap sama.
+- MPU6050 (2.5), GPS langsung ke 3V3 (2.6), LoRa Ra-02 433 MHz + antena pegas U.fl (2.7), tombol power IO13 dan SOS IO27 (2.8) tetap sama.
 - IO4 dan IO32 dibiarkan kosong (firmware tetap jalan, GPS selalu hidup).
-- **Sensor air murah**: pinnya biasanya analog, bukan HIGH/LOW bersih. Untuk uji MOB, sambungkan IO34 ke 3V3 pakai jumper selama 3 detik (= basah), lepas (= kering); tambah resistor 10 k IO34 ke GND supaya tidak mengambang. Pakai sensor asli hanya setelah diukur: tegangan pin S saat basah harus > ±2 V.
+- **Sensor air**: untuk uji MOB tanpa sensor, sambungkan IO34 ke 3V3 pakai jumper selama 3 detik (= basah), lepas (= kering); tambah resistor 10 k IO34 ke GND supaya tidak mengambang. XKC-Y25-V (digital, 5 V): ukur OUT dulu dan pakai pembagi 10 k/20 k (bagian 2.8), jangan langsung ke IO34.
 - Angka baterai (mV) di paket tidak berarti tanpa baterai/pembagi; abaikan.
 
 **Gateway**: daya dari adaptor 5 V lewat micro-USB DevKit. Pin LoRa dan SD sesuai tabel di bagian 3.
 - Lewati IRLZ44N dan sirine. Pengganti: **IO4 → LED + 330 Ω → GND** (LED nyala = sirine ON). Jangan sambungkan sirine 85 dB langsung ke pin.
 
-**Helmet**: daya dari **USB SuperMini** (lewati LiPo, TP4056, saklar; CR2032 tidak kuat untuk BLE). TTP223 VCC → 3V3, OUT → GPIO2, tombol GPIO4 ke GND (pull-up internal sudah ada).
+**Helmet**: daya dari **USB SuperMini** (lewati LiPo, TP4056, saklar). Tanpa sensor sentuh. Tombol GPIO4 ke GND (pull-up internal sudah ada); untuk demo pakai env `supermini_test` (beacon terus-menerus, serial hidup).
 - Pada C3 dengan USB, serial putus-sambung tiap siklus deep sleep (8 s). Normal; buka ulang monitor atau baca lewat paket Vest.
 
-**Urutan uji**: Gateway sendiri (`lora":1,"sd":1`) → Vest sendiri (`MPU=1 LoRa=1`) → heartbeat Vest ke Gateway → SOS (LED Gateway menyala) → jatuh dan MOB → Helmet (`helm` di paket berubah `2 → 0 → 1`).
+**Urutan uji**: Gateway sendiri (`lora":1,"sd":1`) → Vest sendiri (`MPU=1 LoRa=1`) → heartbeat Vest ke Gateway → SOS (LED Gateway menyala) → jatuh dan MOB → Helmet (`helm` di paket berubah `2 → 1` saat beacon ON dan helm didekatkan).
 Yang **belum** terbukti dengan jalur ini: daya baterai Vest, gating GPS/XKC, siren daya penuh, helm dengan baterai.
 
 ## 0. Keselamatan dan aturan
@@ -37,15 +37,15 @@ Yang **belum** terbukti dengan jalur ini: daya baterai Vest, gating GPS/XKC, sir
 - ESP32-DevKitC V4, breadboard besar, kabel jumper M-M / M-F
 - Baterai 18650 + holder, modul TP4056 (USB-C, berproteksi), modul boost MT3608
 - Dioda SS14 (atau 1N5819), kapasitor 100 µF tantalum/elko, 100 nF
-- GY-521 (MPU6050), GPS NEO-6M, modul LoRa (+ adapter 2 mm ke 2,54 mm) + antena
-- XKC-Y25 (air), tact switch 2 buah (power dan SOS), resistor 10 k, 100 k (2 buah untuk pembagi baterai + 1 pull), 100 k
+- GY-521 (MPU6050), GPS NEO-6M, modul LoRa Ra-02 SX1278 433 MHz (breakout 2,54 mm) + antena pegas 433 MHz U.fl
+- XKC-Y25-V (air, kabel XH 4 pin), tact switch 2 buah (power dan SOS), resistor 10 k (2 buah: 1 pembagi XKC, 1 pull SOS), 20 k (pembagi XKC), 100 k (2 buah untuk pembagi baterai + 1 pull)
 - Opsional untuk uji gating: MOSFET P-channel logic-level (mis. AO3401A di adapter SOT-23) dan 2N7000
 
 **Helmet**
-- ESP32-C3 SuperMini, LiPo 3,7 V berproteksi (±400-500 mAh) + modul TP4056 USB-C, saklar geser, modul TTP223, tact switch, resistor 100 k, 10 µF dan 100 µF
+- ESP32-C3 SuperMini, LiPo 3,7 V berproteksi (±400-500 mAh) + modul TP4056 USB-C, saklar geser, tact switch, resistor 100 k, 10 µF dan 100 µF (tanpa sensor sentuh TTP223: sudah dibuang dari desain)
 
 **Gateway**
-- ESP32-DevKitC V4, modul LoRa + antena, modul microSD (SPI), kartu microSD (FAT32)
+- ESP32-DevKitC V4, modul LoRa Ra-02 SX1278 433 MHz + antena pegas 433 MHz, modul microSD (SPI), kartu microSD (FAT32)
 - IRLZ44N, resistor 220 Ω dan 100 k, sirine 5 V (atau LED + resistor 330 Ω untuk uji), kabel
 
 **Alat**: multimeter, kabel micro-USB data (bukan kabel charge-only), laptop dengan PlatformIO.
@@ -105,7 +105,7 @@ Lulus jika: serial tercetak `Boot: ...`. (MPU/LoRa=0 normal pada tahap ini karen
 | SPI SCK / MISO / MOSI | **IO18 / IO19 / IO23** | LoRa SCK / MISO / MOSI |
 | LoRa NSS (CS) | **IO5** | |
 | LoRa RESET | **IO25** | |
-| LoRa DIO0 | **IO26** | |
+| LoRa DIO0 | **IO26** | pin `DIO0` breakout; DIO1-5 tidak dipakai |
 
 ### 2.5 MPU6050 (GY-521)
 - VCC → 3V3, GND → GND, SCL → IO22, SDA → IO21.
@@ -145,12 +145,12 @@ Lihat tahap 2 pada [CHECKLIST_UJI_RAKIT.md](CHECKLIST_UJI_RAKIT.md): jatuh, MOB,
 
 | Fungsi | Pin DevKit | Ke |
 |---|---|---|
-| LoRa SCK / MISO / MOSI | **IO18 / IO19 / IO23** | modul LoRa SCK / MISO / MOSI |
-| LoRa NSS | **IO5** | |
-| LoRa RESET | **IO14** | (beda dengan Vest!) |
-| LoRa DIO0 | **IO26** | |
-| SD SCK / MISO / MOSI | IO18 / IO19 / IO23 | bus SPI **sama** dengan LoRa |
-| SD CS | **IO13** | + pull-up 10 k ke 3V3 |
+| LoRa SCK / MISO / MOSI | **IO18 / IO19 / IO23** | pin `SCK` / `MISO` / `MOSI` breakout Ra-02 |
+| LoRa NSS | **IO5** | pin `NSS` breakout |
+| LoRa RST | **IO14** | pin `RST` breakout (beda dengan Vest = IO25!) |
+| LoRa DIO0 | **IO26** | pin `DIO0` breakout; DIO1-5 tidak dipakai |
+| SD SCK / MISO / MOSI | **IO25 / IO35 / IO32** | bus SPI **terpisah** dari LoRa (PCB3 v3; MISO di IO35 input-only) |
+| SD CS | **IO33** | + pull-up 10 k ke 3V3 |
 | Sirine drive | **IO4** | → 220 Ω → gate IRLZ44N; gate → 100 k → GND |
 | 3V3 / GND | 3V3, GND | LoRa, SD |
 
@@ -163,18 +163,17 @@ cd firmware/gateway
 python -m platformio run -t upload
 python -m platformio device monitor
 ```
+- Antena U.fl terpasang sebelum menyala; 3V3 saja, jangan 5 V; 100 µF dekat modul LoRa. Frekuensi firmware 433E6 (sama dengan Vest).
 - Lulus jika: `{"boot":true,"lora":1,"sd":1}`. Kirim `M` di serial untuk mute.
 
 ## 4. Helmet
 
 | Fungsi | Pin SuperMini | Ke |
 |---|---|---|
-| Sensor sentuh | **GPIO2** | OUT TTP223 (aktif-HIGH) |
 | Tombol on/off | **GPIO4** | tact → GND, pull-up 100 k ke 3V3 |
 | Daya masuk | pin **5V** | LiPo `+` > TP4056 `B+`; TP4056 `OUT+` > saklar geser > pin 5V SuperMini (net `VBAT_SW`). Jangan ke pin 3V3 (4,2 V terlalu tinggi) |
-| 3V3 | pin 3V3 (output) | catu TTP223, 10 µF + 100 µF ke GND |
-| GND | GND | `−` CR2032, TTP223 GND |
-| TTP223 VCC | 3V3 | |
+| 3V3 | pin 3V3 (output) | 10 µF + 100 µF ke GND |
+| GND | GND | `−` baterai (via TP4056 `OUT−`) |
 
 - **Daya:** baterai masuk lewat pin 5V (bukan 3V3). Cek di board fisik bahwa pin 5V melewati regulator 3,3 V dan ada dioda ke VBUS; ukur 3V3 = 3,3 V dengan baterai 3,3-4,2 V. Isi baterai lewat USB-C TP4056, bukan lewat USB SuperMini.
 - Upload lewat USB SuperMini (saklar geser OFF supaya aman):
@@ -183,13 +182,16 @@ cd firmware/helmet_node
 python -m platformio run -t upload
 python -m platformio device monitor
 ```
-- Lulus jika: sentuh sensor → setelah 2 siklus (±8–16 s) `helm dipakai=1`; lepas → `0` setelah 3 siklus. Tombol: OFF/ON bergantian.
+- Tidak ada sensor sentuh. Helm menyiarkan beacon BLE selama ON; Vest menilai dekat/jauh dari RSSI (`helm` = 1 dekat, 0 jauh, 2 tidak terdengar).
+- Mode produk (default): deep sleep, bangun tiap 8 s dan siaran 400 ms. Mode demo: aktifkan env `supermini_test` (`TEST_BEACON`): siaran terus-menerus, serial hidup, tombol GPIO4 = ON/OFF.
+- Lulus jika: beacon ON dan helm di dekat Vest → serial Vest `helm=1`; jauhkan helm → `0`; tombol OFF atau matikan → `2` setelah 30 s. RSSI ambang -85 dBm belum dikalibrasi: catat nilai RSSI pada jarak dekat/jauh.
 - Ukur arus rata-rata dengan multimeter ampere seri dengan baterai.
 
 ## 5. Tautan Vest ↔ Gateway ↔ Helmet
 1. Nyalakan Gateway (serial terbuka). Nyalakan Vest. Tunggu `HB` (heartbeat 30 s) muncul di Gateway: `{"type":"HB",...,"rssi":-xx}`.
 2. Tekan SOS di Vest → sirine/LED Gateway menyala dalam < 2 detik, baris baru di `/pandu.csv`.
-3. Nyalakan Helmet dan sentuh sensor: field `helm` di paket Vest berubah `2 → 0 → 1` dalam ≤ 24 s.
+3. Nyalakan Helmet (beacon ON) dan dekatkan ke Vest: field `helm` berubah `2 → 1` (atau `0` bila terlalu jauh). Tombol OFF → `2` setelah 30 s.
+4. LoRa 433 MHz, antena terpasang di kedua sisi; catat `rssi` dan `snr` di JSON Gateway.
 
 ## 6. Troubleshooting singkat
 
