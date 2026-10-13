@@ -24,6 +24,13 @@ constexpr int PIN_GPS_TX   = 17;
 constexpr int PIN_SDA = 21, PIN_SCL = 22;
 constexpr int PIN_LORA_CS = 5, PIN_LORA_RST = 25, PIN_LORA_DIO0 = 26;
 
+// ---- Identitas paket (DATA_CONTRACT v2) ----
+#ifndef VEST_ID
+#define VEST_ID 1                         // 1-8, set per perangkat: build_flags = -DVEST_ID=2
+#endif
+RTC_DATA_ATTR uint16_t seqCounter = 0;    // nomor urut kejadian; bertahan lewat deep sleep, acak saat cold boot (lihat setup)
+uint16_t nextSeq() { return seqCounter++; }
+
 // ---- Parameter (KALIBRASI) ----
 constexpr long LORA_FREQ       = 433E6;   // Ra-02 SX1278 (410-525 MHz): TIDAK bisa 915/920. Harus sama dengan Gateway
 constexpr float FREEFALL_G     = 0.6f;    // |a| di bawah ini = jatuh bebas (tes nyata: terbaca 0,3-0,5 g karena offset sensor)
@@ -34,7 +41,8 @@ constexpr uint32_t MOB_WINDOW_MS = 60000;   // MOB = jatuh DAN basah dalam jende
 constexpr uint32_t WATER_MS    = 3000;    // sensor air harus aktif sebanyak ini = MOB
 constexpr int WATER_WET_MV     = 1000;    // KALIBRASI: sensor murah analog, kering 140-230 mV, basah 1700-2070 mV
 constexpr uint32_t SOS_HOLD_MS = 2000;
-constexpr uint32_t HEARTBEAT_MS = 30000;
+constexpr uint32_t HEARTBEAT_MS = 30000;   // + jitter acak +-HEARTBEAT_JITTER_MS agar beberapa Vest tidak bertabrakan
+constexpr uint32_t HEARTBEAT_JITTER_MS = 5000;
 constexpr uint32_t ALERT_REPEAT_MS = 5000;
 constexpr float BAT_DIV = 2.0f;     // KALIBRASI: faktor pembagi (cek dengan multimeter)
 constexpr uint8_t MPU = 0x68;
@@ -44,6 +52,7 @@ HardwareSerial gpsSerial(2);
 bool loraOk = false, mpuOk = false;
 
 void helmScanStop();  // didefinisikan di bagian Helm
+void sendPkt(const char *type, uint16_t seq);   // didefinisikan di bagian LoRa
 
 // ---- Power gating ----
 void gpsPower(bool on) {
@@ -55,6 +64,7 @@ void xkcPower(bool on) { pinMode(PIN_XKC_EN, OUTPUT); digitalWrite(PIN_XKC_EN, o
 // ---- Deep sleep ----
 void goToSleep() {
   Serial.println("Sleep...");
+  sendPkt("OFF", nextSeq());   // dimatikan sengaja: Gateway/dashboard menandai Nonaktif, bukan "tidak terjangkau"
   gpsPower(false); xkcPower(false);
   NimBLEDevice::getScan()->stop();   // tanpa deinit: deinit(true) crash (PC=0) di NimBLE 1.4.3, deep sleep me-reset radio sendiri
   if (loraOk) LoRa.sleep();
@@ -134,16 +144,16 @@ int batMilliVolts() {  // rata-rata 8 sampel, analogReadMilliVolts memakai kalib
 }
 
 // ---- LoRa ----
-void sendPkt(const char *type) {
+void sendPkt(const char *type, uint16_t seq) {
   while (gpsSerial.available()) gps.encode(gpsSerial.read());
   static double lastLat, lastLon; static uint32_t lastFixAt = 0;  // posisi valid terakhir (RAM, hilang saat deep sleep)
   if (gps.location.isValid() && gps.location.age() < 3000) { lastLat = gps.location.lat(); lastLon = gps.location.lng(); lastFixAt = millis() ? millis() : 1; }
-  char buf[120];
-  int bat = batMilliVolts();  // format: PANDU,V1,<jenis>,<lat>,<lon>,<mV baterai>,<helm 0/1/2>,<usia posisi detik; 0 = baru>
+  char buf[140];
+  int bat = batMilliVolts();  // format v2: PANDU,V2,<vest_id>,<seq>,<jenis>,<lat>,<lon>,<mV>,<helm 0/1/2>,<usia posisi detik; 0 = baru>
   if (lastFixAt)
-    snprintf(buf, sizeof buf, "PANDU,V1,%s,%.6f,%.6f,%d,%d,%lu", type, lastLat, lastLon, bat, helmState(), (unsigned long)((millis() - lastFixAt) / 1000));
+    snprintf(buf, sizeof buf, "PANDU,V2,%d,%u,%s,%.6f,%.6f,%d,%d,%lu", VEST_ID, (unsigned)seq, type, lastLat, lastLon, bat, helmState(), (unsigned long)((millis() - lastFixAt) / 1000));
   else
-    snprintf(buf, sizeof buf, "PANDU,V1,%s,NOFIX,NOFIX,%d,%d,0", type, bat, helmState());
+    snprintf(buf, sizeof buf, "PANDU,V2,%d,%u,%s,NOFIX,NOFIX,%d,%d,0", VEST_ID, (unsigned)seq, type, bat, helmState());
   Serial.println(buf);
   if (!loraOk) return;
   LoRa.beginPacket(); LoRa.print(buf); LoRa.endPacket();
@@ -155,7 +165,8 @@ const char *alertName[] = {"", "FALL", "MOB", "SOS"};
 Alert active = NONE;
 bool sosWake = false;
 int repeatsLeft = 0;  // SOS dikirim ulang min. 3x (LoRa tanpa ACK)
-uint32_t lastSend = 0, lastBeat = 0;
+uint32_t lastSend = 0, lastBeat = 0, beatInterval = HEARTBEAT_MS;
+uint16_t alertSeq = 0;   // seq alert aktif: kirim ulang SOS memakai seq yang sama (Gateway membuang duplikat)
 
 Alert detectFall() {  // free-fall >= FREEFALL_MS lalu benturan dalam IMPACT_WIN
   static uint32_t ffStart = 0, ffEnd = 0;
@@ -193,6 +204,7 @@ void setup() {
   analogSetPinAttenuation(PIN_WATER, ADC_11db);
   analogSetPinAttenuation(PIN_BAT, ADC_11db);  // 0-3,1 V; baterai 4,2 V / 2 = 2,1 V
   while (digitalRead(PIN_PWR_BTN) == LOW) delay(10);   // abaikan tekanan yang membangunkan
+  if (esp_reset_reason() != ESP_RST_DEEPSLEEP) seqCounter = (uint16_t)esp_random();   // cold boot: mulai acak supaya tidak menabrak seq lama
   Serial.println("[1] gpio ok");
   gpsPower(true); xkcPower(true);
   Serial.println("[2] gps+xkc power on");
@@ -216,16 +228,16 @@ void loop() {
   // tombol power: tekan sebentar = tidur
   if (digitalRead(PIN_PWR_BTN) == LOW) { delay(30); if (digitalRead(PIN_PWR_BTN) == LOW) goToSleep(); }
 
-  if (sosWake) { active = SOS; repeatsLeft = 3; lastSend = millis() - ALERT_REPEAT_MS; sosWake = false; }  // bangun karena SOS = langsung kirim, tanpa tahan 2 detik
+  if (sosWake) { active = SOS; alertSeq = nextSeq(); repeatsLeft = 3; lastSend = millis() - ALERT_REPEAT_MS; sosWake = false; }  // bangun karena SOS = langsung kirim, tanpa tahan 2 detik
   Alert a = detectSos();
   if (a == NONE) a = detectMob();
   if (a == NONE && mpuOk) a = detectFall();
   if (a == FALL) fallAt = millis() ? millis() : 1;
-  if (a != NONE) { if (a != active) { repeatsLeft = (a == SOS ? 3 : 2); lastSend = millis() - ALERT_REPEAT_MS; } active = a; }  // alert baru: kirim segera
+  if (a != NONE) { if (a != active) { alertSeq = nextSeq(); repeatsLeft = (a == SOS ? 3 : 2); lastSend = millis() - ALERT_REPEAT_MS; } active = a; }  // alert baru: kirim segera
 
   uint32_t now = millis();
   if (active != NONE && now - lastSend >= ALERT_REPEAT_MS) {
-    sendPkt(alertName[active]); lastSend = now;
+    sendPkt(alertName[active], alertSeq); lastSend = now;
     if (repeatsLeft > 0) repeatsLeft--;
     bool still = (active == SOS && digitalRead(PIN_SOS) == HIGH) || (active == MOB && waterWet());
     if (repeatsLeft == 0 && !still) active = NONE;  // berhenti setelah kirim ulang & kondisi berakhir
@@ -238,6 +250,9 @@ void loop() {
                   waterWet() ? "ADA AIR" : "kering", analogReadMilliVolts(PIN_WATER), (unsigned long)left,
                   gps.location.isValid() ? "FIX" : "NOFIX", gps.satellites.isValid() ? (int)gps.satellites.value() : 0, mpuOk ? accelG() : 0.0f);
   }
-  if (now - lastBeat >= HEARTBEAT_MS) { sendPkt("HB"); lastBeat = now; }
+  if (now - lastBeat >= beatInterval) {
+    sendPkt("HB", nextSeq()); lastBeat = now;
+    beatInterval = HEARTBEAT_MS - HEARTBEAT_JITTER_MS + esp_random() % (2 * HEARTBEAT_JITTER_MS + 1);
+  }
   delay(10);
 }

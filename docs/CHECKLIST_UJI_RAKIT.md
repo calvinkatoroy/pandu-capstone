@@ -43,6 +43,8 @@ Firmware: `firmware/vest_node`, `firmware/helmet_node`, `firmware/gateway` (buil
 - [ ] Mute: kirim `M` di serial, sirine berhenti.
 
 ## 4. Tautan LoRa Vest → Gateway
+- [ ] **Paket v2:** serial Gateway menampilkan `vest_id`, `seq` naik tiap HB (selang 25-35 s, jitter); SOS: tiga paket `seq` sama, yang ke-2 dan ke-3 bertanda `"dup":true`; tombol power Vest -> `type":"OFF"`.
+- [ ] **Unggah:** dengan `config.h`, `{"upload":...,"http":200}`; cabut WiFi 2 menit lalu colok lagi: event yang tertahan terunggah semua (cek `/queue.jsonl` mengecil). Event muncul di dashboard (tabel `events`, `vest_state`).
 - [ ] Frekuensi sama (433 MHz, `LORA_FREQ = 433E6` di kedua firmware; modul SX1278 tidak bisa 915). Antena terpasang di kedua sisi.
 - [ ] Jarak 1 m: paket `HB` (heartbeat tiap 30 s) diterima. Catat RSSI: ____ dBm.
 - [ ] Jarak 10, 50, 100 m (terbuka): RSSI ____ / ____ / ____ dBm; paket hilang? ____ %.

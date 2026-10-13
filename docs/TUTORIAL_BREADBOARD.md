@@ -163,6 +163,8 @@ cd firmware/gateway
 python -m platformio run -t upload
 python -m platformio device monitor
 ```
+- **Unggah ke dashboard (opsional):** salin `firmware/gateway/include/config.example.h` menjadi `config.h` (di-gitignore), isi WiFi, `GATEWAY_ID`, `INGEST_URL`, `DEVICE_KEY`. Tanpa `config.h` Gateway jalan offline (serial, SD, sirine). Paket yang belum terunggah antre di `/queue.jsonl` di microSD dan dikirim otomatis saat WiFi dan NTP siap. Serial menampilkan `{"upload":{"events":N,"http":200,...}}`.
+- Paket Vest sekarang v2 (`PANDU,V2,<vest_id>,<seq>,<jenis>,...`); `VEST_ID` diatur lewat `-DVEST_ID=n` (default 1). Vest mengirim paket `OFF` saat tombol power ditekan (tidur).
 - Antena U.fl terpasang sebelum menyala; 3V3 saja, jangan 5 V; 100 µF dekat modul LoRa. Frekuensi firmware 433E6 (sama dengan Vest).
 - Lulus jika: `{"boot":true,"lora":1,"sd":1}`. Kirim `M` di serial untuk mute.
 
