@@ -259,6 +259,15 @@ void loop() {
     } else Serial.printf("{\"ignored\":\"bad_packet\",\"rssi\":%d}\n", p.rssi);
   }
 
+  // Status berkala: bukti Gateway hidup walau belum ada paket
+  static uint32_t lastStat = 0;
+  if (now - lastStat >= 10000) {
+    lastStat = now;
+    Serial.printf("{\"status\":{\"lora\":%d,\"sd\":%d,\"rx\":%lu,\"last_rx_s\":%ld,\"wifi\":%d,\"time_synced\":%d}}
+",
+                  loraOk, sdOk, (unsigned long)rxCount, rxCount ? (long)((now - lastRxAt) / 1000) : -1L, NET_ENABLED && WiFi.status() == WL_CONNECTED, timeSynced());
+  }
+
   // Sirine: bunyi selama masih ada alert baru dalam SIREN_MAX_MS
   if (activeKind[0] && now - lastAlertAt < SIREN_MAX_MS) sirenTick(activeKind);
   else if (activeKind[0]) { sirenOff(); activeKind[0] = 0; Serial.println("{\"siren\":\"timeout\"}"); }
