@@ -1,7 +1,7 @@
-// Uji kabel LoRa TANPA multimeter: ESP32 mengedipkan satu pin pada satu waktu; LED + resistor 330 ohm di ujung modul
-// menunjukkan apakah kabel itu benar-benar sampai ke pin modul.
-// Cara: LED kaki panjang (+) -> resistor 330 ohm -> pin breakout yang sedang diuji; kaki pendek (-) -> GND breakout.
-// Pasang antena. Sketsa ini tidak memancar. Pin yang diuji berganti tiap 6 detik; lihat nama di serial monitor.
+// Uji kabel LoRa TANPA multimeter: ESP32 mengedipkan SATU pin terus-menerus sampai kamu memilih pin lain lewat serial monitor.
+// LED + resistor 330 ohm di ujung modul menunjukkan apakah kabel itu benar-benar sampai ke pin modul.
+// Cara: LED kaki panjang (+) -> resistor 330 ohm -> pin breakout yang diuji; kaki pendek (-) -> GND breakout.
+// Pilih pin: ketik angka 1-7 di serial monitor lalu Enter. 0 = berhenti. Sketsa ini tidak memancar (pasang antena tetap disarankan).
 #include <Arduino.h>
 
 struct P { int gpio; const char *name; const char *modulePin; };
@@ -15,24 +15,38 @@ const P PINS[] = {
   {26, "IO26 (DIO0)", "DIO0"},
 };
 constexpr int N = sizeof(PINS) / sizeof(PINS[0]);
+int sel = 1;   // pin yang sedang berkedip (1-based), 0 = diam
+
+void menu() {
+  Serial.println("\nKetik angka lalu Enter untuk memilih pin yang berkedip:");
+  for (int i = 0; i < N; i++) Serial.printf("  %d = %s  -> LED di pin modul '%s'\n", i + 1, PINS[i].name, PINS[i].modulePin);
+  Serial.println("  0 = berhenti\n");
+}
+
+void select(int s) {
+  for (int j = 0; j < N; j++) pinMode(PINS[j].gpio, INPUT);   // semua pin dilepas
+  pinMode(5, OUTPUT); digitalWrite(5, HIGH);                  // NSS dijaga HIGH agar modul tidak menggerakkan MISO
+  sel = s;
+  if (s >= 1 && s <= N) { pinMode(PINS[s - 1].gpio, OUTPUT); Serial.printf("BERKEDIP: %s -> pasang LED di pin modul '%s'\n", PINS[s - 1].name, PINS[s - 1].modulePin); }
+  else Serial.println("Berhenti.");
+}
 
 void setup() {
   Serial.begin(115200);
   delay(500);
   Serial.println("\n=== Uji kabel LoRa (LED) ===");
-  Serial.println("LED(+) -> 330 ohm -> pin modul yang disebut; LED(-) -> GND modul. LED harus berkedip.");
-  Serial.println("Tidak berkedip = kabel dari pin ESP itu tidak sampai ke pin modul (atau salah pin/baris).\n");
+  Serial.println("LED(+) -> 330 ohm -> pin modul; LED(-) -> GND modul. LED harus berkedip. Tidak berkedip = kabel itu tidak sampai.");
+  menu();
+  select(1);
 }
 
 void loop() {
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) pinMode(PINS[j].gpio, INPUT);   // pin lain dilepas
-    pinMode(5, OUTPUT); digitalWrite(5, HIGH);                  // NSS dijaga HIGH agar modul tidak menggerakkan MISO
-    Serial.printf("SEKARANG: %s -> pasang LED di pin modul '%s'\n", PINS[i].name, PINS[i].modulePin);
-    pinMode(PINS[i].gpio, OUTPUT);
-    for (int k = 0; k < 12; k++) { digitalWrite(PINS[i].gpio, k & 1); delay(250); }   // kedip 2 Hz selama 3 detik, lalu jeda
-    digitalWrite(PINS[i].gpio, LOW);
-    delay(3000);
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c >= '0' && c <= '0' + N) select(c - '0');
   }
-  Serial.println("--- ulang dari awal ---\n");
+  if (sel >= 1 && sel <= N) {
+    static uint32_t t = 0; static bool lvl = false;
+    if (millis() - t >= 400) { t = millis(); lvl = !lvl; digitalWrite(PINS[sel - 1].gpio, lvl); }
+  }
 }
