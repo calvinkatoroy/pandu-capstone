@@ -24,6 +24,16 @@ void misoFloatTest() {
                 (up == 1 && down == 0) ? "(mengambang: wajar bila modul hi-Z ATAU kabel MISO tidak tersambung)" : "(ditahan tetap: ada yang menggerakkan MISO)");
 }
 
+// Uji sisi ESP32 saja: LEPAS kabel MISO dan MOSI dari modul, sambung IO23 (MOSI) langsung ke IO19 (MISO) dengan satu jumper.
+// Bila SPI ESP32 sehat, byte yang dikirim kembali persis. Tanpa jumper, hasilnya acak dan harus diabaikan.
+void loopbackTest() {
+  uint8_t sent[3] = {0xA5, 0x3C, 0xFF}, got[3];
+  for (int i = 0; i < 3; i++) got[i] = SPI.transfer(sent[i]);   // NSS HIGH: modul tidak dipilih
+  bool ok = got[0] == sent[0] && got[1] == sent[1] && got[2] == sent[2];
+  Serial.printf("  Loopback IO23->IO19 (hanya bermakna bila dijumper): kirim A5 3C FF, terima %02X %02X %02X  %s\n", got[0], got[1], got[2],
+                ok ? "-> SPI ESP32 SEHAT" : "-> tidak kembali (tanpa jumper = normal)");
+}
+
 void setup() {
   Serial.begin(115200);
   delay(500);
@@ -48,6 +58,7 @@ void loop() {
     pinMode(rst, INPUT);   // lepaskan RST agar pin RST yang salah tidak menahan modul
   }
   misoFloatTest();
+  loopbackTest();
   if (!anyOk) Serial.println("  Cek: (1) 3V3 modul terukur ~3,3 V dengan multimeter, (2) NSS->IO5, SCK->IO18, MISO->IO19, MOSI->IO23, (3) MISO/MOSI tidak tertukar, (4) urutan pin breakout vs foto produk.");
   Serial.println();
   delay(3000);
