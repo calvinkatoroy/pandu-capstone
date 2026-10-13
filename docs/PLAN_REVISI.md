@@ -70,7 +70,7 @@ Hasilnya ditulis di bagian 7 `TUTORIAL_BREADBOARD.md`.
 | P1-3 | Sensor air XKC-Y25-V: header XH2.54 4 pin (VCC, OUT, GND, opsi/hitam), kapasitor 100 uF + 100 nF di `VBOOST_5V` (riak maks 200 mV). Siapkan pembagi `R8` 10 k dan `R9` 20 k (bisa tidak dipasang) di `WATER_SIG`; `R1` pull-up hanya untuk varian open-collector | A4 |
 | P1-4 | Lebarkan `VBAT_RAW`, `VBOOST_5V`, `VBAT_POS` ke sekitar 25 mil | A13 |
 | P1-5 | (jika K2) LED atau haptic + resistor ke GPIO bebas | A11 |
-| P1-6 | Cocokkan footprint GY-521, TP4056, GPS, DevKit dengan hasil Fase 1 | A12 |
+| P1-6 | Cocokkan footprint GY-521, TP4056, GPS, DevKit dengan hasil Fase 1. **DevKit = V1 30 pin (bukan DevKitC V4)**: footprint `U3` dan nomor pin netlist harus dibuat ulang, lihat ESP32_DEVKIT_V1.md | A12 |
 | P1-7 | (opsional) lepas jalur TX ESP ke GPS | A14 |
 | P1-8 | Titik uji untuk 3V3, 5V, GND, BAT, WATER; label versi di silkscreen | |
 | P1-9 | Route ulang (papan padat, kemungkinan perlu geser komponen), DRC, Gerber, netlist | |

@@ -34,7 +34,7 @@ Yang **belum** terbukti dengan jalur ini: daya baterai Vest, gating GPS/XKC, sir
 
 ## 1. Daftar bahan
 **Vest**
-- ESP32-DevKitC V4, breadboard besar, kabel jumper M-M / M-F
+- ESP32 DevKit V1 30 pin (yang dipakai tim; DevKitC V4 juga bisa), breadboard besar, kabel jumper M-M / M-F. Pinout dan catatan: [ESP32_DEVKIT_V1.md](ESP32_DEVKIT_V1.md). Di V1 pin 5 V bernama **VIN**.
 - Baterai 18650 + holder, modul TP4056 (USB-C, berproteksi), modul boost MT3608
 - Dioda SS14 (atau 1N5819), kapasitor 100 µF tantalum/elko, 100 nF
 - GY-521 (MPU6050), GPS NEO-6M, modul LoRa Ra-02 SX1278 433 MHz (breakout 2,54 mm) + antena pegas 433 MHz U.fl

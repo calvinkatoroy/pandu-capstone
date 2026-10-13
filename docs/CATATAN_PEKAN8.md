@@ -12,6 +12,8 @@ Pekan 7 dibiarkan apa adanya (kondisi 10 Okt: satu modul XL1276, belum ada modul
 - Firmware paket v2: Vest (vest_id, seq di RTC, paket OFF, jitter heartbeat) dan Gateway (parse v1/v2, buang duplikat radio, NTP, antrean microSD, unggah batch HTTPS ke Edge Function). Kompilasi OK; **belum diuji di hardware maupun terhadap Supabase asli**.
 - Perbaikan kontrak: kunci idempotensi diubah ke (gateway_id, vest_id, seq, received_at) karena seq 16-bit berulang (migrasi 0005 di pandu-dashboard).
 
+- ESP32 yang dipegang tim = DevKit V1 30 pin; BOM/netlist PCB1 dan PCB3 untuk DevKitC V4 38 pin. Perlu keputusan dan footprint baru (`ESP32_DEVKIT_V1.md`).
+
 ## Belum (jangan ditulis sebagai selesai)
 - Tes tautan LoRa dua modul (RSSI, SNR, jarak nyata).
 - Ukur jarak deret header breakout, ukur output XKC-Y25-V (kering/basah).
