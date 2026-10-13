@@ -118,8 +118,10 @@ Lulus jika: serial tercetak `Boot: ...`. (MPU/LoRa=0 normal pada tahap ini karen
 - Lulus jika: di luar ruangan, setelah beberapa menit paket berisi lat/lon (bukan `NOFIX`).
 
 ### 2.7 LoRa (pasang antena dulu)
-Label modul → pin DevKit: `3.3V` → 3V3, `GND` → GND (semua pin GND), `SCK` → IO18, `MISO` → IO19, `MOSI` → IO23, `NSS` → IO5, `RESET` → IO25, `DIO0` → IO26. **Pin 1 modul = antena (ANT)**, bukan GND.
-- Lulus jika: `Boot: MPU=1 LoRa=1 ...`. Jika `LoRa=0`: cek kabel, GND, 3V3, dan label modul (modul yang dibeli mungkin bukan RA-02: baca label di sisi pin).
+Modul: **Ra-02 SX1278 433 MHz (breakout 2,54 mm)**, antena pegas 433 MHz di konektor U.fl. Pinout dan pemetaan lengkap: [LORA_RA02_BREAKOUT.md](LORA_RA02_BREAKOUT.md).
+Label pin breakout → pin DevKit: `3.3V` → 3V3, `GND` → GND (cukup satu atau dua dari empat pin GND, semua boleh), `SCK` → IO18, `MISO` → IO19, `MOSI` → IO23, `NSS` → IO5, `RST` → IO25, `DIO0` → IO26. DIO1-5 tidak dipakai. **Antena lewat U.fl, bukan pin header.** Jangan ke 5 V.
+- Lulus jika: `Boot: MPU=1 LoRa=1 ...`. Jika `LoRa=0`: cek kabel, GND, 3V3, dan urutan label pin breakout (atas: GND NSS MOSI MISO SCK DIO5 DIO4 GND; bawah: GND GND 3.3V RST DIO0 DIO1 DIO2 DIO3).
+- Tes tautan dua modul: flash `firmware/test_lora_one` ke kedua ESP32; baris `RX ... rssi snr` membuktikan paket sampai.
 - Daya: arus pulsa transmit ±120 mA. Sertakan 100 µF dekat modul.
 
 ### 2.8 Sensor air XKC-Y25 dan tombol
@@ -204,7 +206,7 @@ Setiap kali pinout/ukuran modul tidak cocok dengan skematik, tulis di sini lalu 
 
 | Modul | Temuan | Dampak PCB |
 |---|---|---|
-| LoRa XL1276-P01 (chip SX1276) | Dari foto sisi pad: kolom kiri atas ke bawah `DIO2, DIO1, DIO0, VCC, DIO4, DIO3, GND, ANT`; kolom kanan `GND, MISO, MOSI, SCK, NSS, REST, DIO5, GND`. Urutan ini = pinout **RFM95**, bukan RA-02 (RA-02: 1 ANT, 2 GND, 3 3,3V, 4 RST, 5 DIO0, ... 15 NSS). | Footprint `WIRELM-SMD_RA-02-BL` di PCB1/PCB3 **tidak cocok** dengan modul ini. Ganti footprint ke RFM95 (atau beli Ra-01H) sebelum order PCB. Cek juga jarak antar deret pad. |
-| LoRa XL1276-P01 | Di foto sisi pad, kotak pita frekuensi (915M/868M/433M/315M/169M) yang terisi/ditandai hitam adalah **868M**. Belum dicek di modul fisik. | Kalau modul fisik juga 868M, matching RF-nya untuk 868 MHz, bukan 915/920 MHz. Cek modul dan listing. |
+| ~~LoRa XL1276-P01 (chip SX1276)~~ (USANG 13 Okt: modul diganti Ra-02 SX1278 433 MHz, lihat LORA_RA02_BREAKOUT.md) | Dari foto sisi pad: kolom kiri atas ke bawah `DIO2, DIO1, DIO0, VCC, DIO4, DIO3, GND, ANT`; kolom kanan `GND, MISO, MOSI, SCK, NSS, REST, DIO5, GND`. Urutan ini = pinout **RFM95**, bukan RA-02 (RA-02: 1 ANT, 2 GND, 3 3,3V, 4 RST, 5 DIO0, ... 15 NSS). | Footprint `WIRELM-SMD_RA-02-BL` di PCB1/PCB3 **tidak cocok** dengan modul ini. Ganti footprint ke RFM95 (atau beli Ra-01H) sebelum order PCB. Cek juga jarak antar deret pad. |
+| ~~LoRa XL1276-P01~~ (usang) | Di foto sisi pad, kotak pita frekuensi (915M/868M/433M/315M/169M) yang terisi/ditandai hitam adalah **868M**. Belum dicek di modul fisik. | Kalau modul fisik juga 868M, matching RF-nya untuk 868 MHz, bukan 915/920 MHz. Cek modul dan listing. |
 
 > **Update 13 Okt 2026:** baris XL1276 di atas usang. Modul sekarang Ra-02 SX1278 433 MHz (breakout); pinout dan wiring di [LORA_RA02_BREAKOUT.md](LORA_RA02_BREAKOUT.md). Frekuensi firmware 433E6.

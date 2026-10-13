@@ -7,7 +7,7 @@ Firmware: `firmware/vest_node`, `firmware/helmet_node`, `firmware/gateway` (buil
 
 ## 0. Verifikasi modul fisik (sebelum order PCB)
 - [ ] **ESP32 DevKit**: ukur jarak tengah lubang pin kiri-kanan. Resmi 25,4 mm. Hasil: ____ mm. Jika 22,86 mm, footprint PCB1/PCB3 harus diubah.
-- [ ] **Modul LoRa**: foto sisi pin, cocokkan urutan dengan RA-02 (pin 1 ANT, 2 GND, 3 3,3V, 4 RESET, 5 DIO0 ... 12 SCK, 13 MISO, 14 MOSI, 15 NSS, 16 GND). Hasil: ____ (cocok / tidak cocok). Jika bukan RA-02, footprint harus diubah.
+- [ ] **Modul LoRa**: Ra-02 SX1278 433 MHz breakout: foto sisi pin, cocokkan dengan tabel di LORA_RA02_BREAKOUT.md (atas: GND NSS MOSI MISO SCK DIO5 DIO4 GND; bawah: GND GND 3.3V RST DIO0 DIO1 DIO2 DIO3). Ukur jarak tengah-ke-tengah antar dua deret header: ____ mm. Hasil: ____ (cocok / tidak cocok).
 - [ ] **TP4056**: urutan pin/pad (IN+, IN-, OUT+, OUT-, B+, B-) dan posisi USB-C sesuai footprint.
 - [ ] **Boost MT3608**: urutan IN+/IN-/OUT-/OUT+ sesuai header 4 pin (`IN+ IN- OUT- OUT+`).
 - [ ] **SuperMini C3 (Helmet)**: urutan pin dan posisi pin 3V3/5V/GND/GPIO2/GPIO4 sesuai simbol.

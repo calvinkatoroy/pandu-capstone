@@ -1,7 +1,7 @@
 # Gerber
 
 JANGAN dipesan, semua versi di bawah memuat masalah yang diaudit di docs/AUDIT_V2.md:
-- footprint LoRa RA-02 tidak cocok dengan modul XL1276 (RFM95), PCB1 dan PCB3
+- footprint LoRa RA-02 (modul telanjang 2 mm) tidak cocok dengan breakout Ra-02 yang dibeli (header 2,54 mm), PCB1 dan PCB3
 - proteksi TP4056 terlewati (B- dan OUT- digabung GND), PCB1 dan PCB2
 - SAW1 di PCB2 adalah filter SMD, bukan saklar
 - TTP223 di PCB2 tidak dipakai lagi

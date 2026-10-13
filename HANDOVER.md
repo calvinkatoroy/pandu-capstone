@@ -25,7 +25,7 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 1. **[SELESAI di PCB1, 2 Okt malam]** Footprint ESP32 PCB1 sudah diganti ke DevKitC V4 (part LCSC C571181, designator U3, jarak baris resmi 1,0"). Skematik PCB1 tersimpan, PCB di-update, auto-route 0 ratline, DRC 0 error. Yang masih harus dicek: ukuran fisik board klon, dan USB micro DevKit sekarang menghadap ke dalam papan (perhatikan akses di casing). Teks lama:
    **Footprint ESP32 di PCB1 salah.** Sekarang 17 pin/sisi, jarak baris 0,9". Board yang dibeli (DevKitC V4) 2x19 pin, jarak baris resmi 25,4 mm (klon kadang 22,86 mm). **Part siap pakai ADA** di library EasyEDA (System): cari "DevKitC" di tab Device, baris ke-7 (LCSC C571181, nama ESP32-DEVKITC...). Simbol 38 pin (3V3, EN, VP, VN, IO34... GND, IO23, IO22, TX, RX, ... CLK) cocok dengan pinout DevKitC V4, footprint 2x19 THT dengan jarak baris sekitar 1,0" (estimasi dari preview, **ukur setelah ditempatkan**). Tidak perlu membuat dari nol. Tetap minta Calvin ukur board fisik (jarak tengah lubang kiri-kanan) sebelum order PCB.
 2. **PCB3**: BOM beli DevKit tapi PCB3 didesain untuk modul polos. Rekomendasi: ganti ke footprint DevKitC V4 yang sama, hapus U4/C1/C2/J1/R2/C3 (DevKit sudah punya regulator dan USB).
-3. **Modul LoRa yang dibeli bukan Ra-02**: listing "Wifi LoRa XL1276/SX1276 915MHz" (akhishop, Rp95k, datang dengan antena pegas, 1,8-3,7 V, SPI, foto mirip RFM95). Simbol/footprint RA-02 di PCB1/PCB3 mungkin tidak cocok. Minta foto sisi pin atau datasheet modul, cek urutan pin.
+3. **[USANG, lihat update 13 Okt di bawah] Modul LoRa yang dibeli bukan Ra-02**: listing "Wifi LoRa XL1276/SX1276 915MHz" (akhishop, Rp95k, datang dengan antena pegas, 1,8-3,7 V, SPI, foto mirip RFM95). Simbol/footprint RA-02 di PCB1/PCB3 mungkin tidak cocok. Minta foto sisi pin atau datasheet modul, cek urutan pin.
 4. Setelah 1-3: lebarkan trek daya (VBAT_RAW, VBAT_POS 20 mil; auto-route menimpa ke 10 mil), DRC, ekspor Gerber PCB1/2/3 baru ke `hardware/`.
 
 ## Item terbuka lain
@@ -35,7 +35,7 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 - Gerber lama (`weekly/WEEK_6/Gerber`) **jangan dipesan**.
 - Laporan Pekan 6 belum ditulis. Catat sebagai perubahan scope: tanpa ToF/BME680, PCB1 di-routing ulang setelah audit, casing dibuat ulang mengikuti PCB.
 - BOM sheet (Google Sheets "Bills of Materials") belum di-update oleh tim; Rafif bilang semua sudah dibeli kecuali baris kuning dan PCB. ESP32 Vest dan LoRa Gateway tercentang FALSE padahal link sama (kemungkinan sudah dibeli 2). Harga ESP32 di listing Rp128k vs BOM Rp80k. VL53L0X/BME680 masih di BOM (hapus, hemat Rp250k). Belum ada di BOM: boost 5 V, XKC-Y25, antena+SMA untuk Vest, komponen SMD (AO3401A, 2N7002, resistor), IRLZ44N. Total BOM Rp2,495 jt vs dana Rp2 jt.
-- RA-02/LoRa: proposal 915 MHz, modul dibeli 915 MHz (OK). Regulasi Indonesia 920-923 MHz, sebut di laporan.
+- [USANG] RA-02/LoRa: proposal 915 MHz, modul dibeli 915 MHz (OK). Sekarang 433 MHz, lihat update 13 Okt. Regulasi Indonesia 920-923 MHz, sebut di laporan.
 - Angka "akurasi sensor 96,2%" di laporan kelompok tidak punya data pengujian; cek atau hapus.
 
 ## Catatan teknis EasyEDA (penting, UI-nya rapuh)
@@ -91,16 +91,16 @@ Firmware: SOS bangun dari sleep dan langsung kirim (3x ulang), alert baru dikiri
 - Vest scanner BLE (6 Okt): NimBLE pasif, interval 62,5 ms/window 31 ms, scan terus-menerus; paket helm = manufacturer data FF FF 'P' 'H' worn counter. Paket LoRa sekarang: `PANDU,V1,<jenis>,<lat>,<lon>,<mV>,<helm>` dengan helm 1=dipakai, 0=terdengar tidak dipakai, 2=tidak terjangkau (timeout 30 s, juga 2 setelah bangun sampai paket pertama ~8 s). Konsekuensi: scan terus menambah arus Vest (perkiraan +10-15 mA, ukur) -> kalau boros, ganti ke scan berkala. Gateway/dashboard harus mem-parse field ke-7. Kompilasi OK (flash 48%), belum diuji.
 
 ## Firmware Gateway (6 Okt 2026)
-`firmware/gateway/` (PlatformIO, DevKitC V4). Terima LoRa 915 MHz, parse `PANDU,V1,<jenis>,<lat>,<lon>,<mV>,<helm>`, keluarkan JSON per baris di serial 115200 (tambahan rssi/snr), log CSV ke SD (/pandu.csv), sirine (IO4 HIGH): SOS/MOB 500 ms, FALL 200 ms, otomatis berhenti 60 s tanpa alert baru, kirim 'M' di serial untuk mute. Peringatan `vest_lost` setelah 90 s tanpa paket (sirine mati secara default, `SIREN_ON_LOST`). Kompilasi OK (flash 26%), belum diuji. Belum: ACK ke Vest, enkripsi/otentikasi paket, tombol mute fisik (PCB3 tidak punya), jembatan serial -> dashboard.
+`firmware/gateway/` (PlatformIO, DevKitC V4). Terima LoRa 433 MHz (sebelumnya 915), parse `PANDU,V1,<jenis>,<lat>,<lon>,<mV>,<helm>`, keluarkan JSON per baris di serial 115200 (tambahan rssi/snr), log CSV ke SD (/pandu.csv), sirine (IO4 HIGH): SOS/MOB 500 ms, FALL 200 ms, otomatis berhenti 60 s tanpa alert baru, kirim 'M' di serial untuk mute. Peringatan `vest_lost` setelah 90 s tanpa paket (sirine mati secara default, `SIREN_ON_LOST`). Kompilasi OK (flash 26%), belum diuji. Belum: ACK ke Vest, enkripsi/otentikasi paket, tombol mute fisik (PCB3 tidak punya), jembatan serial -> dashboard.
 
 ## PCB2 v2.1 (8 Okt 2026): Helmet pakai LiPo + TP4056 (keputusan Calvin)
 CR2032 dan holder dihapus. Rangkaian: LiPo (header H2 2-pin, `VBAT_POS`/GND) > modul TP4056 USB-C berproteksi (U7, OUT+ = `VBAT_RAW`) > saklar geser SAW1 > `VBAT_SW` > pin **5V** SuperMini (regulator onboard 3,3 V). 3V3 dari board memberi daya TTP223 (net `3V0_HELMET`, sebenarnya 3,3 V). Tombol tact GPIO4 dan sensor sentuh GPIO2 tidak berubah. Outline diperpanjang jadi 1245 x 3900 mil. DRC 0, tanpa ratline. Gerber: `hardware/gerber/Gerber_PCB2_2026-10-08.zip` (menggantikan versi 6 Okt). Netlist `PCB2.tel` diperbarui. USB SuperMini aman dicolok bersama baterai karena baterai masuk lewat pin 5V (diode onboard SuperMini ke VBUS harus diverifikasi di board fisik). Belum: casing Helmet, cek apakah pin 5V SuperMini benar-benar lewat LDO (bukan terhubung langsung ke 3V3), arus TP4056 saat beban.
 
 
 ## Temuan modul LoRa (foto pad, 8 Okt 2026)
-- Modul XL1276-P01 (SX1276) berpinout **RFM95**, bukan RA-02: footprint PCB1/PCB3 (`WIRELM-SMD_RA-02-BL`) tidak cocok. Pinout dari foto: kiri atas-bawah DIO2, DIO1, DIO0, VCC, DIO4, DIO3, GND, ANT; kanan GND, MISO, MOSI, SCK, NSS, REST, DIO5, GND.
-- Kotak pita frekuensi di foto menandai **868M** (belum dicek di modul fisik). Firmware memakai 915 MHz.
-- Tindakan: ganti footprint ke RFM95 di EasyEDA (PCB1 dan PCB3) dan netlist ulang; cek pita 868/915 pada modul; jangan order PCB sebelum itu.
+- [USANG] Modul XL1276-P01 (SX1276) berpinout **RFM95**, bukan RA-02: footprint PCB1/PCB3 (`WIRELM-SMD_RA-02-BL`) tidak cocok. Pinout dari foto: kiri atas-bawah DIO2, DIO1, DIO0, VCC, DIO4, DIO3, GND, ANT; kanan GND, MISO, MOSI, SCK, NSS, REST, DIO5, GND.
+- [USANG] Kotak pita di foto XL1276 menandai 868M. Modul itu tidak dipakai lagi.
+- [USANG] Tindakan: ganti footprint ke RFM95 di EasyEDA (PCB1 dan PCB3) dan netlist ulang; cek pita 868/915 pada modul; jangan order PCB sebelum itu.
 
 
 ## Koreksi desain Helmet (8 Okt 2026)

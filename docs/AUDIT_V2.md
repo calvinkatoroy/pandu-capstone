@@ -1,6 +1,6 @@
 # Audit PANDU v2 vs definisi proyek (8 Okt 2026)
 
-Definisi acuan (dari Calvin): Vest = MOB (jatuh AND ada air di balik casing, non-contact) + deteksi helm via RSSI BLE + LoRa 915 ke Gateway + GPS + USB-C + 18650 1200 mAh + 2 tact (SOS, power). Helmet = beacon BLE, tact on/off, baterai kecil. Gateway = LoRa, microSD, dashboard 3 tahap (1 aman, 2 warning APD tidak lengkap, 3 danger SOS/FALL/MOB), peta real-time, buzzer lokal, WiFi di dermaga, sampai 8 Vest.
+Definisi acuan (dari Calvin): Vest = MOB (jatuh AND ada air di balik casing, non-contact) + deteksi helm via RSSI BLE + LoRa 433 MHz (Ra-02 SX1278, sejak 13 Okt; sebelumnya 915) ke Gateway + GPS + USB-C + 18650 1200 mAh + 2 tact (SOS, power). Helmet = beacon BLE, tact on/off, baterai kecil. Gateway = LoRa, microSD, dashboard 3 tahap (1 aman, 2 warning APD tidak lengkap, 3 danger SOS/FALL/MOB), peta real-time, buzzer lokal, WiFi di dermaga, sampai 8 Vest.
 
 Yang diperiksa: netlist `PCB1/2/3.tel`, skematik EasyEDA (Vest, Helmet, Gateway, dibuka langsung), PCB1 (cek sebagian), firmware di `firmware/`, dashboard `APP/index.html`, BOM sheet, dokumen repo.
 Tingkat: **KRITIS** = alat tidak jalan/berbahaya, **SEDANG** = tidak sesuai definisi atau berisiko, **MINOR** = rapikan.
