@@ -11,7 +11,7 @@ Firmware: `firmware/vest_node`, `firmware/helmet_node`, `firmware/gateway` (buil
 - [ ] **TP4056**: urutan pin/pad (IN+, IN-, OUT+, OUT-, B+, B-) dan posisi USB-C sesuai footprint.
 - [ ] **Boost MT3608**: urutan IN+/IN-/OUT-/OUT+ sesuai header 4 pin (`IN+ IN- OUT- OUT+`).
 - [ ] **SuperMini C3 (Helmet)**: urutan pin dan posisi pin 3V3/5V/GND/GPIO2/GPIO4 sesuai simbol.
-- [ ] **XKC-Y25**: tipe output (NPN open-collector atau tegangan) dan tegangan kerja. Hasil: ____. Jika output 5 V, IO34 butuh pembagi/level shifter.
+- [ ] **XKC-Y25-V** (digital high/low, 5-24 V): tegangan OUT kering ____ V, basah ____ V (kawat hitam terbuka); kawat hitam ke GND: kering ____ V, basah ____ V. State yang berarti ada cairan: ____. Jika OUT mendekati 5 V, IO34 wajib lewat pembagi 10 k/20 k.
 - [ ] **Modul sentuh TTP223**: mode (momentary/toggle), output aktif-HIGH atau LOW. Hasil: ____.
 - [ ] **Holder 18650, GPS NEO-6M, MPU6050**: ukur dimensi untuk dicocokkan ke casing.
 

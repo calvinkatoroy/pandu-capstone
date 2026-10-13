@@ -125,8 +125,10 @@ Label pin breakout → pin DevKit: `3.3V` → 3V3, `GND` → GND (cukup satu ata
 - Daya: arus pulsa transmit ±120 mA. Sertakan 100 µF dekat modul.
 
 ### 2.8 Sensor air XKC-Y25 dan tombol
-- XKC-Y25: `VCC` → 5 V (rel `VBOOST_5V`), `GND` → GND, `OUT` → **IO34**, dengan resistor 10 k dari IO34 ke 3V3 (pull-up).
-- **Cek tipe output dulu**: ukur pin OUT saat kering dan basah. Jika outputnya naik ke 5 V, **jangan sambung ke IO34** langsung: pasang pembagi 10 k/20 k atau level shifter.
+- **XKC-Y25-V** (spesifikasi: halaman produk xkc-sensor.com/detail/1432.html): digital high/low, 5-24 V, 5 mA, riak catu ≤ 200 mV, respons 500 ms, tebal dinding ≤ 20 mm, kabel XH2.54-4P. Kawat: cokelat = `VCC`, kuning = `OUT`, biru = `GND`, hitam = "signal option" (polaritas, belum diketahui; tes terbuka vs ke GND).
+- Sambungan: `VCC` → 5 V (rel `VBOOST_5V` atau VIN USB), `GND` → GND, `OUT` → **pembagi 10 k (seri) lalu 20 k ke GND, titik tengah ke IO34** (5 V → 3,3 V). **Tanpa pull-up ke 3V3.** Jangan sambung OUT langsung ke IO34.
+- **Ukur dulu dengan multimeter** sebelum ke ESP32: tegangan OUT kering dan basah, dengan kawat hitam terbuka lalu ke GND. Catat state mana yang berarti ada cairan.
+- Sensor harus menempel di dinding (non-logam, ≤ 20 mm) dengan cairan di sisi seberang; uji juga dengan casing asli.
 - Tombol power: antara IO13 dan GND. Tombol SOS: antara IO27 dan 3V3, plus 10 k dari IO27 ke GND.
 - Lulus jika: celup sensor 3 detik → serial/LoRa `MOB`. Tahan tombol SOS 2 detik → `SOS`. Tekan tombol power → `Sleep...`, lalu SOS membangunkan alat dan langsung mengirim.
 

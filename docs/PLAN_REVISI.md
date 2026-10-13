@@ -15,7 +15,7 @@ Ukuran pekerjaan: S = kecil (menit), M = sedang (sekitar satu sesi), L = besar (
 ## Keputusan yang masih menunggu
 | # | Pertanyaan | Mempengaruhi |
 |---|---|---|
-| K1 | Varian XKC-Y25 (NPN atau tegangan) dan polaritasnya: ukur saat modul datang | PCB1 rangkaian IO34 |
+| K1 | Varian = XKC-Y25-V (digital high/low, 5-24 V; dari halaman produk). **Sisa:** tegangan OUT kering/basah dan fungsi kawat hitam (polaritas): ukur | PCB1 rangkaian IO34 |
 | K2 | Indikator di Vest (LED/haptic): masuk atau dibuang dari BOM | PCB1 |
 | K3 | Dashboard untuk overseer atau pandu? Tombol "I'm safe" dan "Hold to send SOS" dibuang atau dipertahankan (butuh downlink) | APP, Gateway |
 | K4 | Baterai helm perlu dilaporkan di dashboard? | PCB2 (pembagi), beacon |
@@ -67,7 +67,7 @@ Hasilnya ditulis di bagian 7 `TUTORIAL_BREADBOARD.md`.
 |---|---|---|
 | P1-1 | Pisahkan negatif baterai: `BAT_NEG` = `BT1.2` + `U7.3 (B-)`; `U7.4 (OUT-)` dan `U7.6 (IN-)` ke GND | A2 |
 | P1-2 | Ganti footprint LoRa `U6` ke female header 2x8 2,54 mm untuk breakout Ra-02 (pemetaan di LORA_RA02_BREAKOUT.md); sambung ulang 3V3, GND, RST (IO25), DIO0 (IO26), NSS (IO5), SCK/MISO/MOSI | A3 |
-| P1-3 | Sensor air: sesuai K1. Siapkan pembagi `R8` 10 k dan `R9` 20 k (bisa tidak dipasang) di `WATER_SIG`; `R1` pull-up hanya untuk varian open-collector | A4 |
+| P1-3 | Sensor air XKC-Y25-V: header XH2.54 4 pin (VCC, OUT, GND, opsi/hitam), kapasitor 100 uF + 100 nF di `VBOOST_5V` (riak maks 200 mV). Siapkan pembagi `R8` 10 k dan `R9` 20 k (bisa tidak dipasang) di `WATER_SIG`; `R1` pull-up hanya untuk varian open-collector | A4 |
 | P1-4 | Lebarkan `VBAT_RAW`, `VBOOST_5V`, `VBAT_POS` ke sekitar 25 mil | A13 |
 | P1-5 | (jika K2) LED atau haptic + resistor ke GPIO bebas | A11 |
 | P1-6 | Cocokkan footprint GY-521, TP4056, GPS, DevKit dengan hasil Fase 1 | A12 |

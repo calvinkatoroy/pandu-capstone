@@ -1,6 +1,8 @@
 // Tes mandiri sensor air / MOB (ESP32 DevKit saja). Sinyal di IO34 (input-only, tanpa pull internal).
 // Logika SAMA dengan vest_node: sinyal HIGH terus-menerus >= WATER_MS (3 s) = MOB; lebih singkat = percikan, diabaikan.
 // Wiring uji TANPA sensor: jumper IO34 -> 3V3 (= basah), lepas (= kering), resistor 10k IO34 -> GND.
+// Wiring XKC-Y25-V (digital high/low): cokelat VCC -> 5 V, biru GND, kuning OUT -> [10k] -> IO34 -> [20k] -> GND (pembagi, tanpa pull-up).
+//   Kawat hitam = opsi polaritas: tes terbuka vs ke GND. Jika basah = rendah, ganti kondisi `wet` (mV < ambang).
 // Wiring sensor murah: VCC -> 3V3 (JANGAN 5 V), GND -> GND, S/OUT -> IO34 (+ 10k ke GND).
 // Sambil jalan, cetak tegangan analog (mV) supaya kelihatan apakah sensor memberi HIGH/LOW bersih atau analog.
 #include <Arduino.h>

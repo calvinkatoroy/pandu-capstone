@@ -15,3 +15,5 @@ Pekan 7 dibiarkan apa adanya (kondisi 10 Okt: satu modul XL1276, belum ada modul
 - Footprint PCB1/PCB3 diganti, DRC, Gerber baru.
 - Migrasi 0003/0004 dan deploy Edge Function di Supabase (menunggu Rafif/tim).
 - Regulasi 433 MHz dicek, deck dan Google Doc disesuaikan.
+
+- XKC-Y25-V: spesifikasi dari halaman produk resmi (digital, 5-24 V, dinding <= 20 mm); sisa: ukur tegangan OUT dan fungsi kawat hitam. PCB1 perlu header XH 4 pin, pembagi R8/R9, kapasitor di VBOOST_5V.

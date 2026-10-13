@@ -11,7 +11,7 @@ Tanda **PERLU DIPERBAIKI** = item di desain/EasyEDA yang salah atau belum cocok 
 | U8 | GY-521 (MPU6050) | 1 | Ada, tes jatuh jalan. Urutan footprint belum dicek |
 | U9 | GPS NEO-6M + antena keramik | 1 | Ada, dapat fix (sinyal lemah). Antena aktif eksternal disarankan |
 | U6 | Modul LoRa Ra-02 SX1278 433 MHz (breakout 28x20 mm, header 2,54 mm) | 1 | **Sudah dibeli (sepasang, 13 Okt).** Footprint PCB diganti female header 2x8 (lihat LORA_RA02_BREAKOUT.md). XL1276 915 MHz lama tidak dipakai |
-| U10 | Sensor air analog (S, +, -) | 1 | Ada, ambang 1000 mV. **PERLU DIPERBAIKI:** VCC ke 3V3, hapus R1. (XKC-Y25 tidak dipakai/belum dibeli) |
+| U10 | Sensor air non-kontak XKC-Y25-V (digital high/low, 5-24 V, kabel XH2.54-4P) | 1 | **Sudah dibeli (13 Okt).** PCB: header XH 4 pin, pembagi R8 10 k / R9 20 k ke IO34, hapus R1, kapasitor di VBOOST_5V (riak ≤ 200 mV). Sensor air analog murah = cadangan tes |
 | BT1 | Holder 18650 | 1 | Ada |
 | - | Baterai 18650 1200 mAh | 1 | Ada |
 | U7 | Modul TP4056 USB-C berproteksi (HW-373) | 1 | Ada. **PERLU DIPERBAIKI:** B- dan OUT- sama-sama GND (proteksi terlewati) |
@@ -72,7 +72,7 @@ Tanda **PERLU DIPERBAIKI** = item di desain/EasyEDA yang salah atau belum cocok 
 | Resistor/kapasitor assortment untuk prototipe breadboard | Cek stok (10 k, 100 k, 330 ohm, 100 uF) |
 
 ## 5. Dihapus dari BOM lama (tidak dipakai di desain)
-VL53L0X x2 (Rp80 rb), BME680 (Rp170 rb), AMS1117/step-down, CR2032 + holder, XKC-Y25 (belum dibeli; sensor air analog dipakai).
+VL53L0X x2 (Rp80 rb), BME680 (Rp170 rb), AMS1117/step-down, CR2032 + holder, XKC-Y25 (sudah dibeli 13 Okt).
 
 ## 6. Minimum untuk prototipe breadboard (tanpa PCB, power bank/USB)
 Vest: ESP32 DevKit, GY-521, GPS NEO-6M, sensor air, 2 tact, 1 resistor 10 k, kabel jumper, LoRa (setelah disolder + antena).
