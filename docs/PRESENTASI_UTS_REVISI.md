@@ -57,10 +57,10 @@ Gambar lama masih menampilkan komponen yang sudah dibuang. Buat ulang dengan isi
 | Blok | Isi yang benar sekarang |
 |---|---|
 | Helmet Node | ESP32-C3 SuperMini, tombol ON/OFF (GPIO4), beacon BLE, LiPo + TP4056 (**bukan** TTP223 dan CR2032) |
-| Vest Node Master | ESP32 DevKit (WROOM-32), MPU-6050, GPS NEO-6M, sensor air (analog di prototipe, XKC-Y25 non-kontak direncanakan), LoRa SX1276, tombol SOS dan power, 18650 + TP4056 + boost 5 V (**bukan** VL53L0X dan BME680) |
+| Vest Node Master | ESP32 DevKit (WROOM-32), MPU-6050, GPS NEO-6M, sensor air (analog di prototipe, XKC-Y25 non-kontak direncanakan), LoRa Ra-02 SX1278 433 MHz, tombol SOS dan power, 18650 + TP4056 + boost 5 V (**bukan** VL53L0X dan BME680) |
 | Edge Gateway | ESP32 + LoRa, microSD (bus SPI terpisah), buzzer lewat MOSFET, WiFi |
 | Cloud/Dashboard | [ISI Rafif] sesuai keputusan stack (lihat slide 8) |
-| Tautan | Helmet ke Vest: BLE (RSSI); Vest ke Gateway: LoRa 915/920 MHz; Gateway ke cloud: WiFi |
+| Tautan | Helmet ke Vest: BLE (RSSI); Vest ke Gateway: LoRa 433 MHz; Gateway ke cloud: WiFi |
 
 Slide 7 (diagram blur) cukup dihapus jika slide 5 sudah jelas.
 
@@ -70,7 +70,7 @@ Render AI perangkat (ada kamera dan layar yang tidak ada di desain) tidak sesuai
 ### Slide 8 Edge Gateway dan Cloud backend [UBAH]
 Ganti isi kolom dengan yang akurat:
 
-- **Gateway:** ESP32 + LoRa SX1276 sebagai penerima; microSD sebagai buffer store-and-forward dan log insiden; buzzer lokal; WiFi di dermaga; NTP untuk waktu.
+- **Gateway:** ESP32 + LoRa Ra-02 SX1278 433 MHz sebagai penerima; microSD sebagai buffer store-and-forward dan log insiden; buzzer lokal; WiFi di dermaga; NTP untuk waktu.
 - **Backend:** [ISI Rafif] Supabase (real-time) atau Firebase, sesuai keputusan tim. Hapus "Mosquitto, InfluxDB, FastAPI" kalau stack berubah.
 - **Keamanan:** tulis "AES pada payload LoRa: direncanakan" (belum diimplementasi).
 - **Status:** "Firmware Gateway ter-compile; WiFi, cloud, dan uji di papan belum."
@@ -100,7 +100,7 @@ Gabung menjadi 1-2 slide dengan kolom baru **Status Pekan 7**. Isi usulan:
 |---|---|---|---|---|
 | 1 | Durasi operasi | ≥8-12 jam, baterai **18650 1200 mAh** (bukan 1500) | Belum diukur | Uji discharge |
 | 2 | BLE helm-Vest | 1-5 m, ambang RSSI ≈ -85 dBm | Sebagian: status dekat/jauh/tidak terdengar bekerja; ambang belum dikalibrasi | Kalibrasi jarak |
-| 3 | Jarak LoRa | [ISI: samakan 50-330 m vs ~5 km] pada pita 920-923 MHz | Belum diuji (1 modul) | Uji lapangan |
+| 3 | Jarak LoRa | [ISI: samakan 50-330 m vs ~5 km] pada pita 433 MHz | Belum diuji (modul sudah dua, uji tautan berikutnya) | Uji lapangan |
 | 4 | PDR dan latensi | PDR ≥95%, latensi ≤30 s | Belum diuji | Uji LoRa |
 | 5 | GPS | 5-10 m | Sebagian: dapat satelit, fix lemah di dalam ruangan | Uji luar ruangan |
 | 6 | Suara alarm | ≥85 dB | Belum (sirine belum dibeli) | Sound level meter |
@@ -212,7 +212,7 @@ Pin map Vest/Gateway/Helmet; format paket `PANDU,V1,<tipe>,<lat>,<lon>,<mV>,<hel
 | MCU Vest/Gateway | ESP32 DevKit (WROOM-32) |
 | MCU Helmet | ESP32-C3 SuperMini |
 | IMU | **MPU-6050** (bukan 6059) |
-| LoRa | SX1276, LoRa **point-to-point** (bukan LoRaWAN); pita 915/920 MHz [ISI: satu angka] |
+| LoRa | SX1278 (Ra-02), LoRa **point-to-point** (bukan LoRaWAN); pita 433 MHz (keputusan final: modul SX1278 tidak bisa 915/920) |
 | Baterai Vest | Doublepow 18650 **1200 mAh** |
 | Alarm | 3 stage |
 | Deteksi helm | BLE RSSI (bukan sensor sentuh) |
@@ -237,7 +237,7 @@ Cadangan: rekam video demo yang sama; siapkan screenshot log; bawa kabel USB pen
 ## 6. Keputusan dan data yang perlu dilengkapi
 
 1. Dimensi casing final (55×65 vs 114×101×36,6): Calvin dan Yoga.
-2. Frekuensi dan jarak target LoRa (915/920 MHz; 330 m vs ~5 km): seluruh tim.
+2. Jarak target LoRa (pita sudah 433 MHz; 330 m vs ~5 km) dan regulasi 433 MHz: seluruh tim.
 3. Stack backend dan dashboard (Supabase vs MQTT): Rafif.
 4. Angka anggaran terbaru: Rafif dan Gibran.
 5. Foto prototipe dan screenshot log yang lebih lengkap: Rifat dan Gibran.

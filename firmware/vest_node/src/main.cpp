@@ -25,7 +25,7 @@ constexpr int PIN_SDA = 21, PIN_SCL = 22;
 constexpr int PIN_LORA_CS = 5, PIN_LORA_RST = 25, PIN_LORA_DIO0 = 26;
 
 // ---- Parameter (KALIBRASI) ----
-constexpr long LORA_FREQ       = 915E6;   // modul dibeli 915 MHz (regulasi ID 920-923 MHz)
+constexpr long LORA_FREQ       = 433E6;   // Ra-02 SX1278 (410-525 MHz): TIDAK bisa 915/920. Harus sama dengan Gateway
 constexpr float FREEFALL_G     = 0.6f;    // |a| di bawah ini = jatuh bebas (tes nyata: terbaca 0,3-0,5 g karena offset sensor)
 constexpr uint32_t FREEFALL_MS = 120;
 constexpr float IMPACT_G       = 2.5f;    // benturan setelah jatuh bebas

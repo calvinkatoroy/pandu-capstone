@@ -9,7 +9,7 @@
 constexpr int PIN_LORA_CS = 5, PIN_LORA_RST = 14, PIN_LORA_DIO0 = 26, PIN_SIREN = 4;
 constexpr int PIN_SD_SCK = 25, PIN_SD_MISO = 35, PIN_SD_MOSI = 32, PIN_SD_CS = 33;   // SD di bus SPI sendiri (PCB3 v3), terpisah dari LoRa
 SPIClass sdSpi(HSPI);
-constexpr long LORA_FREQ = 915E6;                 // harus sama dengan Vest
+constexpr long LORA_FREQ = 433E6;                 // Ra-02 SX1278, harus sama dengan Vest
 constexpr uint32_t SIREN_MAX_MS   = 60000;        // sirine otomatis berhenti jika tidak ada alert baru selama ini (KALIBRASI)
 constexpr uint32_t VEST_LOST_MS   = 90000;        // tidak ada paket sama sekali selama ini = peringatan "VEST LOST" (serial saja)
 constexpr bool     SIREN_ON_LOST  = false;        // false: jangan bunyikan sirine hanya karena sinyal hilang (rawan alarm palsu)

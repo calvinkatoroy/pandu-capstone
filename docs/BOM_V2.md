@@ -10,7 +10,7 @@ Tanda **PERLU DIPERBAIKI** = item di desain/EasyEDA yang salah atau belum cocok 
 | U3 | ESP32-DevKitC V4 (WROOM-32) | 1 | Ada. Cek jarak baris pin (25,4 vs 22,86 mm) |
 | U8 | GY-521 (MPU6050) | 1 | Ada, tes jatuh jalan. Urutan footprint belum dicek |
 | U9 | GPS NEO-6M + antena keramik | 1 | Ada, dapat fix (sinyal lemah). Antena aktif eksternal disarankan |
-| U6 | Modul LoRa SX1276 (XL1276-P01, 915 MHz) + antena pegas | 1 | Ada 1. **PERLU DIPERBAIKI:** pinout RFM95, footprint PCB = RA-02. Belum disolder. Cek pita 868M vs 915M |
+| U6 | Modul LoRa Ra-02 SX1278 433 MHz (breakout 28x20 mm, header 2,54 mm) | 1 | **Sudah dibeli (sepasang, 13 Okt).** Footprint PCB diganti female header 2x8 (lihat LORA_RA02_BREAKOUT.md). XL1276 915 MHz lama tidak dipakai |
 | U10 | Sensor air analog (S, +, -) | 1 | Ada, ambang 1000 mV. **PERLU DIPERBAIKI:** VCC ke 3V3, hapus R1. (XKC-Y25 tidak dipakai/belum dibeli) |
 | BT1 | Holder 18650 | 1 | Ada |
 | - | Baterai 18650 1200 mAh | 1 | Ada |
@@ -25,7 +25,7 @@ Tanda **PERLU DIPERBAIKI** = item di desain/EasyEDA yang salah atau belum cocok 
 | C2 | Kapasitor 100 nF (0603) | 1 | |
 | SW1, SW2 | Tact switch SMD (TS-1088-AR02016) | 2 | Power dan SOS |
 | H1 | Header 2 pin 2,54 mm | 1 | Untuk pigtail antena LoRa |
-| - | Antena LoRa 915 MHz + pigtail (SMA) | 1 | Untuk Vest belum ada di BOM; antena pegas bawaan modul bisa dipakai tes |
+| - | Antena pegas 433 MHz U.fl 3 dBi (kabel ±15 cm) | 1 | **Sudah dibeli.** Konektor U.fl langsung ke breakout |
 
 ## 2. Helmet Node (PCB2)
 | Ref | Komponen | Jml | Status / catatan |
@@ -46,7 +46,7 @@ Tanda **PERLU DIPERBAIKI** = item di desain/EasyEDA yang salah atau belum cocok 
 | Ref | Komponen | Jml | Status / catatan |
 |---|---|---|---|
 | U5 | ESP32-DevKitC V4 (WROOM-32) | 1 | Ada |
-| U1 | Modul LoRa SX1276 915 MHz | 1 | **Belum dibeli (baru 1 modul)**. Footprint RA-02 sama masalahnya |
+| U1 | Modul LoRa Ra-02 SX1278 433 MHz (breakout) | 1 | **Sudah dibeli (modul kedua dari sepasang).** Footprint: female header 2x8 |
 | H1 | Header 1x6 + modul microSD (SPI) | 1 | Ada. Urutan pin dan level logika perlu dicek |
 | - | Kartu microSD 16/32 GB (FAT32) | 1 | Ada |
 | Q1 | MOSFET IRLZ44N (TO-220) | 1 | Belum ada |
@@ -56,7 +56,7 @@ Tanda **PERLU DIPERBAIKI** = item di desain/EasyEDA yang salah atau belum cocok 
 | U2 | Terminal block 2 pin 3,81 mm | 1 | Untuk sirine |
 | - | Sirine/strobo 5 V (>= 85 dB) | 1 | Belum ada. Perlu dioda flyback jika sirine berkoil/motor |
 | H2 | Header 2 pin | 1 | Pigtail antena |
-| - | Antena LoRa 915 MHz + pigtail SMA | 1 | Ada |
+| - | Antena pegas 433 MHz U.fl 3 dBi | 1 | **Sudah dibeli** |
 | - | Adaptor 5 V 2 A + kabel | 1 | Ada |
 | - | Box enclosure gateway | 1 | Belum ada |
 

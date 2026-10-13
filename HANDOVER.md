@@ -105,3 +105,9 @@ CR2032 dan holder dihapus. Rangkaian: LiPo (header H2 2-pin, `VBAT_POS`/GND) > m
 
 ## Koreksi desain Helmet (8 Okt 2026)
 Deteksi helm TIDAK memakai sensor sentuh. Alur: tombol ON/OFF di Helmet (GPIO4) -> Helmet menyiarkan BLE `PANDU-HELM` -> Vest menilai dekat/jauh dari RSSI (`HELM_RSSI_MIN`, default -85 dBm, dikalibrasi). Field helm di paket LoRa: 1 = beacon terdengar dan dekat, 0 = terdengar tapi jauh, 2 = tidak terdengar (OFF atau jauh > 30 s). Firmware `helmet_node` sudah disederhanakan (tanpa TTP223/GPIO2). TODO PCB2: hapus TTP223 (H1), net `TOUCH_SIG`, dan ganti `SAW1` (salah, bukan saklar). Catatan: checklist dan tutorial breadboard masih menyebut sensor sentuh; abaikan bagian itu.
+
+## Update 13 Okt 2026: LoRa = Ra-02 SX1278 433 MHz
+- Modul LoRa diganti: sepasang Ra-02 SX1278 433 MHz (breakout 28x20 mm, header 2,54 mm) + antena pegas 433 MHz U.fl. Bagian di atas yang menyebut XL1276/RFM95/915 MHz sudah usang.
+- Firmware `vest_node`, `gateway`, `test_lora_one`: `LORA_FREQ = 433E6`.
+- Footprint PCB1/PCB3 harus jadi female header 2x8 2,54 mm; pemetaan pin dan daftar ukur di `docs/LORA_RA02_BREAKOUT.md`.
+- XKC-Y25-V sudah dibeli; varian outputnya (digital 5 V vs analog) belum diukur (K1). IO34 wajib pembagi 10k/20k kalau output 5 V.

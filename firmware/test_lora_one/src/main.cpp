@@ -7,7 +7,7 @@
 #include <LoRa.h>
 
 constexpr int PIN_CS = 5, PIN_RST = 25, PIN_DIO0 = 26;
-constexpr long LORA_FREQ = 915E6;
+constexpr long LORA_FREQ = 433E6;   // Ra-02 SX1278 433 MHz
 
 void setup() {
   Serial.begin(115200);

@@ -43,7 +43,7 @@ Firmware: `firmware/vest_node`, `firmware/helmet_node`, `firmware/gateway` (buil
 - [ ] Mute: kirim `M` di serial, sirine berhenti.
 
 ## 4. Tautan LoRa Vest → Gateway
-- [ ] Frekuensi sama (915 MHz default kedua firmware). Antena terpasang di kedua sisi.
+- [ ] Frekuensi sama (433 MHz, `LORA_FREQ = 433E6` di kedua firmware; modul SX1278 tidak bisa 915). Antena terpasang di kedua sisi.
 - [ ] Jarak 1 m: paket `HB` (heartbeat tiap 30 s) diterima. Catat RSSI: ____ dBm.
 - [ ] Jarak 10, 50, 100 m (terbuka): RSSI ____ / ____ / ____ dBm; paket hilang? ____ %.
 - [ ] Simulasikan `SOS`: sirine Gateway bunyi dalam < 2 detik; `/pandu.csv` bertambah satu baris.

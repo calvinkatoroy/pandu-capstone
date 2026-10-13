@@ -206,3 +206,5 @@ Setiap kali pinout/ukuran modul tidak cocok dengan skematik, tulis di sini lalu 
 |---|---|---|
 | LoRa XL1276-P01 (chip SX1276) | Dari foto sisi pad: kolom kiri atas ke bawah `DIO2, DIO1, DIO0, VCC, DIO4, DIO3, GND, ANT`; kolom kanan `GND, MISO, MOSI, SCK, NSS, REST, DIO5, GND`. Urutan ini = pinout **RFM95**, bukan RA-02 (RA-02: 1 ANT, 2 GND, 3 3,3V, 4 RST, 5 DIO0, ... 15 NSS). | Footprint `WIRELM-SMD_RA-02-BL` di PCB1/PCB3 **tidak cocok** dengan modul ini. Ganti footprint ke RFM95 (atau beli Ra-01H) sebelum order PCB. Cek juga jarak antar deret pad. |
 | LoRa XL1276-P01 | Di foto sisi pad, kotak pita frekuensi (915M/868M/433M/315M/169M) yang terisi/ditandai hitam adalah **868M**. Belum dicek di modul fisik. | Kalau modul fisik juga 868M, matching RF-nya untuk 868 MHz, bukan 915/920 MHz. Cek modul dan listing. |
+
+> **Update 13 Okt 2026:** baris XL1276 di atas usang. Modul sekarang Ra-02 SX1278 433 MHz (breakout); pinout dan wiring di [LORA_RA02_BREAKOUT.md](LORA_RA02_BREAKOUT.md). Frekuensi firmware 433E6.

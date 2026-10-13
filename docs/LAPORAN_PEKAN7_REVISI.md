@@ -68,7 +68,7 @@ Hapus baris casing (sudah di P6). Hapus kata "paketnya terkirim", ganti "terceta
 ### 9. Kendala (baru, nyata)
 | Kendala | Dampak | Solusi |
 |---|---|---|
-| Footprint LoRa (RA-02) tidak cocok dengan modul fisik (pinout RFM95, pitch lebih kecil dari 2,54 mm) | PCB belum bisa dipesan | Ganti footprint ke RFM95 dan ukur modul |
+| Footprint LoRa (RA-02) tidak cocok dengan modul fisik (pinout RFM95, pitch lebih kecil dari 2,54 mm) | PCB belum bisa dipesan | Modul diganti Ra-02 SX1278 433 MHz (breakout 2,54 mm); footprint diganti female header 2x8 setelah modul diukur |
 | Proteksi TP4056 terlewati karena negatif baterai ke GND | Risiko over-discharge/korslet | Pisahkan BAT_NEG (sudah di PCB Helmet, PCB Vest belum) |
 | GPS NEO-6M cold start lama dengan antena keramik | Fix lambat | Uji di luar ruangan, antena aktif/modul multi-konstelasi |
 | ESP32 brownout/reset saat BLE menyala dengan daya USB | Demo tidak stabil | Kabel pendek-tebal, kapasitor 100 µF, firmware demo tanpa deteksi brownout |

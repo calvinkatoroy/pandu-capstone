@@ -35,7 +35,7 @@ Hasilnya ditulis di bagian 7 `TUTORIAL_BREADBOARD.md`.
 | Item | Yang diukur/dicek |
 |---|---|
 | ESP32 DevKit | Jarak tengah lubang kiri-kanan (25,4 atau 22,86 mm), ukuran papan |
-| Modul LoRa XL1276-P01 | Lebar dan jarak deret pad, panjang modul, pita 868M atau 915M (kotak yang terisi), jarak pitch 2 mm |
+| Modul LoRa Ra-02 breakout (SX1278 433 MHz) | Jarak tengah-ke-tengah antar dua deret header, panjang x lebar papan, header sudah tersolder atau lepasan, urutan pin vs foto |
 | TP4056 HW-373 | Urutan pad kiri ke kanan (OUT−, B−, B+, OUT+ dari foto), ukuran papan, posisi USB-C |
 | GY-521 | Urutan pin header dan jarak, posisi lubang baut |
 | GPS NEO-6M | Urutan pin (VCC, RX, TX, GND?), ukuran, konektor antena |
@@ -66,7 +66,7 @@ Hasilnya ditulis di bagian 7 `TUTORIAL_BREADBOARD.md`.
 | # | Tugas | Kode audit |
 |---|---|---|
 | P1-1 | Pisahkan negatif baterai: `BAT_NEG` = `BT1.2` + `U7.3 (B-)`; `U7.4 (OUT-)` dan `U7.6 (IN-)` ke GND | A2 |
-| P1-2 | Ganti footprint LoRa `U6` ke RFM95 (pinout fisik), sambung ulang ANT, GND, 3V3, RST (IO25), DIO0 (IO26), NSS (IO5), SCK/MISO/MOSI | A3 |
+| P1-2 | Ganti footprint LoRa `U6` ke female header 2x8 2,54 mm untuk breakout Ra-02 (pemetaan di LORA_RA02_BREAKOUT.md); sambung ulang 3V3, GND, RST (IO25), DIO0 (IO26), NSS (IO5), SCK/MISO/MOSI | A3 |
 | P1-3 | Sensor air: sesuai K1. Siapkan pembagi `R8` 10 k dan `R9` 20 k (bisa tidak dipasang) di `WATER_SIG`; `R1` pull-up hanya untuk varian open-collector | A4 |
 | P1-4 | Lebarkan `VBAT_RAW`, `VBOOST_5V`, `VBAT_POS` ke sekitar 25 mil | A13 |
 | P1-5 | (jika K2) LED atau haptic + resistor ke GPIO bebas | A11 |
@@ -78,7 +78,7 @@ Hasilnya ditulis di bagian 7 `TUTORIAL_BREADBOARD.md`.
 ### PCB3 Gateway (M)
 | # | Tugas | Kode audit |
 |---|---|---|
-| P3-1 | Ganti footprint LoRa `U1` ke RFM95 | A3 |
+| P3-1 | Ganti footprint LoRa `U1` ke female header 2x8 (breakout Ra-02), RST=IO14, DIO0=IO26, NSS=IO5 | A3 |
 | P3-2 | Pindahkan microSD ke bus SPI terpisah: usul `SD_SCK`=IO25, `SD_MISO`=IO35 (input-only, cukup), `SD_MOSI`=IO32, `SD_CS`=IO33; hindari pin strapping (0, 2, 5, 12, 15). LoRa tetap di IO18/19/23 | A8 |
 | P3-3 | Tombol mute (tact ke GND di IO27, pull-up internal); LED status memakai LED onboard DevKit (IO2) | A9 |
 | P3-4 | Dioda flyback (1N4148/1N5819) di terminal sirine, bisa tidak dipasang untuk buzzer elektronik | A15 |

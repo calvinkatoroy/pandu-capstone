@@ -25,7 +25,7 @@ Per 10 Okt 2026. Catatan status menunjukkan mana yang sudah jalan di breadboard 
 | MPU-6050 (GY-521) | Deteksi jatuh dari akselerometer (free-fall lalu benturan) |
 | Sensor air non-kontak XKC-Y25 | Mendeteksi air di balik casing (prototipe sekarang masih sensor analog kontak) |
 | GPS NEO-6M | Koordinat; dinyalakan hanya saat perlu lewat MOSFET untuk hemat daya |
-| Modul LoRa SX1276 (915/920 MHz) | Mengirim paket ke Gateway |
+| Modul LoRa Ra-02 SX1278 (433 MHz) | Mengirim paket ke Gateway |
 | ESP32 DevKit (WROOM-32) | Pengendali; BLE scanner membaca beacon Helmet |
 | 2 tact switch | Power/tidur (IO13) dan SOS manual (IO27) |
 | Baterai Doublepow 18650 1200 mAh + TP4056 USB-C + boost 5 V | Daya dan pengisian lewat USB-C |
@@ -46,7 +46,7 @@ Per 10 Okt 2026. Catatan status menunjukkan mana yang sudah jalan di breadboard 
 | Komponen | Fungsi |
 |---|---|
 | ESP32 DevKit | Pengendali dan WiFi ke cloud |
-| Modul LoRa SX1276 | Menerima paket dari sampai 8 Vest |
+| Modul LoRa Ra-02 SX1278 (433 MHz) | Menerima paket dari sampai 8 Vest |
 | Modul microSD (bus SPI terpisah) | Log insiden dan buffer saat internet putus (store-and-forward) |
 | MOSFET IRLZ44N + buzzer/sirine | Alarm lokal di Gateway |
 | Adaptor 5 V | Daya |
