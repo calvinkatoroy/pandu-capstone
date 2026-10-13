@@ -263,8 +263,7 @@ void loop() {
   static uint32_t lastStat = 0;
   if (now - lastStat >= 10000) {
     lastStat = now;
-    Serial.printf("{\"status\":{\"lora\":%d,\"sd\":%d,\"rx\":%lu,\"last_rx_s\":%ld,\"wifi\":%d,\"time_synced\":%d}}
-",
+    Serial.printf("{\"status\":{\"lora\":%d,\"sd\":%d,\"rx\":%lu,\"last_rx_s\":%ld,\"wifi\":%d,\"time_synced\":%d}}\n",
                   loraOk, sdOk, (unsigned long)rxCount, rxCount ? (long)((now - lastRxAt) / 1000) : -1L, NET_ENABLED && WiFi.status() == WL_CONNECTED, timeSynced());
   }
 
