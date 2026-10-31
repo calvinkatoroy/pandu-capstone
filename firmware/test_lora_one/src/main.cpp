@@ -12,6 +12,7 @@ void setup() {
   Serial.begin(115200);
   delay(300);
   LoRa.setPins(PIN_CS, PIN_RST, PIN_DIO0);
+  LoRa.setSPIFrequency(1E6);   // default 8 MHz terlalu cepat untuk kabel jumper breadboard
   if (!LoRa.begin(LORA_FREQ)) {
     Serial.println("LoRa.begin GAGAL: cek 3.3V, GND, SCK/MISO/MOSI/NSS/RESET, dan label pin modul (bukan RA-02?)");
     while (true) delay(1000);

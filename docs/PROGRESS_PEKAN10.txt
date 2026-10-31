@@ -1,0 +1,119 @@
+PROGRESS MINGGU KE-10 - PANDU (Kelompok 13)
+Periode: 26 - 31 Oktober 2026
+Anggota: Calvin Wirathama Katoroy, Gibran, Rafif, Rifat
+(DRAFT - cek dan sesuaikan sebelum dikumpulkan)
+
+==================================================
+1. RINGKASAN
+==================================================
+Minggu ini fokus pada integrasi seluruh sistem di breadboard dan pembuktian alur
+data ujung ke ujung. Komponen utama sudah terkumpul dan sesuai BOM, lalu
+dirangkai di breadboard. Alur utama berhasil berjalan dengan hardware asli:
+Vest Node -> LoRa 433 MHz -> Edge Gateway -> WiFi -> Supabase -> Dashboard.
+Pengujian masih menggunakan catu daya USB (belum baterai). Revisi PCB sedang
+berjalan karena dosen meminta jalur tembaga dilebarkan.
+
+==================================================
+2. YANG SUDAH DICAPAI
+==================================================
+a. Pengadaan dan BOM
+   - Komponen utama sudah dibeli dan dicocokkan dengan BOM_V2 (ESP32 DevKit V1,
+     ESP32 SuperMini, Ra-02 LoRa SX1278, GPS NEO-6M, MPU6050/GY-521, sensor air
+     XKC-Y25-V, TP4056, modul microSD, buzzer, tact switch, antena, holder 18650).
+   - Ukuran setiap modul dicatat (BOM_V2 bagian 7) untuk perencanaan casing
+     (tinggi casing sekitar 2,1 cm mengikuti baterai).
+   - Keputusan desain: baterai Helmet dan Vest sama-sama 18650 1200 mAh;
+     saklar geser diganti jumper; buzzer sebagai sirine; MOSFET IRLZ44N diganti
+     2N7002 pada PCB3; PCB1 hapus R1 dan tambah R8/R9 (pembagi sensor air).
+   - Daftar belanja MOSFET/dioda/resistor (versi breadboard dan versi PCB)
+     disusun di BOM_V2 bagian 8.
+
+b. Integrasi hardware (breadboard)
+   - Vest, Helmet, dan Gateway sudah dirangkai di breadboard dan terprogram.
+   - Vest: MPU6050 dan LoRa terdeteksi, heartbeat terkirim.
+   - Helmet: terdeteksi via BLE oleh Vest (RSSI sekitar -54 sampai -88 dBm).
+   - Gateway: LoRa aktif, WiFi (2,4 GHz) dan sinkron waktu NTP berhasil.
+   - Tautan LoRa Vest -> Gateway terbukti dengan paket asli
+     (RSSI sekitar -84 sampai -92 dBm, SNR sekitar 9,8 dB).
+
+c. Firmware dan software
+   - Gateway berhasil mengunggah event ke endpoint ingest (accepted:1).
+   - Firmware Gateway ditambah dukungan http:// untuk pengujian jaringan lokal.
+   - Backend lokal (Supabase di Docker) disiapkan karena project Supabase lama
+     sudah tidak dapat dijangkau; seluruh migrasi 0001-0005 dan seed berhasil.
+   - Bug pendaftaran akun diperbaiki (migrasi 0006_fix_signup_trigger.sql).
+   - Dashboard menampilkan data nyata dari Vest (status WARNING karena tegangan
+     baterai demo rendah) dan berubah ke BAHAYA secara realtime pada simulasi SOS.
+
+d. Audit sistem
+   - Audit menyeluruh firmware, backend, dashboard, dan PCB dituangkan di
+     AUDIT_V3.md (4 temuan kritis, 7 tinggi, 8 sedang, 3 proses) lengkap dengan
+     akar masalah dan usulan perbaikan.
+
+e. PCB
+   - Desain PCB1 lolos DRC (0 masalah) pada kondisi saat ini.
+   - Percobaan pelebaran jalur secara massal menghasilkan 188 pelanggaran jarak
+     (clearance), sehingga dibatalkan dan desain dikembalikan ke kondisi bersih.
+   - Revisi PCB sedang dikerjakan ulang (rute ulang / board lebih besar /
+     pelebaran bertahap per net) sesuai permintaan dosen.
+
+==================================================
+3. KENDALA DAN SOLUSI
+==================================================
+- Error I2C pada MPU6050 (Wire Error 263/-1): penyebab kontak kabel, hilang
+  setelah koneksi diperbaiki.
+- WiFi "kalpinoo" hanya 5 GHz sehingga tidak bisa dipakai ESP32: band 2,4 GHz
+  diaktifkan.
+- Pin baterai (IO35) mengambang sehingga bat_mv acak dan event ditolak server:
+  dipasang pembagi tegangan demo; data diterima.
+- Port Supabase lokal bentrok dengan port yang dicadangkan Windows: port
+  dipindah ke rentang 563xx.
+- Upload sesekali timeout setelah idle (timeout 8 s): rencana dinaikkan ke
+  15-20 s.
+- Pelebaran jalur PCB memicu pelanggaran DRC: dikembalikan, direncanakan ulang.
+
+==================================================
+4. MASALAH YANG MASIH TERBUKA
+==================================================
+- Pembacaan akselerometer g=4,8 saat diam (seharusnya sekitar 1,0): perlu
+  kalibrasi dan pengecekan range MPU6050 (berdampak ke deteksi jatuh).
+- Microsd Gateway belum terbaca (sd:0).
+- Sensor air XKC: belum uji basah dan belum dipastikan polaritas.
+- GPS: belum diuji fix di luar ruangan.
+- Pengujian SOS, jatuh, dan man-overboard dari hardware ke dashboard belum
+  dilakukan secara penuh (baru simulasi SOS lewat API).
+- Temuan kritis audit (K1-K4) belum diperbaiki: alarm bisa ditolak server,
+  LoRa tanpa CRC/sync word, SOS saat bangun deep sleep tanpa posisi, deteksi
+  jatuh gagal diam-diam.
+- Modul pengisi daya kedua (TP4056) dan boost MT3608 untuk daya baterai Vest
+  perlu dipastikan ketersediaannya.
+- Project Supabase bersama (hosted) perlu dibuat ulang agar tim memakai
+  backend yang sama.
+
+==================================================
+5. PEMBAGIAN TUGAS
+==================================================
+- Gibran dan Rafif : troubleshooting rangkaian hardware secara langsung.
+- Calvin           : membantu troubleshooting hardware, serta troubleshooting
+                     firmware.
+- Rifat            : troubleshooting dashboard.
+
+==================================================
+6. RENCANA MINGGU DEPAN (MINGGU KE-11)
+==================================================
+- Senin: integrasi dengan baterai agar rangkaian compact (Vest dan Helmet);
+  uji daya baterai dan charging.
+- Setelah penggunaan baterai terbukti stabil: pesan PCB.
+- Selesaikan revisi PCB (jalur dilebarkan sesuai permintaan dosen), lalu
+  DRC ulang dan pengecekan skematik PCB2 dan PCB3.
+- Firmware: kalibrasi MPU6050, perbaikan K1-K4 dari audit, naikkan timeout
+  upload, perbaiki SD Gateway.
+- Uji lapangan: SOS, jatuh, man-overboard, GPS fix, sensor air (basah).
+- Dashboard: buat/konfirmasi project Supabase bersama, terapkan migrasi,
+  dan lanjutkan perbaikan keamanan (pendaftaran terbuka).
+- Commit dan push seluruh perubahan ke repositori.
+
+==================================================
+7. DOKUMEN PENDUKUNG
+==================================================
+docs/BOM_V2.md, docs/AUDIT_V3.md, docs/REKAP_RABU_28_OKT_2026.md

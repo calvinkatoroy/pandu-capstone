@@ -167,8 +167,10 @@ bool upload() {
   body += "]}";
   // ponytail: setInsecure() tidak memverifikasi sertifikat server. Untuk produksi: pasang CA root (setCACert) agar device key tidak bisa disadap MITM.
   WiFiClientSecure client; client.setInsecure();
+  WiFiClient plainClient;                                       // http:// hanya untuk uji LAN (Supabase lokal); produksi wajib https
   HTTPClient http; http.setTimeout(8000);
-  if (!http.begin(client, INGEST_URL)) return false;
+  bool plain = strncmp(INGEST_URL, "http://", 7) == 0;
+  if (!(plain ? http.begin(plainClient, INGEST_URL) : http.begin(client, INGEST_URL))) return false;
   http.addHeader("Content-Type", "application/json");
   http.addHeader("x-device-key", DEVICE_KEY);
   int code = http.POST(body);
