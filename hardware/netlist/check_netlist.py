@@ -35,7 +35,26 @@ pcb3 = dict(LORA_CS="IO5", LORA_RST="IO14", LORA_DIO0="IO26", SD_CS="IO33", SD_S
 # Pemakaian: python check_netlist.py [pcb1] [pcb2] [pcb3]   (tanpa argumen = semua board)
 want = {a.lower() for a in sys.argv[1:]} or {"pcb1", "pcb2", "pcb3"}
 e = 0
-if "pcb1" in want: print("PCB1"); e += check("PCB1.tel", pcb1)
+if "pcb1" in want:
+    print("PCB1"); e += check("PCB1.tel", pcb1)
+    n1 = parse("PCB1.tel"); gnd1 = set(n1.get("GND", []))
+    # P1-1 / audit A2: negatif baterai hanya ke B- TP4056 (BAT_NEG), supaya proteksi DW01 tidak terlewati.
+    # OUT- (U7.4) dan IN- (U7.6) ke GND sistem; B- (U7.3) dan BT1.2 TIDAK boleh di GND.
+    ok = {"BT1.2", "U7.3"} <= set(n1.get("BAT_NEG", [])); e += not ok
+    print(f"  {'OK ' if ok else 'ERR'} BAT_NEG = BT1.2 + U7.3 {sorted(n1.get('BAT_NEG', []))}")
+    bad = {"BT1.2", "U7.3"} & gnd1; e += bool(bad)
+    print(f"  {'OK ' if not bad else 'ERR'} B- dan baterai negatif tidak di GND {sorted(bad)}")
+    ok = {"U7.4", "U7.6"} <= gnd1; e += not ok
+    print(f"  {'OK ' if ok else 'ERR'} TP4056 OUT- (U7.4) dan IN- (U7.6) di GND")
+    # P1-3 / audit A4: output XKC-Y25 (bisa 5 V) ke IO34 lewat pembagi R8 10k (seri) dan R9 20k (ke GND); R1 pull-up dihapus.
+    ok = {"R8.1", "U10.1"} == set(n1.get("XKC_OUT", [])); e += not ok
+    print(f"  {'OK ' if ok else 'ERR'} XKC_OUT = R8.1 + U10.1 {sorted(n1.get('XKC_OUT', []))}")
+    ok = {"R8.2", "R9.1", "U3.J2-5"} == set(n1.get("WATER_SIG", [])); e += not ok
+    print(f"  {'OK ' if ok else 'ERR'} WATER_SIG = R8.2 + R9.1 + IO34 (U3.J2-5) {sorted(n1.get('WATER_SIG', []))}")
+    ok = "R9.2" in gnd1; e += not ok
+    print(f"  {'OK ' if ok else 'ERR'} R9.2 di GND")
+    r1 = [n for n, pins in n1.items() if any(p.startswith("R1.") for p in pins)]; e += bool(r1)
+    print(f"  {'OK ' if not r1 else 'ERR'} R1 (pull-up lama) sudah dihapus {r1}")
 if "pcb3" in want:
     print("PCB3"); e += check("PCB3.tel", pcb3)
     n3 = parse("PCB3.tel")
