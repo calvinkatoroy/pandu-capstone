@@ -2,7 +2,7 @@ $PACKAGES
 COMM-SMD_ESP32-DEVKITC-32D ! COMM-SMD_ESP32-DEVKITC-32D ! '{Value}' ; U5 
 HDR-TH_6P-P2_54-V-M-1 ! HDR-TH_6P-P2_54-V-M-1 ! '{Value}' ; H1 
 R0603 ! R0603 ! '10kΩ' ; R2 
-Ra02_Breakout_2x8_26mm ! Ra02_Breakout_2x8_26mm ! '{Value}' ; U1 
+Ra02_Breakout_2x8_25_4mm ! Ra02_Breakout_2x8_25_4mm ! '{Value}' ; U1 
 $A_PROPERTIES
 $NETS
 '5V_SYS' ; H1.2 U5.J2-19 
