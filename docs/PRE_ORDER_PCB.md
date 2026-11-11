@@ -27,7 +27,8 @@ Urutan menurut ketergantungan: tahap 1 menentukan apakah tahap 3 perlu diulang; 
 - [x] PCB1: `U10` sudah footprint `CONN-TH_B4B-XH-A-LF-SN` (JST XH 4 pin 2,5 mm, 11 Nov): pad 1 = SIG, 2 = VCC (5 V), 3 = GND, pad 4 tidak tersambung (keputusan Calvin: kabel XH 4 pin, pin 4 dibiarkan kosong). Terbukti di `PCB1.tel` (net tidak berubah), rute ulang 214 jalur/15 via/100%, copper di-rebuild, DRC 0. Urutan fisik kabel ke pad 1-3 masih DUGAAN.
 - [ ] PCB1: tentukan part `R9` 20k (device masih `Res_0603` generik); tinjau posisi `R8`/`R9` dengan Calvin.
 - [ ] PCB3: garis luar microSD 42 x 24 mm: **belum digambar**. Dari tampilan EasyEDA tidak ada ruang bebas 42 x 24 mm di papan 55,88 x 77,47 mm (header `H1` ada di tepi kanan, di sebelah Ra-02 dan DevKit), jadi modul akan menimpa Ra-02/DevKit atau menjorok keluar papan. Perlu keputusan: modul dihubungkan lewat kabel di luar PCB, ditaruh di atas komponen lain (header lebih tinggi), atau PCB3 diperbesar.
-- [ ] Rute ulang (Unroute All, Auto Route, rebuild copper, Check DRC). Jalur daya (`VBAT_RAW`, `VBAT_POS`, `VBOOST_5V`, 5V) 25 mil bila muat.
+- [x] Jalur daya 25 mil (11 Nov, aturan net `power25mil` 25 mil, jalur lain tetap 16 mil): PCB1 net `VBAT_RAW`, `VBAT_POS`, `VBOOST_5V`, `5V_DK` (rute ulang 223 jalur/14 via/100%, copper di-rebuild, DRC 0, papan tetap 107,95 x 95,25 mm); PCB2 net `VBAT_RAW`, `VBAT_POS`, `VBAT_SW` (45 jalur/3 via/100%, DRC 0, 31,6 x 99,1 mm). Netlist PCB1 identik dengan sebelumnya. Lebar jalur hasil rute diperiksa visual (jalur daya jelas lebih tebal) dan dari aturan, belum diukur satu per satu. PCB3 tidak punya net daya baterai; 5V_SYS dan 3V3 di PCB3 masih 16 mil.
+- [ ] Rute ulang tiap kali footprint berubah lagi (Unroute All, Auto Route, rebuild copper, Check DRC).
 - [ ] Hilangkan net satu pin yang tersisa (mis. `VBUS_5V` di PCB1).
 
 **Tahap 4. Ukuran dan casing (G7)**
