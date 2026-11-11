@@ -13,9 +13,9 @@ Sumber: ukuran modul fisik diukur Calvin (5 Nov), footprint dibaca dari EasyEDA 
 
 ## Ra-02 breakout (dua deret 1x8)
 - Pitch 2,54 mm; panjang deret 7 x 2,54 = 17,78 mm.
-- **Jarak antar deret 26,0 mm** (tengah ke tengah), deret ada di dua ujung panjang modul; modul 27 sampai 28 x 20,5 mm.
+- **Jarak antar deret 25,4 mm** (tengah ke tengah; dikoreksi 11 Nov dari 26,0, status D: penggaris teliti + standar 10 x 2,54, disetujui Calvin), deret ada di dua ujung panjang modul; modul 27 sampai 28 x 20,5 mm.
 - Pemetaan pin: `LORA_RA02_BREAKOUT.md` (**urutan di silkscreen modul belum diverifikasi**).
-- Cara paling mudah: dua header betina 1x8 terpisah, 26,0 mm antar pusat, atau satu footprint kustom 16 pad.
+- Cara paling mudah: dua header betina 1x8 terpisah, 25,4 mm antar pusat, atau satu footprint kustom 16 pad.
 
 ## TP4056 HW-373 Type-C
 - Papan 28,5 x 17 mm.

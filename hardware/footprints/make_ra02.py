@@ -1,7 +1,7 @@
-"""Footprint Ra-02 breakout (2 deret 1x8, 2,54 mm, jarak deret 26,0 mm) -> KiCad .kicad_mod untuk diimpor ke EasyEDA.
+"""Footprint Ra-02 breakout (2 deret 1x8, 2,54 mm, jarak deret 25,4 mm) -> KiCad .kicad_mod untuk diimpor ke EasyEDA.
 Pad bernomor sama dengan pin simbol Ra-02 di skematik (netlist tidak berubah). Pad GND ekstra kiri-bawah diberi nomor 2 (net GND sama).
 Pandangan atas, modul portrait, U.fl kiri-bawah. Ubah ROW / PITCH bila ukuran fisik beda."""
-PITCH, ROW = 2.54, 26.0
+PITCH, ROW = 2.54, 25.4
 TOP = [16, 15, 14, 13, 12, 11, 10, 9]   # GND NSS MOSI MISO SCK DIO5 DIO4 GND (kiri ke kanan)
 BOT = [2, 2, 3, 4, 5, 6, 7, 8]          # GND GND 3.3V RST DIO0 DIO1 DIO2 DIO3
 pads = []
@@ -18,5 +18,5 @@ out = f'''(footprint "Ra02_Breakout_2x8_{ROW:g}mm" (version 20211014) (generator
 )
 '''
 open(f"Ra02_Breakout_2x8_{ROW:g}mm.kicad_mod", "w", encoding="utf-8").write(out)
-assert len(pads) == 16 and abs((ROW) - 26.0) < 1e-9
+assert len(pads) == 16 and abs((ROW) - 25.4) < 1e-9
 print(out)

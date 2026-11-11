@@ -23,7 +23,7 @@ Proyek: P.A.N.D.U (Perangkat Alarm Nirkabel Deteksi Urgensi), wearable keselamat
 | PCB2 Helmet Node | ESP32-C3 SuperMini, TP4056 HW-373, baterai, 1 tact (on/off, GPIO4), jumper/saklar baterai | BLE beacon `PANDU-HELM`. Tanpa sensor sentuh TTP223 |
 | PCB3 Edge Gateway | ESP32 DevKit **38 pin** (19/sisi), Ra-02 breakout, microSD (SPI sendiri) | **Pure gateway: tanpa sirine/buzzer** (keputusan 11 Nov). WiFi ke Supabase |
 - LoRa = **433 MHz** (SX1278), `LORA_FREQ = 433E6`. Modul 868/915 MHz lama tidak dipakai.
-- Ra-02 yang dibeli = **breakout 2,54 mm** (bukan modul SMD telanjang). Jarak deret 26,0 mm. Pin: `docs/LORA_RA02_BREAKOUT.md`.
+- Ra-02 yang dibeli = **breakout 2,54 mm** (bukan modul SMD telanjang). Jarak deret **25,4 mm** (D: penggaris teliti 11 Nov + cocok standar 10 x 2,54; berkas sumber footprint dikoreksi dari 26,0, disetujui Calvin 11 Nov; salinan EasyEDA belum diperbarui). Pin: `docs/LORA_RA02_BREAKOUT.md`.
 - Pin map firmware dan netlist: `HANDOVER.md` (bagian "Pemetaan pin final", XKC_EN=IO32) dan `hardware/netlist/check_netlist.py`. Jangan pakai IO6-11 (flash); hati-hati strapping IO0/2/5/12/15.
 - Sensor yang dibuang: VL53L0X, BME680. Jangan ditambahkan kembali.
 
