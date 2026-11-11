@@ -9,6 +9,7 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 - Sumber kebenaran skematik/PCB = EasyEDA (akun calvinwkatoroy). Repo ini hanya salinan.
 
 ## Keputusan yang sudah final
+- **11 Nov 2026: Edge Gateway = pure gateway, TANPA sirine/buzzer.** Rangkaian sirine (Q1, R1, R3, terminal U2, net `SIREN_DRV`/IO4) dihapus dari PCB3, BOM, dan firmware; setiap catatan sirine/IRLZ44N/IRFZ44N/dioda flyback/mute di bawah **usang**. Panduan terkini: `CLAUDE.md`, `docs/PRE_ORDER_PCB.md`, `docs/AGENT_PLAN.md`.
 - Sensor Vest: MPU6050, XKC-Y25 (air, non-kontak, VCC 5 V), GPS NEO-6M, LoRa. **Tanpa VL53L0X dan BME680** (false positive anti-crush). Tanpa buzzer di Vest.
 - Board ESP32 Vest: **ESP32-DevKitC V4 WROOM-32D (klasik, Micro USB)**, bukan DevKitM-1/C3. Nama part di EasyEDA "ESP32-DEVKITM-1" menyesatkan.
 - Daya Vest: 18650 > TP4056 > `VBAT_RAW` (tanpa saklar seri). Boost 5 V selalu aktif memberi pin 5V ESP32 dan `VBOOST_5V`. AMS1117, C1, C2 dihapus.
@@ -19,7 +20,7 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 ## Status per board
 **PCB1 (Vest)**: skematik sudah diperbaiki (RA-02 pin 1 = ANT bukan GND, GND pin 2/9/16, GPS_EN tersambung, gating MOSFET). PCB di-update, auto-route, DRC 0 error, 0 ratline.
 **PCB2 (Helmet)**: belum diubah. Risiko brownout CR2032 (tambah 100-220 uF low-ESR di 3V0).
-**PCB3 (Gateway, sudah diganti ke DevKitC, lihat blocker 2)**: EN pull-up + 100 nF, header program J1 1x6, ANT RA-02 diperbaiki, EP ke GND, pull-down gate sirine R3. DRC 0 error. Masih ESP32 **modul polos** WROOM-32.
+**PCB3 (Gateway, sudah diganti ke DevKitC, lihat blocker 2)**: EN pull-up + 100 nF, header program J1 1x6, ANT RA-02 diperbaiki, EP ke GND, pull-down gate sirine R3 [USANG 11 Nov: sirine dihapus]. DRC 0 error. Masih ESP32 **modul polos** WROOM-32.
 
 ## BLOCKER (urut prioritas)
 1. **[SELESAI di PCB1, 2 Okt malam]** Footprint ESP32 PCB1 sudah diganti ke DevKitC V4 (part LCSC C571181, designator U3, jarak baris resmi 1,0"). Skematik PCB1 tersimpan, PCB di-update, auto-route 0 ratline, DRC 0 error. Yang masih harus dicek: ukuran fisik board klon, dan USB micro DevKit sekarang menghadap ke dalam papan (perhatikan akses di casing). Teks lama:
@@ -29,7 +30,7 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 4. Setelah 1-3: lebarkan trek daya (VBAT_RAW, VBAT_POS 20 mil; auto-route menimpa ke 10 mil), DRC, ekspor Gerber PCB1/2/3 baru ke `hardware/`.
 
 ## Item terbuka lain
-- Gateway: Q1 IRFZ44N bukan logic-level, ganti IRLZ44N (footprint sama). USB-C tanpa resistor CC 5,1k (pakai kabel A-ke-C). Dioda flyback hanya jika beban induktif.
+- Gateway: [USANG 11 Nov: Q1 dan sirine dihapus] USB-C tanpa resistor CC 5,1k (pakai kabel A-ke-C).
 - Pin TP4056 dan boost: urutan harus dicek ke modul fisik.
 - Casing SCAD (`weekly/WEEK_6/PANDU_VestNode_Casing.scad`) belum diupdate: TP4056 di sisi Bottom (bukaan USB), posisi boost (kiri), XKC-Y25, plug USB, alur gasket.
 - Gerber lama (`weekly/WEEK_6/Gerber`) **jangan dipesan**.
@@ -53,7 +54,7 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 
 ## Pemetaan pin final
 - Vest (U3 DevKitC): PWR_BTN=IO13, BTN_SOS=IO27, WATER_SIG=IO34, GPS_EN=IO4, **XKC_EN=IO32** (bukan IO2, strapping), SPI MOSI/MISO/SCK=IO23/19/18, LORA_CS=IO5, LORA_RST=IO25, LORA_DIO0=IO26, I2C SDA/SCL=IO21/22, GPS RX/TX=IO17/16.
-- Gateway (U5 DevKitC): SPI IO23/19/18, LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SD_CS=IO13, SIREN_DRV=IO4, 3V3 dan 5V_SYS dari/ke pin DevKit.
+- Gateway (U5 DevKitC): SPI IO23/19/18, LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SD_CS=IO13 [lama; sekarang SD IO25/35/32/33], ~~SIREN_DRV=IO4~~ (dihapus 11 Nov), 3V3 dan 5V_SYS dari/ke pin DevKit.
 - Modul baru yang akan dibeli (kata Calvin): XKC-Y25, boost 5 V; CATATAN KOREKSI: RA-02 itu SX1278 (433 MHz), BUKAN 915 MHz. Footprint "RA-02" di PCB hanya mewakili pinout 16 pin 2 mm. Untuk 915 MHz pakai modul SX1276 (mis. Ra-01H atau RFM95W) dan cek pinout + jarak antar deret pad terhadap footprint, bukan membeli RA-02.
 
 ## Update 3 Okt 2026 (akhir sesi lokal)
@@ -70,8 +71,8 @@ Penerima: sesi baru (cloud atau lokal). Baca ini dulu, lalu `weekly/WEEK_6/Audit
 ## v2 (6 Okt 2026): perbaikan dari cek netlist (branch `v2`, EasyEDA `main`)
 Gerber v2: `hardware/gerber/Gerber_PCB1_2026-10-06.zip` dan `Gerber_PCB3_2026-10-06.zip` (DRC 0 error). PCB2 tidak berubah (pakai Gerber 3 Okt). Netlist terbaru: `hardware/netlist/` (cek: `python check_netlist.py`).
 - PCB1: + header 2 pin H1 untuk antena (pigtail ke SMA, `LORA_ANT` sekarang terhubung ke RA-02 pin 1, `GND`); + C1 100 uF tantalum di 3V3_SYS; + D1 SS14 antara `VBOOST_5V` (anoda) dan pin 5V DevKit (`5V_DK`, katoda) agar USB DevKit tidak backfeed ke boost/baterai.
-- PCB3: USB-C (USB1) dihapus, hanya micro-USB DevKit (satu port); + R2 10k pull-up SD_CS ke 3V3; + H2 header antena; Q1 IRFZ44N diganti IRLZ44N (logic-level, footprint TO-220 vertikal).
-- Catatan: sirine di PCB3 sekarang disuplai lewat jalur 5V DevKit/USB (arus sirine lewat konektor micro-USB; cek rating adaptor dan jalur DevKit). Antena: sambung pigtail U.FL/SMA ke H1/H2 manual.
+- PCB3: USB-C (USB1) dihapus, hanya micro-USB DevKit (satu port); + R2 10k pull-up SD_CS ke 3V3; + H2 header antena; Q1 IRFZ44N diganti IRLZ44N [USANG 11 Nov: Q1 dan sirine dihapus].
+- [USANG 11 Nov: sirine dihapus] Antena: sambung pigtail U.FL/SMA ke H1/H2 manual.
 - Belum: modul fisik belum diverifikasi, PCB2 (dioda D1 + CR2032 vs ESP32), casing Helmet/Gateway, firmware Gateway.
 
 - PCB2 (v2): dioda D1 1N5819 dihapus (drop 0,3-0,45 V membuat modul < 3,0 V dari CR2032); SAW1.OUTPUT langsung ke `3V0_HELMET`. DRC 0 error, Gerber `hardware/gerber/Gerber_PCB2_2026-10-06.zip`. Arus puncak BLE vs CR2032 tetap perlu uji nyata (cadangan: Li-ion kecil / 2xCR2032).
@@ -91,7 +92,7 @@ Firmware: SOS bangun dari sleep dan langsung kirim (3x ulang), alert baru dikiri
 - Vest scanner BLE (6 Okt): NimBLE pasif, interval 62,5 ms/window 31 ms, scan terus-menerus; paket helm = manufacturer data FF FF 'P' 'H' worn counter. Paket LoRa sekarang: `PANDU,V1,<jenis>,<lat>,<lon>,<mV>,<helm>` dengan helm 1=dipakai, 0=terdengar tidak dipakai, 2=tidak terjangkau (timeout 30 s, juga 2 setelah bangun sampai paket pertama ~8 s). Konsekuensi: scan terus menambah arus Vest (perkiraan +10-15 mA, ukur) -> kalau boros, ganti ke scan berkala. Gateway/dashboard harus mem-parse field ke-7. Kompilasi OK (flash 48%), belum diuji.
 
 ## Firmware Gateway (6 Okt 2026)
-`firmware/gateway/` (PlatformIO, DevKitC V4). Terima LoRa 433 MHz (sebelumnya 915), parse `PANDU,V1,<jenis>,<lat>,<lon>,<mV>,<helm>`, keluarkan JSON per baris di serial 115200 (tambahan rssi/snr), log CSV ke SD (/pandu.csv), sirine (IO4 HIGH): SOS/MOB 500 ms, FALL 200 ms, otomatis berhenti 60 s tanpa alert baru, kirim 'M' di serial untuk mute. Peringatan `vest_lost` setelah 90 s tanpa paket (sirine mati secara default, `SIREN_ON_LOST`). Kompilasi OK (flash 26%), belum diuji. Belum: ACK ke Vest, enkripsi/otentikasi paket, tombol mute fisik (PCB3 tidak punya), jembatan serial -> dashboard.
+`firmware/gateway/` (PlatformIO, DevKitC V4). Terima LoRa 433 MHz (sebelumnya 915), parse `PANDU,V1,<jenis>,<lat>,<lon>,<mV>,<helm>`, keluarkan JSON per baris di serial 115200 (tambahan rssi/snr), log CSV ke SD (/pandu.csv), [sirine dihapus dari firmware 11 Nov: tanpa IO4, tanpa mute 'M']. Peringatan `vest_lost` setelah 90 s tanpa paket (serial). Kompilasi OK (flash 26%), belum diuji. Belum: ACK ke Vest, enkripsi/otentikasi paket, jembatan serial -> dashboard.
 
 ## PCB2 v2.1 (8 Okt 2026): Helmet pakai LiPo + TP4056 (keputusan Calvin)
 CR2032 dan holder dihapus. Rangkaian: LiPo (header H2 2-pin, `VBAT_POS`/GND) > modul TP4056 USB-C berproteksi (U7, OUT+ = `VBAT_RAW`) > saklar geser SAW1 > `VBAT_SW` > pin **5V** SuperMini (regulator onboard 3,3 V). 3V3 dari board memberi daya TTP223 (net `3V0_HELMET`, sebenarnya 3,3 V). Tombol tact GPIO4 dan sensor sentuh GPIO2 tidak berubah. Outline diperpanjang jadi 1245 x 3900 mil. DRC 0, tanpa ratline. Gerber: `hardware/gerber/Gerber_PCB2_2026-10-08.zip` (menggantikan versi 6 Okt). Netlist `PCB2.tel` diperbarui. USB SuperMini aman dicolok bersama baterai karena baterai masuk lewat pin 5V (diode onboard SuperMini ke VBUS harus diverifikasi di board fisik). Belum: casing Helmet, cek apakah pin 5V SuperMini benar-benar lewat LDO (bukan terhubung langsung ke 3V3), arus TP4056 saat beban.

@@ -37,10 +37,8 @@ Firmware: `firmware/vest_node`, `firmware/helmet_node`, `firmware/gateway` (buil
 
 ## 3. Gateway
 - [ ] Upload `gateway`. Serial `{"boot":true,"lora":1,"sd":1}`. Jika `sd":0`: cek kartu SD (FAT32), CS IO13, kabel.
-- [ ] Sirine lepas dulu, ukur gate IRLZ44N: 0 V saat idle, ≈ 3,3 V saat sirine ON.
-- [ ] Sambung sirine/beban uji (jangan langsung sirine penuh): LED + resistor dulu, lalu sirine. Arus sirine ____ A, jalur 5V DevKit tidak jatuh di bawah 4,5 V.
 - [ ] **Hanya satu port USB** dicolok (micro-USB DevKit). Jangan pernah dua sumber 5 V bersamaan.
-- [ ] Mute: kirim `M` di serial, sirine berhenti.
+- [ ] Gateway tanpa sirine/buzzer (keputusan 11 Nov): peringatan alarm hanya lewat dashboard. Tidak ada uji sirine, mute, atau MOSFET.
 
 ## 4. Tautan LoRa Vest → Gateway
 - [ ] **Paket v2:** serial Gateway menampilkan `vest_id`, `seq` naik tiap HB (selang 25-35 s, jitter); SOS: tiga paket `seq` sama, yang ke-2 dan ke-3 bertanda `"dup":true`; tombol power Vest -> `type":"OFF"`.
@@ -48,8 +46,8 @@ Firmware: `firmware/vest_node`, `firmware/helmet_node`, `firmware/gateway` (buil
 - [ ] Frekuensi sama (433 MHz, `LORA_FREQ = 433E6` di kedua firmware; modul SX1278 tidak bisa 915). Antena terpasang di kedua sisi.
 - [ ] Jarak 1 m: paket `HB` (heartbeat tiap 30 s) diterima. Catat RSSI: ____ dBm.
 - [ ] Jarak 10, 50, 100 m (terbuka): RSSI ____ / ____ / ____ dBm; paket hilang? ____ %.
-- [ ] Simulasikan `SOS`: sirine Gateway bunyi dalam < 2 detik; `/pandu.csv` bertambah satu baris.
-- [ ] Simulasikan `FALL` dan `MOB`: pola sirine berbeda (200 ms vs 500 ms).
+- [ ] Simulasikan `SOS`: serial Gateway menampilkan event SOS dalam < 2 detik, `/pandu.csv` bertambah satu baris, dan event muncul di dashboard.
+- [ ] Simulasikan `FALL` dan `MOB`: jenis event benar di serial dan dashboard.
 - [ ] Matikan Vest: setelah 90 detik Gateway mencetak `vest_lost`.
 - [ ] Paket asing (kirim string acak dari modul lain) diabaikan (`bad_packet`).
 
