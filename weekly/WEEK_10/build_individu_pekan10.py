@@ -215,7 +215,11 @@ fill(T[6], [
 # Tanda tangan Calvin dipertahankan dari template; tanda tangan ketua dihapus (harus ditandatangani sendiri).
 st(P[79], "Tanggal: 31 Oktober 2026")
 st(P[85], "Tanggal: 31 Oktober 2026")
-for dr in P[84]._p.findall('.//' + qn('w:drawing')):
-    dr.getparent().remove(dr)
+# Tanda tangan ketua (Rafif, sudah ACC) dipertahankan dari template pekan 7,
+# dikecilkan 70% agar halaman persetujuan tetap muat di satu halaman.
+for ext in P[84]._p.iter():
+    if ext.tag.endswith('}extent') or (ext.tag.endswith('}ext') and ext.get('cx')):
+        ext.set('cx', str(int(int(ext.get('cx')) * 0.7)))
+        ext.set('cy', str(int(int(ext.get('cy')) * 0.7)))
 d.save(OUT)
 print("OK", OUT)
