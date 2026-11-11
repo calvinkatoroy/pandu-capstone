@@ -78,5 +78,8 @@ if "pcb2" in want:
         print(f"  {'OK ' if ok else 'ERR'} {name} {sorted(n2.get(name, []))}")
     if "TOUCH_SIG" in n2: bad2 += 1; print("  ERR TOUCH_SIG masih ada")
     if {"H2.2", "U7.3"} & set(n2.get("GND", [])): bad2 += 1; print("  ERR B- atau baterai negatif masih di GND")
+    # stub net satu pin (mis. $1N31 di U1.11) tidak boleh ada
+    stub = {n: p for n, p in n2.items() if len(p) == 1}; bad2 += bool(stub)
+    print(f"  {'OK ' if not stub else 'ERR'} tidak ada net satu pin (stub) {stub}")
     e += bad2
 sys.exit(1 if e else 0)
