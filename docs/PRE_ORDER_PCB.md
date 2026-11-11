@@ -24,8 +24,9 @@ Urutan menurut ketergantungan: tahap 1 menentukan apakah tahap 3 perlu diulang; 
 
 **Tahap 3. Sesuaikan desain dengan hasil tahap 1 dan 2** (satu perubahan, satu simpan, satu DRC)
 - [ ] Koreksi footprint yang berbeda dari modul (pad TP4056, urutan pin GPS/microSD/GY-521, lubang baut).
-- [ ] PCB1: `U10` jadi XH 4 pin; tentukan part `R9` 20k; tinjau posisi `R8`/`R9` dengan Calvin.
-- [ ] PCB3: garis luar microSD 42 x 24 mm sesuai posisi header.
+- [x] PCB1: `U10` sudah footprint `CONN-TH_B4B-XH-A-LF-SN` (JST XH 4 pin 2,5 mm, 11 Nov): pad 1 = SIG, 2 = VCC (5 V), 3 = GND, pad 4 tidak tersambung (keputusan Calvin: kabel XH 4 pin, pin 4 dibiarkan kosong). Terbukti di `PCB1.tel` (net tidak berubah), rute ulang 214 jalur/15 via/100%, copper di-rebuild, DRC 0. Urutan fisik kabel ke pad 1-3 masih DUGAAN.
+- [ ] PCB1: tentukan part `R9` 20k (device masih `Res_0603` generik); tinjau posisi `R8`/`R9` dengan Calvin.
+- [ ] PCB3: garis luar microSD 42 x 24 mm: **belum digambar**. Dari tampilan EasyEDA tidak ada ruang bebas 42 x 24 mm di papan 55,88 x 77,47 mm (header `H1` ada di tepi kanan, di sebelah Ra-02 dan DevKit), jadi modul akan menimpa Ra-02/DevKit atau menjorok keluar papan. Perlu keputusan: modul dihubungkan lewat kabel di luar PCB, ditaruh di atas komponen lain (header lebih tinggi), atau PCB3 diperbesar.
 - [ ] Rute ulang (Unroute All, Auto Route, rebuild copper, Check DRC). Jalur daya (`VBAT_RAW`, `VBAT_POS`, `VBOOST_5V`, 5V) 25 mil bila muat.
 - [ ] Hilangkan net satu pin yang tersisa (mis. `VBUS_5V` di PCB1).
 

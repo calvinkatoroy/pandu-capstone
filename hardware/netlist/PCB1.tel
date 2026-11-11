@@ -3,6 +3,7 @@ BAT-TH_BH-18650-A1AJ005 ! BAT-TH_BH-18650-A1AJ005 ! '{Value}' ; BT1
 C0603 ! C0603 ! 100nF ; C2 
 CASE-B_3528 ! CASE-B_3528 ! 100uF ; C1 
 COMM-TH_GY-521 ! COMM-TH_GY-521 ! '{Value}' ; U8 
+CONN-TH_B4B-XH-A-LF-SN ! CONN-TH_B4B-XH-A-LF-SN ! '{Value}' ; U10 
 ESP32_DevKitV1_30P_J2J3 ! ESP32_DevKitV1_30P_J2J3 ! '{Value}' ; U3 
 HDR-TH_HDR-M_2_54_1X4P ! HDR-TH_HDR-M_2_54_1X4P ! '{Value}' ; U2 
 NEO-6M-V2-GPSMODULE-FOOTPRINT ! NEO-6M-V2-GPSMODULE-FOOTPRINT ! '{Value}' ; U9 
@@ -19,7 +20,6 @@ SOT-23_L2_9-W1_3-P1_90-LS2_4-BR ! SOT-23_L2_9-W1_3-P1_90-LS2_4-BR ! '{Value}' ,
         ; Q5 
 SW-SMD_L3_9-W3_0-P4_45 ! SW-SMD_L3_9-W3_0-P4_45 ! '{Value}' ; SW1 ,
         SW2(SOSButton) 
-Water_Level_Sensor ! Water_Level_Sensor ! '{Value}' ; U10 
 $A_PROPERTIES
 $NETS
 '3V3_SYS' ; C1.1 Q1.2 R3.2 SW2(SOSButton).1 U3.J2-1 U6.3 U8.8 
