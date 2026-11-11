@@ -22,30 +22,32 @@ Status tiap angka: **T** = TERBUKTI (diukur/dijalankan), **D** = DUGAAN (listing
 ## 2. Ukuran fisik yang harus diukur (jangka sorong, resolusi 0,05 mm; catat T/D)
 Pengukuran 5 dan 28 Okt memakai penggaris (akurasi sekitar 0,5 mm). Ukur ulang semua kolom "Ukur baru".
 
+**Riset web 11 Nov (`docs/RISET_KOMPONEN.md`)**: jarak deret Ra-02 breakout kemungkinan **25,4 mm** (bukan 26,0 mm yang ada di footprint); TP4056 Type-C punya tiga angka berbeda (27,5 / 28,5 / 29 mm); lubang 1,0 mm untuk pin header 0,64 mm sudah standar. Tanpa jangka sorong: pakai uji tusuk kertas 1:1 (coba 25,4 dan 26,0 untuk Ra-02) dan pindai di scanner dengan penggaris.
+
 | Modul | Parameter | Footprint sekarang | Ukur lama (sumber) | Ukur baru (isi) |
 |---|---|---|---|---|
 | ESP32 DevKit V1 30 pin (Vest) | jarak tengah deret kiri-kanan | 25,4 mm | 25,4 mm (5 Nov, penggaris) D | ____ |
 | | pitch pin; jumlah pin | 2,54 mm; 15/sisi | sama | ____ |
-| | panjang x lebar papan | silk 28,3 x 51,5 mm | 51,5 x 28,5 (BOM: 5,15 x 2,85 cm) | ____ |
+|  | panjang x lebar papan | silk 28,3 x 51,5 mm | 51,5 x 28,5 mm (5,15 x 2,85 cm, 28 Okt, penggaris) D | ____ |
 | | **diameter/diagonal pin header; diameter lubang** | lubang 1,0 mm, pad oval 1,524 x 1,9 | belum | pin ____ mm, rule: lubang = diagonal pin + 0,2 s.d. 0,3 mm |
 | | letak konektor USB (tengah, ujung papan) | | | ____ |
 | | urutan pin sesuai silkscreen papan (VIN..EN kiri, 3V3..IO23 kanan) | pad 1..30 | konfirmasi 5 Nov D | cek satu per satu ____ |
-| ESP32 DevKit 38 pin (Gateway) | jarak deret (25,4 atau 22,86?), jumlah pin 19/sisi, papan (BOM "ESP32 U": 4,8 x 2,8 cm) | 38 pin | jumlah 19/sisi cocok (5 Nov) | deret ____ mm |
+| ESP32 DevKit 38 pin (Gateway) | jarak deret (25,4 atau 22,86?), jumlah pin 19/sisi, papan (BOM "ESP32 U": 4,8 x 2,8 cm) | 38 pin | jumlah 19/sisi cocok (5 Nov); papan 48 x 28 mm ("ESP32U" 4,8 x 2,8 cm, 28 Okt) D | deret ____ mm |
 | Ra-02 breakout | jarak tengah antar deret | 26,0 mm | 26 mm (5 Nov) D | ____ |
-| | pitch, panjang deret (7 x 2,54 = 17,78), papan | | 28 x 20,5 mm | ____ |
+|  | pitch, panjang deret (7 x 2,54 = 17,78), papan |  | 28 x 20,5 mm (2,8 x 2,05 cm, 28 Okt, penggaris) D; 8 pin/sisi | ____ |
 | | urutan pin tiap deret (atas: GND NSS MOSI MISO SCK DIO5 DIO4 GND; bawah: GND GND 3.3V RST DIO0 DIO1 DIO2 DIO3) | pad 1 = GND | foto 5 Nov | ____ |
 | | header jantan tersolder ke sisi bawah, tinggi, posisi konektor U.fl dan jaraknya ke tepi PCB | | | ____ |
 | TP4056 HW-373 Type-C | panjang x lebar papan | silk 27,1 x 16,7 | **28,5 x 17 (5 Nov) vs 27,5 x 17 (28 Okt)**: selisih 1 mm, ukur ulang | ____ |
 | | pad kiri-kanan (c-c) | 23,45 mm | sekitar 24 mm | ____ |
 | | OUT-/OUT+ ; B-/B+ (c-c) | 14,36 ; 8,02 mm | 14,5 ; 8,0 mm | ____ ; ____ |
 | | diameter lubang pad, urutan pad (IN+, IN-, OUT+, OUT-, B+, B-), posisi dan ukuran port USB-C | lubang 1,2 | | ____ |
-| GY-521 (MPU6050) | papan 20 x 16 mm; 8 pin satu sisi pitch 2,54; urutan pin (VCC..INT); posisi dan diameter lubang baut | urutan footprint **belum dicek** | | ____ |
-| GPS NEO-6M (GY-GPS6MV2) | papan 35 x 26,5 mm; 4 pin satu sisi; urutan (VCC, RX, TX, GND?); lubang baut | belum dicek | | ____ |
-| ESP32-C3 SuperMini | papan 22,4 x 13,8 mm; 8 pin/sisi; **jarak antar deret**; pin 3V3/5V/GND/GPIO4 | belum dicek | | ____ |
+| GY-521 (MPU6050) | papan 20 x 16 mm; 8 pin satu sisi pitch 2,54; urutan pin (VCC..INT); posisi dan diameter lubang baut | urutan footprint **belum dicek** | 20 x 16 mm (2 x 1,6 cm, 28 Okt, penggaris) D; 8 pin satu sisi | ____ |
+| GPS NEO-6M (GY-GPS6MV2) | papan 35 x 26,5 mm; 4 pin satu sisi; urutan (VCC, RX, TX, GND?); lubang baut | belum dicek | 35 x 26,5 mm (3,5 x 2,65 cm, 28 Okt, penggaris) D; 4 pin satu sisi | ____ |
+| ESP32-C3 SuperMini | papan 22,4 x 13,8 mm; 8 pin/sisi; **jarak antar deret**; pin 3V3/5V/GND/GPIO4 | belum dicek | 22,4 x 13,8 mm (2,24 x 1,38 cm, 28 Okt, penggaris) D; 8 pin/sisi | ____ |
 | Boost MT3608 (belum dibeli) | papan sekitar 37 x 17 mm (listing D), pad IN+, IN-, OUT-, OUT+, header 1x4 | | | ____ |
-| Modul microSD | papan 29 x 41,5 mm; header 1x6 (urutan pin, level logika) | belum dicek | | ____ |
-| Holder 18650 | 76,5 x 20,5 mm; jarak pin/pad terminal; tinggi dengan sel | belum dicek terhadap footprint BT1 | | ____ |
-| Tact switch (3 pcs: SOS, power Vest, on/off Helmet) | ukuran 6 x 6 mm (BOM 28 Okt), jarak kaki, THT atau SMD | **PCB memakai SMD TS-1088; yang dibeli beda** | | ____ |
+| Modul microSD | papan 29 x 41,5 mm; header 1x6 (urutan pin, level logika) | belum dicek | 29 x 41,5 mm (2,9 x 4,15 cm, 28 Okt, penggaris) D | ____ |
+| Holder 18650 | 76,5 x 20,5 mm; jarak pin/pad terminal; tinggi dengan sel | belum dicek terhadap footprint BT1 | 76,5 x 20,5 mm (7,65 x 2,05 cm, 28 Okt, penggaris) D; tinggi holder + sel sekitar 21 mm D | ____ |
+| Tact switch (3 pcs: SOS, power Vest, on/off Helmet) | ukuran 6 x 6 mm (BOM 28 Okt), jarak kaki, THT atau SMD | **PCB memakai SMD TS-1088; yang dibeli beda** | 6 x 6 mm (0,6 x 0,6 cm, 2 pin, 28 Okt) D; jumlah 3 | ____ |
 | Konektor sensor air XKC-Y25-V | header XH 2,54 mm 4 pin, urutan (coklat VCC, kuning sinyal, biru GND, hitam opsi) | | | ____ |
 
 ## 3. Validasi footprint dan netlist (tiap board)
