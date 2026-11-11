@@ -4,11 +4,57 @@ Tujuan: PCB1, PCB2, PCB3 yang dipesan **tepat** terhadap modul fisik (ukuran, pi
 
 Status tiap angka: **T** = TERBUKTI (diukur/dijalankan), **D** = DUGAAN (listing, datasheet, ingatan), **B** = BELUM DICEK. Hanya T yang boleh dipakai sebagai dasar memesan. Semua D dan B di bawah harus jadi T.
 
+## 0. Jalur ke PCB siap dipesan (checklist per tahap, 11 Nov 2026)
+Urutan menurut ketergantungan: tahap 1 menentukan apakah tahap 3 perlu diulang; tahap 8 hanya setelah semua tahap lain lulus. Detail gerbang ada di bagian 1 sampai 8 di bawah.
+
+**Tahap 0. Sudah selesai di salinan EasyEDA `Pandu-Capstone-v3-footprint-fix` (terbukti di `.tel` dan DRC)**
+- [x] Netlist PCB1/2/3 diekspor ulang dan `check_netlist.py` lulus; DRC 0 di ketiganya; aturan jalur default 16 mil.
+- [x] PCB3: siren dihapus. PCB1/PCB3: footprint Ra-02 25,4 mm. PCB1: `BAT_NEG` terpisah dari GND, pembagi sensor air `R8`/`R9`. PCB2: stub `$1N31` dihapus. Silk GPS PCB1 25 x 35 mm (posisi terpusat, D).
+
+**Tahap 1. Ukuran modul: dinyatakan final oleh Calvin (11 Nov), tidak perlu jangka sorong lagi**
+- [x] Angka ukuran di bagian 2 (kolom "Ukur baru") dipakai apa adanya sebagai ukuran final. Statusnya tetap **D** sampai cetak 1:1 di tahap 5 lulus; jangan disebut T.
+- [ ] Hal non-ukuran yang tetap harus dipastikan (bukan soal jangka sorong): urutan pin GPS (4), microSD (6), GY-521; catu microSD (5 V atau 3,3 V); port TP4056 (Type-C atau micro-USB); warna kabel dan tegangan keluaran XKC-Y25-V (kering/basah); posisi header microSD terhadap tepi modul; pin 5V/3V3 SuperMini.
+- [ ] Semua modul sudah ada di tangan (G1: TP4056 kedua dan MT3608).
+
+**Tahap 2. Uji listrik di breadboard (G9)**
+- [ ] TP4056: `B-` terpisah dari GND, uji pengisian dan proteksi.
+- [ ] Pembagi sensor air: tegangan di IO34 saat kering dan basah (target sekitar 3,3 V).
+- [ ] SuperMini: 5V lewat regulator onboard dan dioda ke VBUS; 4,2 V tidak masuk pin 3V3.
+- [ ] microSD: catu sesuai modul.
+
+**Tahap 3. Sesuaikan desain dengan hasil tahap 1 dan 2** (satu perubahan, satu simpan, satu DRC)
+- [ ] Koreksi footprint yang berbeda dari modul (pad TP4056, urutan pin GPS/microSD/GY-521, lubang baut).
+- [ ] PCB1: `U10` jadi XH 4 pin; tentukan part `R9` 20k; tinjau posisi `R8`/`R9` dengan Calvin.
+- [ ] PCB3: garis luar microSD 42 x 24 mm sesuai posisi header.
+- [ ] Rute ulang (Unroute All, Auto Route, rebuild copper, Check DRC). Jalur daya (`VBAT_RAW`, `VBAT_POS`, `VBOOST_5V`, 5V) 25 mil bila muat.
+- [ ] Hilangkan net satu pin yang tersisa (mis. `VBUS_5V` di PCB1).
+
+**Tahap 4. Ukuran dan casing (G7)**
+- [ ] Putuskan dengan Tri Yoga: casing mana untuk board mana, atau kecilkan PCB (konsekuensi: rute ulang). Casing laporan 55 x 65 x 23 mm tidak muat PCB1 dan PCB2.
+- [ ] Bekukan ukuran papan.
+
+**Tahap 5. Cetak 1:1 di kertas (G8)**
+- [ ] Cetak skala 100% (matikan "fit to page"), cek dengan penggaris, pasang semua modul asli di atas cetakan. Pin harus pas tanpa dipaksa; kalau tidak, kembali ke tahap 3. Lulus tahap ini = ukuran naik dari D ke T.
+
+**Tahap 6. Pemeriksaan akhir desain**
+- [ ] Skematik: tidak ada pin mengambang (selain 8 pin DevKit tanpa pad); DRC 0.
+- [ ] Netlist cocok dengan pin map firmware (`HANDOVER.md`); tidak memakai IO6-11.
+- [ ] Silkscreen: tanda pin 1, polaritas, nama board; lebar jalur sesuai (16 mil, daya 25 mil).
+- [ ] Ditinjau oleh reviewer kedua (Calvin atau Rafif).
+
+**Tahap 7. Ekspor produksi (G10)**
+- [ ] Ekspor ulang `.tel` terakhir, jalankan `check_netlist.py`, commit ke `v3`.
+- [ ] Ekspor Gerber (plus BOM dan Pick and Place bila perlu), buka di penampil Gerber, bandingkan dengan EasyEDA; simpan di `hardware/gerber/` (isi lama tidak valid, jangan dipesan).
+
+**Tahap 8. Persetujuan dan pesan (G11)**
+- [ ] Persetujuan tertulis Calvin (dan Rafif); tanda tangan ketua hanya setelah ACC dosen. Jangan klik "Order PCB" sebelum itu.
+- [ ] Setelah dipesan: kirim ke Tri Yoga STEP 3D PCB, outline DXF, dan koordinat konektor, tombol, lubang baut.
+
 ## 1. Gerbang (urut; semua harus lulus)
 | # | Gerbang | Penanggung jawab | Status |
 |---|---|---|---|
 | G1 | Semua modul fisik sudah ada di tangan (termasuk TP4056 kedua dan boost MT3608, yang per 28 Okt **belum ada**; tact switch 3 pcs) | Rafif/Gibran | B |
-| G2 | Semua ukuran di bagian 2 terisi hasil jangka sorong (T), selisih terhadap footprint <= 0,2 mm | Calvin | B |
+| G2 | Semua ukuran di bagian 2 terisi dan selisih terhadap footprint <= 0,2 mm. **11 Nov: Calvin menyatakan ukuran sudah final, jangka sorong tidak diperlukan lagi**; status naik ke T setelah cetak 1:1 (G8) lulus | Calvin | D (final menurut Calvin) |
 | G3 | Footprint PCB1/2/3 sama dengan modul (bagian 3), semua pin/pad tervalidasi | Agen 1-3 + Calvin | sebagian |
 | G4 | Skematik = PCB (Import Changes tanpa perubahan tak terduga), netlist diekspor ulang dan `check_netlist.py` OK | Agen 1-3 | B |
 | G5 | DRC PCB: 0 masalah; skematik: tidak ada pin mengambang selain 8 pin DevKit tanpa pad | Agen 1-3 | PCB1, PCB3 di salinan: 0 |
@@ -19,7 +65,7 @@ Status tiap angka: **T** = TERBUKTI (diukur/dijalankan), **D** = DUGAAN (listing
 | G10 | Gerber baru diekspor dari proyek final, dibuka di penampil Gerber, dibandingkan dengan tampilan EasyEDA | Calvin | B |
 | G11 | Persetujuan tertulis Calvin (dan Rafif) sebelum klik Order | Calvin | B |
 
-## 2. Ukuran fisik yang harus diukur (jangka sorong, resolusi 0,05 mm; catat T/D)
+## 2. Ukuran fisik modul (final menurut Calvin 11 Nov; pengukuran jangka sorong tidak diperlukan lagi; T/D dicatat)
 Pengukuran 5 dan 28 Okt memakai penggaris (akurasi sekitar 0,5 mm). Ukur ulang semua kolom "Ukur baru".
 
 **Riset web 11 Nov (`docs/RISET_KOMPONEN.md`)**: jarak deret Ra-02 breakout kemungkinan **25,4 mm** (bukan 26,0 mm yang ada di footprint); TP4056 Type-C punya tiga angka berbeda (27,5 / 28,5 / 29 mm); lubang 1,0 mm untuk pin header 0,64 mm sudah standar. Tanpa jangka sorong: pakai uji tusuk kertas 1:1 (coba 25,4 dan 26,0 untuk Ra-02) dan pindai di scanner dengan penggaris.
