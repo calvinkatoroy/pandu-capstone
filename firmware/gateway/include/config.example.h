@@ -5,3 +5,4 @@
 #define GATEWAY_ID   "GW1"                                                // harus ada di tabel gateways (seed.sql)
 #define INGEST_URL   "https://<project-ref>.supabase.co/functions/v1/ingest"
 #define DEVICE_KEY   "isi-dengan-GATEWAY_DEVICE_KEY"                      // sama dengan secret Edge Function; jangan di-commit
+#define PANDU_KEY    "isi-kunci-acak-min-16-karakter"                     // kunci HMAC paket LoRa; HARUS sama dengan firmware/vest_node/include/config.h. Tanpa ini dipakai kunci dev bawaan (tidak aman)

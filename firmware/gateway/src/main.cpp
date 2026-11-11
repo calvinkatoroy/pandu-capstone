@@ -1,7 +1,9 @@
 // PANDU Edge Gateway: ESP32-DevKitC V4. Terima paket LoRa dari Vest (pure gateway, tanpa sirine), log ke SD, keluarkan JSON ke serial,
 // dan unggah ke dashboard (HTTPS POST ke Edge Function ingest) dengan antrean microSD (store-and-forward).
 // Pin (PCB3 v3): LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SPI LoRa=IO23/19/18, SD: SCK=IO25 MISO=IO35 MOSI=IO32 CS=IO33.
-// Paket Vest v2: PANDU,V2,<vest_id>,<seq>,<jenis>,<lat>,<lon>,<mV>,<helm>,<usia posisi detik>   (v1 tanpa vest_id/seq tetap diterima)
+// Paket Vest v2: PANDU,V2,<vest_id>,<seq>,<jenis>,<lat>,<lon>,<mV>,<helm>,<usia posisi detik>[,<sens>]*<hmac 8 hex>
+//   Paket tanpa HMAC sah dibuang (bad_mac). Paket v1 (tanpa vest_id/seq) masih bisa di-parse tetapi tidak punya HMAC, jadi praktis tidak diterima lagi.
+//   sens = bitmask kesehatan sensor Vest (1 = MPU mati, 2 = g belum terkalibrasi); hanya dicetak di serial, belum ada di kontrak ingest.
 //   jenis: HB|SOS|FALL|MOB|OFF   helm: 1 dipakai, 0 tidak, 2 tidak terjangkau.   Kontrak: pandu-dashboard/docs/DATA_CONTRACT.md
 // Arsitektur: loop() hanya LoRa (tidak boleh terblok). Task netTask() satu-satunya pengguna SD dan jaringan.
 #include <Arduino.h>
@@ -16,6 +18,7 @@
 #if __has_include("config.h")
 #include "config.h"
 #endif
+#include "pandu_mac.h"   // ../common: HMAC paket + sync word (audit K2)
 
 constexpr int PIN_LORA_CS = 5, PIN_LORA_RST = 14, PIN_LORA_DIO0 = 26;
 constexpr int PIN_SD_CS = 33, PIN_SD_SCK = 25, PIN_SD_MISO = 35, PIN_SD_MOSI = 32;   // SD di bus SPI sendiri (PCB3 v3), terpisah dari LoRa
@@ -26,7 +29,12 @@ constexpr uint32_t DUP_WINDOW_MS  = 60000;        // paket ulang (vest_id, seq) 
 constexpr int      UPLOAD_BATCH   = 20;           // maks event per POST (server menerima <= 100)
 constexpr uint32_t RETRY_MS       = 30000;        // jeda setelah unggah gagal
 constexpr size_t   RAM_QUEUE_MAX  = 64;           // antrean cadangan di RAM bila SD tidak ada (hilang saat mati)
-const char *QFILE = "/queue.jsonl", *QOFF = "/queue.off", *CSVFILE = "/pandu_v2.csv";
+const char *QFILE = "/queue.jsonl", *QOFF = "/queue.off", *CSVFILE = "/pandu_v2.csv", *DEADFILE = "/deadletter.jsonl";
+constexpr size_t   RAM_DEAD_MAX   = 16;           // dead-letter di RAM bila SD tidak ada
+
+// Batas yang sama dengan validateEvent di server (supabase/functions/_shared/stage.ts). Untuk event ALARM, nilai di luar batas
+// diperbaiki sebelum unggah supaya alarm tidak ditolak (K1); data mentah tetap utuh di CSV.
+constexpr int BAT_MV_MIN = 2500, BAT_MV_MAX = 4500;
 
 #ifdef WIFI_SSID
 constexpr bool NET_ENABLED = true;
@@ -45,17 +53,19 @@ bool lostReported = false;
 uint32_t bootId;                                   // membedakan millis() antar boot pada antrean SD
 int v1Seq = 0;                                     // seq buatan untuk paket v1
 
-struct Pkt { uint8_t vest; int seq; char type[8]; char lat[16]; char lon[16]; int mv, helm, age, rssi; float snr; };
+struct Pkt { uint8_t vest; int seq; char type[8]; char lat[16]; char lon[16]; int mv, helm, age, rssi; float snr; int sens; };
 struct Ev { Pkt p; time_t epoch; uint32_t ms; };  // epoch = 0 bila jam belum tersinkron saat paket diterima
 QueueHandle_t evQ;                                 // loop() -> netTask()
 
 bool validType(const char *t) { return !strcmp(t, "HB") || !strcmp(t, "SOS") || !strcmp(t, "FALL") || !strcmp(t, "MOB") || !strcmp(t, "OFF"); }
+bool isAlarm(const char *t) { return !strcmp(t, "SOS") || !strcmp(t, "FALL") || !strcmp(t, "MOB"); }
 
 bool parse(const String &s, Pkt &p) {
-  char buf[160];
+  char buf[200];
+  if (s.length() >= sizeof buf) return false;   // lebih panjang dari paket sah mana pun: jangan dipotong diam-diam
   s.toCharArray(buf, sizeof buf);
-  char *tok[12]; int n = 0;
-  for (char *t = strtok(buf, ","); t && n < 12; t = strtok(nullptr, ",")) tok[n++] = t;
+  char *tok[14]; int n = 0;
+  for (char *t = strtok(buf, ","); t && n < 14; t = strtok(nullptr, ",")) tok[n++] = t;
   if (n < 7 || strcmp(tok[0], "PANDU")) return false;   // abaikan paket asing
   int i;
   if (!strcmp(tok[1], "V2")) { p.vest = atoi(tok[2]); p.seq = atoi(tok[3]); i = 4; }
@@ -68,6 +78,7 @@ bool parse(const String &s, Pkt &p) {
   p.mv = atoi(tok[i + 3]);
   p.helm = atoi(tok[i + 4]);
   p.age = n > i + 5 ? atoi(tok[i + 5]) : 0;       // usia posisi (detik); 0 = baru atau tidak ada
+  p.sens = n > i + 6 ? atoi(tok[i + 6]) : 0;      // kesehatan sensor Vest (bitmask)
   return true;
 }
 
@@ -81,14 +92,46 @@ void iso(time_t t, char *out, size_t n) { struct tm g; gmtime_r(&t, &g); strftim
 std::deque<String> ramQ;
 uint32_t qOff = 0;   // offset byte baca di QFILE (diserialkan di QOFF)
 
-String latJson(const char *s) { char *e; double v = strtod(s, &e); return (e != s && *e == 0) ? String(v, 6) : String("null"); }
+// Koordinat di luar rentang (atau bukan angka) -> null, supaya server tidak menolak seluruh event.
+String latJson(const char *s, double lim) { char *e; double v = strtod(s, &e); return (e != s && *e == 0 && v >= -lim && v <= lim) ? String(v, 6) : String("null"); }
 
 String makeLine(const Ev &e) {
   char b[260];
+  int mv = e.p.mv;
+  if (isAlarm(e.p.type) && (mv < BAT_MV_MIN || mv > BAT_MV_MAX)) {   // K1: alarm tidak boleh gugur karena angka baterai tidak masuk akal
+    mv = mv < BAT_MV_MIN ? BAT_MV_MIN : BAT_MV_MAX;
+    Serial.printf("{\"warning\":\"alarm_bat_mv_clamped\",\"vest_id\":%d,\"seq\":%d,\"raw_mv\":%d,\"sent_mv\":%d}\n", e.p.vest, e.p.seq, e.p.mv, mv);
+  }
   snprintf(b, sizeof b, "%d,%lu,%lu,{\"vest_id\":%d,\"seq\":%d,\"type\":\"%s\",\"lat\":%s,\"lon\":%s,\"pos_age_s\":%d,\"bat_mv\":%d,\"helm\":%d,\"rssi\":%d,\"snr\":%.1f",
            e.epoch ? 1 : 0, (unsigned long)(e.epoch ? (unsigned long)e.epoch : e.ms), (unsigned long)bootId, e.p.vest, e.p.seq, e.p.type,
-           latJson(e.p.lat).c_str(), latJson(e.p.lon).c_str(), e.p.age, e.p.mv, e.p.helm, e.p.rssi, e.p.snr);
+           latJson(e.p.lat, 90).c_str(), latJson(e.p.lon, 180).c_str(), e.p.age, mv, e.p.helm, e.p.rssi, e.p.snr);
   return String(b);
+}
+
+// ---- Dead-letter (K1): event ALARM yang ditolak server tidak boleh hilang diam-diam ----
+std::deque<String> ramDead;
+void deadLetter(const String &line, const String &why) {
+  String shown = line; shown.replace('"', '\'');   // supaya baris serial tetap JSON valid
+  Serial.printf("{\"alarm_rejected\":{\"why\":\"%s\",\"line\":\"%s\"}}\n", why.c_str(), shown.c_str());   // selalu terlihat di serial
+  String rec = line + "\t" + why;
+  if (sdOk) { File f = SD.open(DEADFILE, FILE_APPEND); if (f) { f.println(rec); f.close(); return; } }
+  ramDead.push_back(rec);
+  if (ramDead.size() > RAM_DEAD_MAX) ramDead.pop_front();
+}
+// Ambil alasan penolakan untuk indeks idx dari respons {"rejected":[{"index":N,"reason":"..."}]}. Kosong bila tidak ketemu.
+String rejectReason(const String &resp, int idx) {
+  String key = String("\"index\":") + idx;
+  int p = -1;
+  for (int from = 0; (from = resp.indexOf(key, from)) >= 0; from += key.length()) {
+    char next = from + key.length() < resp.length() ? resp[from + key.length()] : ',';
+    if (next < '0' || next > '9') { p = from; break; }   // "index":1 tidak boleh cocok dengan "index":10
+  }
+  if (p < 0) return String();
+  int r = resp.indexOf("\"reason\":\"", p);
+  if (r < 0) return String("(tanpa alasan)");
+  r += 10;
+  int e = resp.indexOf('"', r);
+  return e < 0 ? String() : resp.substring(r, e);
 }
 
 void qPush(const String &line) {
@@ -142,9 +185,11 @@ bool upload() {
   char ts[24]; iso(now, ts, sizeof ts);
   String body = String("{\"gateway_id\":\"") + GATEWAY_ID + "\",\"sent_at\":\"" + ts + "\",\"events\":[";
   int good = 0;
+  int bodyLine[UPLOAD_BATCH];   // indeks event di body -> indeks baris antrean (baris rusak dilewati, jadi tidak selalu sama)
   for (int i = 0; i < n; i++) {
     int syn = 0, off = 0; unsigned long tv = 0, bid = 0;
     if (sscanf(lines[i].c_str(), "%d,%lu,%lu,%n", &syn, &tv, &bid, &off) < 3 || off == 0) { Serial.println("{\"queue\":\"bad_line_dropped\"}"); continue; }
+    bodyLine[good] = i;
     time_t t = syn ? (time_t)tv : (bid == bootId ? now - (time_t)((millis() - tv) / 1000) : now);
     char rt[24]; iso(t, rt, sizeof rt);
     if (body[body.length() - 1] != '[') body += ",";
@@ -166,7 +211,15 @@ bool upload() {
   http.end();
   Serial.printf("{\"upload\":{\"events\":%d,\"http\":%d,\"resp\":%s}}\n", n, code, resp.length() ? resp.c_str() : "null");
   if (code != 200) return false;   // 401/422/429/5xx atau tanpa jaringan: antrean tetap, coba lagi nanti
-  qAck(n, endOff);                 // per-event yang ditolak validasi (rejected) tetap dihapus agar antrean tidak macet
+  // Event yang ditolak validasi tetap dihapus dari antrean (agar tidak macet), TAPI yang bertipe alarm disimpan ke dead-letter dulu (K1).
+  for (int bi = 0; bi < good; bi++) {
+    String why = rejectReason(resp, bi);
+    if (!why.length()) continue;
+    const String &ln = lines[bodyLine[bi]];
+    if (ln.indexOf("\"type\":\"SOS\"") >= 0 || ln.indexOf("\"type\":\"FALL\"") >= 0 || ln.indexOf("\"type\":\"MOB\"") >= 0) deadLetter(ln, why);
+    else Serial.printf("{\"rejected\":{\"index\":%d,\"why\":\"%s\"}}\n", bi, why.c_str());
+  }
+  qAck(n, endOff);
   return true;
 }
 
@@ -205,6 +258,8 @@ void setup() {
 
   LoRa.setPins(PIN_LORA_CS, PIN_LORA_RST, PIN_LORA_DIO0);
   loraOk = LoRa.begin(LORA_FREQ);
+  if (loraOk) { LoRa.enableCrc(); LoRa.setSyncWord(PANDU_SYNC_WORD); LoRa.receive(); }   // K2: CRC + sync word unik (sama dengan Vest); receive() sekali (S5)
+  if (PANDU_KEY_IS_DEFAULT) Serial.println("{\"warning\":\"PANDU_KEY bawaan (dev): paket tidak terautentikasi, buat include/config.h\"}");
   sdSpi.begin(PIN_SD_SCK, PIN_SD_MISO, PIN_SD_MOSI, PIN_SD_CS);
   sdOk = SD.begin(PIN_SD_CS, sdSpi);
   if (sdOk) {
@@ -232,12 +287,15 @@ void loop() {
     String s;
     while (LoRa.available()) s += (char)LoRa.read();
     Pkt p; p.rssi = LoRa.packetRssi(); p.snr = LoRa.packetSnr();
-    if (parse(s, p)) {
+    String body;
+    if (!panduVerify(s, body)) {   // K2: HMAC salah/tidak ada = paket asing atau palsu
+      Serial.printf("{\"ignored\":\"bad_mac\",\"rssi\":%d}\n", p.rssi);
+    } else if (parse(body, p)) {
       rxCount++; lastRxAt = now; lostReported = false;
       if (p.seq < 0) p.seq = (v1Seq++) & 0xFFFF;                      // v1: seq dibuat Gateway
       bool dup = seen[p.vest] && lastSeq[p.vest] == p.seq && now - lastSeqAt[p.vest] < DUP_WINDOW_MS;
-      Serial.printf("{\"vest_id\":%d,\"seq\":%d,\"type\":\"%s\",\"lat\":\"%s\",\"lon\":\"%s\",\"bat_mv\":%d,\"helm\":%d,\"pos_age_s\":%d,\"rssi\":%d,\"snr\":%.1f%s}\n",
-                    p.vest, p.seq, p.type, p.lat, p.lon, p.mv, p.helm, p.age, p.rssi, p.snr, dup ? ",\"dup\":true" : "");
+      Serial.printf("{\"vest_id\":%d,\"seq\":%d,\"type\":\"%s\",\"lat\":\"%s\",\"lon\":\"%s\",\"bat_mv\":%d,\"helm\":%d,\"pos_age_s\":%d,\"rssi\":%d,\"snr\":%.1f,\"sens\":%d%s}\n",
+                    p.vest, p.seq, p.type, p.lat, p.lon, p.mv, p.helm, p.age, p.rssi, p.snr, p.sens, dup ? ",\"dup\":true" : "");
       if (!dup) {
         seen[p.vest] = true; lastSeq[p.vest] = p.seq; lastSeqAt[p.vest] = now;
         Ev e = { p, timeSynced() ? time(nullptr) : 0, now };
