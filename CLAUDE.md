@@ -50,5 +50,8 @@ Proyek: P.A.N.D.U (Perangkat Alarm Nirkabel Deteksi Urgensi), wearable keselamat
 ## Laporan
 Jumlah jam dan persentase di laporan = estimasi kecuali ada catatan. GPS sudah diuji luar ruangan; deteksi jatuh terbukti; nilai diam MPU6050 g=4,8 (seharusnya ~1,0) belum dikalibrasi; microSD `sd:0` = kartu belum dimasukkan. Software pekan 11 hanya sekitar +10%. Tanda tangan ketua hanya setelah ACC.
 
-## Setelah PCB dipesan
-Pemodelan 3D casing (Tri Yoga). Butuh dari tiap board: STEP 3D PCB, outline DXF, koordinat konektor/tombol/lubang baut. Lihat bagian Deliverable di `docs/AGENT_PLAN.md`. Catatan: casing yang ada di laporan (55 x 65 x 23 mm) **tidak muat** PCB1 (108 x 95,25 mm); samakan sebelum memesan (item G7 di `PRE_ORDER_PCB.md`).
+## Urutan kerja (keputusan tim, 11 Nov): PCB dan modul dulu, casing mengikuti
+1. **PCB dan semua modul harus fix dulu** (ukuran modul final, footprint cocok, rute/DRC, cetak 1:1 lulus, disetujui Calvin/Rafif).
+2. **Baru casing**: dimodelkan dan dicetak 3D (Tri Yoga) berdasarkan PCB dan modul yang sudah fix. **Casing mengikuti PCB, bukan sebaliknya**: jangan mengecilkan atau mengubah PCB demi muat casing lama, dan jangan mencetak casing sebelum PCB dan modul beku.
+3. Dari tiap board Tri Yoga butuh: STEP 3D PCB, outline DXF, koordinat konektor/tombol/lubang baut (lihat Deliverable di `docs/AGENT_PLAN.md`). Casing laporan 55 x 65 x 23 mm **tidak muat** PCB1 (108 x 95,25 mm) dan PCB2; ia diganti, bukan dijadikan acuan (item G7 di `PRE_ORDER_PCB.md`).
+4. PCB3 memakai modul microSD di luar PCB (kabel ke `H1`), jadi casing Gateway harus punya ruang terpisah untuk modul itu.

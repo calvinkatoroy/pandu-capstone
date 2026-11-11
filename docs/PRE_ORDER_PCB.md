@@ -33,8 +33,9 @@ Urutan menurut ketergantungan: tahap 1 menentukan apakah tahap 3 perlu diulang; 
 - [x] Net satu pin `VBUS_5V` di PCB1 dihapus (11 Nov): kabel dan label di pin `U7.5` (IN+ TP4056) dihapus di skematik, Import Changes hanya berisi satu perubahan (`U7:5` lepas dari `VBUS_5V`), PCB di-save, DRC PCB tanpa masalah. Pin IN+ sengaja dibiarkan kosong karena pengisian lewat port Type-C pada modul HW-373 (sama dengan PCB2, yang tidak punya net di pad itu). `PCB1.tel` diekspor ulang: selisih hanya baris `VBUS_5V`; `check_netlist.py` exit 0, 50 OK, tanpa peringatan net satu pin. Rute tidak berubah (net itu tidak punya jalur).
 
 **Tahap 4. Ukuran dan casing (G7)**
-- [ ] Putuskan dengan Tri Yoga: casing mana untuk board mana, atau kecilkan PCB (konsekuensi: rute ulang). Casing laporan 55 x 65 x 23 mm tidak muat PCB1 dan PCB2.
-- [ ] Bekukan ukuran papan.
+- [x] Keputusan urutan (tim, 11 Nov, tercatat di `CLAUDE.md`): PCB dan semua modul fix dulu, baru casing dimodelkan dan dicetak 3D; **casing mengikuti PCB**. Jadi PCB tidak dikecilkan agar muat casing lama (55 x 65 x 23 mm dari laporan, tidak muat PCB1 dan PCB2), dan casing baru diturunkan dari PCB final. Tri Yoga perlu diberi tahu urutan ini (belum dilakukan).
+- [ ] Bekukan ukuran papan setelah cetak 1:1 lulus (tahap 5). Ukuran sekarang di salinan EasyEDA: PCB1 107,95 x 95,25 mm, PCB2 sekitar 31,6 x 99,1 mm (EasyEDA menampilkan 31,623 x 99,06), PCB3 55,88 x 77,47 mm. Setiap perubahan ukuran sesudah ini berarti rute ulang dan pemberitahuan ke Tri Yoga.
+- [ ] Setelah ukuran beku, siapkan paket untuk Tri Yoga per board: STEP 3D PCB, outline DXF, koordinat konektor/tombol/lubang baut (USB-C TP4056, USB DevKit, Ra-02 dan antena, SW1/SW2, konektor XKC `U10`, header microSD `H1` dan kabelnya, holder 18650), dan tinggi komponen (belum diukur; lihat `BOM_V2.md`). Casing Gateway: ruang terpisah untuk modul microSD 42 x 24 mm (D).
 
 **Tahap 5. Cetak 1:1 di kertas (G8)**
 - [ ] Cetak skala 100% (matikan "fit to page"), cek dengan penggaris, pasang semua modul asli di atas cetakan. Pin harus pas tanpa dipaksa; kalau tidak, kembali ke tahap 3. Lulus tahap ini = ukuran naik dari D ke T.
@@ -62,7 +63,7 @@ Urutan menurut ketergantungan: tahap 1 menentukan apakah tahap 3 perlu diulang; 
 | G4 | Skematik = PCB (Import Changes tanpa perubahan tak terduga), netlist diekspor ulang dan `check_netlist.py` OK | Agen 1-3 | B |
 | G5 | DRC PCB: 0 masalah; skematik: tidak ada pin mengambang selain 8 pin DevKit tanpa pad | Agen 1-3 | PCB1, PCB3 di salinan: 0 |
 | G6 | Jalur sesuai dosen (bagian 5) | Agen 1-3 | sebagian |
-| G7 | Outline PCB cocok dengan casing (bagian 6) | Calvin + Tri Yoga | **belum cocok** |
+| G7 | Outline PCB cocok dengan casing (bagian 6) | Calvin + Tri Yoga | **belum cocok**; casing lama diganti, casing baru dibuat setelah PCB dan modul fix (11 Nov) |
 | G8 | Cetak 1:1 di kertas lulus untuk ketiga board (bagian 4) | Calvin | B |
 | G9 | Uji baterai dan charging dengan modul asli lulus (checklist daya di `CHECKLIST_UJI_RAKIT.md` bagian 1) | Gibran/Rafif | B |
 | G10 | Gerber baru diekspor dari proyek final, dibuka di penampil Gerber, dibandingkan dengan tampilan EasyEDA | Calvin | B |
@@ -132,7 +133,7 @@ Untuk setiap komponen: nomor pad = nomor pin simbol = nomor pin fisik. Cara: (a)
 
 ## 6. Cocokkan dengan casing (G7)
 - PCB1 107,95 x 95,25 mm; PCB2 1245 x 3900 mil = 31,6 x 99,1 mm (per 8 Okt, cek ulang); PCB3 55,88 x 77,47 mm. Casing Vest di SCAD v5: lebar PCB 108, tinggi 95,25, dinding 2 mm, celah 1 mm, standoff 9 mm.
-- Casing di laporan Pekan 11 (Tri Yoga): **55 x 65 x 23 mm** tidak muat PCB1 (Vest) dan PCB2. Putuskan dengan Tri Yoga: casing mana untuk board mana, atau kecilkan PCB (konsekuensi: rute ulang).
+- Casing di laporan Pekan 11 (Tri Yoga): **55 x 65 x 23 mm** tidak muat PCB1 (Vest) dan PCB2. Keputusan 11 Nov: casing dimodelkan ulang dari PCB final (casing mengikuti PCB), bukan PCB dikecilkan; lihat tahap 4.
 - Lokasi konektor yang harus jatuh pada lubang casing: USB-C TP4056, micro/USB-C DevKit, SMA/U.fl, SW1/SW2, konektor XKC. Ekspor koordinatnya (lihat `AGENT_PLAN.md`).
 
 ## 7. Keputusan yang harus dikunci sebelum memesan
