@@ -1,0 +1,107 @@
+# Checklist sebelum memesan PCB (per 11 Nov 2026)
+
+Tujuan: PCB1, PCB2, PCB3 yang dipesan **tepat** terhadap modul fisik (ukuran, pin, jarak), jalur tembaga sesuai permintaan dosen, dan tanpa error DRC/netlist. Satu PCB salah = uang dan waktu hilang; jangan pesan kalau ada satu pun gerbang di bawah belum lulus.
+
+Status tiap angka: **T** = TERBUKTI (diukur/dijalankan), **D** = DUGAAN (listing, datasheet, ingatan), **B** = BELUM DICEK. Hanya T yang boleh dipakai sebagai dasar memesan. Semua D dan B di bawah harus jadi T.
+
+## 1. Gerbang (urut; semua harus lulus)
+| # | Gerbang | Penanggung jawab | Status |
+|---|---|---|---|
+| G1 | Semua modul fisik sudah ada di tangan (termasuk TP4056 kedua dan boost MT3608, yang per 28 Okt **belum ada**; tact switch 3 pcs; buzzer/sirine Gateway) | Rafif/Gibran | B |
+| G2 | Semua ukuran di bagian 2 terisi hasil jangka sorong (T), selisih terhadap footprint <= 0,2 mm | Calvin | B |
+| G3 | Footprint PCB1/2/3 sama dengan modul (bagian 3), semua pin/pad tervalidasi | Agen 1-3 + Calvin | sebagian |
+| G4 | Skematik = PCB (Import Changes tanpa perubahan tak terduga), netlist diekspor ulang dan `check_netlist.py` OK | Agen 1-3 | B |
+| G5 | DRC PCB: 0 masalah; skematik: tidak ada pin mengambang selain 8 pin DevKit tanpa pad | Agen 1-3 | PCB1, PCB3 di salinan: 0 |
+| G6 | Jalur sesuai dosen (bagian 5) | Agen 1-3 | sebagian |
+| G7 | Outline PCB cocok dengan casing (bagian 6) | Calvin + Tri Yoga | **belum cocok** |
+| G8 | Cetak 1:1 di kertas lulus untuk ketiga board (bagian 4) | Calvin | B |
+| G9 | Uji baterai dan charging dengan modul asli lulus (checklist daya di `CHECKLIST_UJI_RAKIT.md` bagian 1) | Gibran/Rafif | B |
+| G10 | Gerber baru diekspor dari proyek final, dibuka di penampil Gerber, dibandingkan dengan tampilan EasyEDA | Calvin | B |
+| G11 | Persetujuan tertulis Calvin (dan Rafif) sebelum klik Order | Calvin | B |
+
+## 2. Ukuran fisik yang harus diukur (jangka sorong, resolusi 0,05 mm; catat T/D)
+Pengukuran 5 dan 28 Okt memakai penggaris (akurasi sekitar 0,5 mm). Ukur ulang semua kolom "Ukur baru".
+
+| Modul | Parameter | Footprint sekarang | Ukur lama (sumber) | Ukur baru (isi) |
+|---|---|---|---|---|
+| ESP32 DevKit V1 30 pin (Vest) | jarak tengah deret kiri-kanan | 25,4 mm | 25,4 mm (5 Nov, penggaris) D | ____ |
+| | pitch pin; jumlah pin | 2,54 mm; 15/sisi | sama | ____ |
+| | panjang x lebar papan | silk 28,3 x 51,5 mm | 51,5 x 28,5 (BOM: 5,15 x 2,85 cm) | ____ |
+| | **diameter/diagonal pin header; diameter lubang** | lubang 1,0 mm, pad oval 1,524 x 1,9 | belum | pin ____ mm, rule: lubang = diagonal pin + 0,2 s.d. 0,3 mm |
+| | letak konektor USB (tengah, ujung papan) | | | ____ |
+| | urutan pin sesuai silkscreen papan (VIN..EN kiri, 3V3..IO23 kanan) | pad 1..30 | konfirmasi 5 Nov D | cek satu per satu ____ |
+| ESP32 DevKit 38 pin (Gateway) | jarak deret (25,4 atau 22,86?), jumlah pin 19/sisi, papan (BOM "ESP32 U": 4,8 x 2,8 cm) | 38 pin | jumlah 19/sisi cocok (5 Nov) | deret ____ mm |
+| Ra-02 breakout | jarak tengah antar deret | 26,0 mm | 26 mm (5 Nov) D | ____ |
+| | pitch, panjang deret (7 x 2,54 = 17,78), papan | | 28 x 20,5 mm | ____ |
+| | urutan pin tiap deret (atas: GND NSS MOSI MISO SCK DIO5 DIO4 GND; bawah: GND GND 3.3V RST DIO0 DIO1 DIO2 DIO3) | pad 1 = GND | foto 5 Nov | ____ |
+| | header jantan tersolder ke sisi bawah, tinggi, posisi konektor U.fl dan jaraknya ke tepi PCB | | | ____ |
+| TP4056 HW-373 Type-C | panjang x lebar papan | silk 27,1 x 16,7 | **28,5 x 17 (5 Nov) vs 27,5 x 17 (28 Okt)**: selisih 1 mm, ukur ulang | ____ |
+| | pad kiri-kanan (c-c) | 23,45 mm | sekitar 24 mm | ____ |
+| | OUT-/OUT+ ; B-/B+ (c-c) | 14,36 ; 8,02 mm | 14,5 ; 8,0 mm | ____ ; ____ |
+| | diameter lubang pad, urutan pad (IN+, IN-, OUT+, OUT-, B+, B-), posisi dan ukuran port USB-C | lubang 1,2 | | ____ |
+| GY-521 (MPU6050) | papan 20 x 16 mm; 8 pin satu sisi pitch 2,54; urutan pin (VCC..INT); posisi dan diameter lubang baut | urutan footprint **belum dicek** | | ____ |
+| GPS NEO-6M (GY-GPS6MV2) | papan 35 x 26,5 mm; 4 pin satu sisi; urutan (VCC, RX, TX, GND?); lubang baut | belum dicek | | ____ |
+| ESP32-C3 SuperMini | papan 22,4 x 13,8 mm; 8 pin/sisi; **jarak antar deret**; pin 3V3/5V/GND/GPIO4 | belum dicek | | ____ |
+| Boost MT3608 (belum dibeli) | papan sekitar 37 x 17 mm (listing D), pad IN+, IN-, OUT-, OUT+, header 1x4 | | | ____ |
+| Modul microSD | papan 29 x 41,5 mm; header 1x6 (urutan pin, level logika) | belum dicek | | ____ |
+| Holder 18650 | 76,5 x 20,5 mm; jarak pin/pad terminal; tinggi dengan sel | belum dicek terhadap footprint BT1 | | ____ |
+| Tact switch (3 pcs: SOS, power Vest, on/off Helmet) | ukuran 6 x 6 mm (BOM 28 Okt), jarak kaki, THT atau SMD | **PCB memakai SMD TS-1088; yang dibeli beda** | | ____ |
+| Konektor sensor air XKC-Y25-V | header XH 2,54 mm 4 pin, urutan (coklat VCC, kuning sinyal, biru GND, hitam opsi) | | | ____ |
+| Terminal sirine PCB3 | pitch 3,81 mm, kawat sirine | | | ____ |
+| Buzzer/sirine Gateway | jenis (aktif/pasif), tegangan, **arus (mA)** | | belum dibeli | ____ |
+
+## 3. Validasi footprint dan netlist (tiap board)
+Untuk setiap komponen: nomor pad = nomor pin simbol = nomor pin fisik. Cara: (a) dari modul ke tabel pin (bagian 2), (b) tabel pin ke simbol, (c) simbol ke net di `.tel`.
+- [ ] **DevKit V1 (PCB1 U3)**: 30 pad dinamai `J2-n`/`J3-n`. Pemetaan: VIN=J2-19, GND=J2-14, IO13=J2-15, IO12=J2-13, IO14=J2-12, IO27=J2-11, IO26=J2-10, IO25=J2-9, IO33=J2-8, IO32=J2-7, IO35=J2-6, IO34=J2-5, VN=J2-4, VP=J2-3, EN=J2-2, 3V3=J2-1 | GND=J3-1, IO15=J3-16, IO2=J3-15, IO4=J3-13, IO16=J3-12, IO17=J3-11, IO5=J3-10, IO18=J3-9, IO19=J3-8, IO21=J3-6, RX0=J3-5, TX0=J3-4, IO22=J3-3, IO23=J3-2. Bandingkan dengan silkscreen papan fisik.
+- [ ] **Ra-02 (PCB1 U6, PCB3 U1)**: pad 1 = GND, 16 pad nomor unik, 26,0 mm. Net: 3V3, 4x GND, NSS=IO5, SCK=IO18, MISO=IO19, MOSI=IO23, RST (Vest IO25, Gateway IO14), DIO0=IO26, DIO1-5 NC. Pin `LORA_ANT`/header antena tidak ada lagi (antena via U.fl di breakout).
+- [ ] **Q1 PCB3 = 2N7002 (SOT-23)**: pastikan pin G/S/D simbol dan footprint sesuai datasheet (SOT-23 biasanya 1=G, 2=S, 3=D; **cek datasheet part LCSC C50176485, status B**). Gate ke `SIREN_DRV` (IO4), source ke GND, drain ke sirine. Pull-down gate R3 ada.
+- [ ] **Arus 2N7002**: batas sekitar 115 mA (BOM). Pastikan arus buzzer/sirine < 100 mA. Kalau lebih, ganti MOSFET sebelum memesan.
+- [ ] **PCB1 Q1/Q2 = AO3401A (P-ch)**, Q5 = 2N7002: G/S/D benar; gating GPS (`GPS_EN`=IO4) dan XKC (`XKC_EN`=IO32) aktif sesuai logika.
+- [ ] **TP4056 (PCB1, PCB2)**: baterai negatif hanya ke `B-` (net `BAT_NEG`); `OUT-` dan `IN-` ke GND sistem (agar proteksi DW01 tidak terlewati, temuan A2). Verifikasi di `.tel`.
+- [ ] **XKC-Y25-V**: pembagi `R8` 10 k / `R9` 20 k ke `WATER_SIG` (IO34); `R1` dihapus. Tegangan OUT kering/basah belum diukur (K1).
+- [ ] **PCB2 SuperMini**: pin 5V lewat regulator onboard dan dioda ke VBUS belum diverifikasi di board fisik; jangan beri 4,2 V ke pin 3V3.
+- [ ] PCB2: `SAW1` sudah diganti header jumper `J1`; TTP223 dan `TOUCH_SIG` dihapus; stub `$1N31` di `U1` pin 11 dihapus. Konfirmasi bahwa baterai Helmet (18650 + holder atau LiPo) terhubung lewat header `H2` dan footprint cocok dengan yang dibeli.
+- [ ] Setelah footprint final: ekspor ulang `PCB1.tel`, `PCB2.tel`, `PCB3.tel`, jalankan `python hardware/netlist/check_netlist.py` (di folder `netlist`). Salinan `.tel` saat ini adalah per 6-8 Okt dan **usang** untuk PCB1 dan PCB3.
+- [ ] Item 8 pin simbol DevKit tanpa pad diterima (hanya peringatan skematik).
+- [ ] Tidak ada net satu pin (mengambang) selain yang disengaja.
+
+## 4. Cetak 1:1 (uji fisik di kertas)
+1. Dari EasyEDA cetak/ekspor PDF tiap board pada skala 100% (Print: Scale 100%, tanpa "fit to page"). Ukur garis/outline hasil cetak dengan jangka sorong untuk memastikan skala 100% (toleransi 0,2 mm).
+2. Letakkan modul di atas kertas, tusuk pin/header ke lubang pad (lubangi kertas dengan jarum bila perlu). **Lulus** bila semua pin masuk tanpa dipaksa dan offset <= 0,2 mm; bila modul tidak dapat dilepas dari header lewat pad, ukur selisih.
+3. Periksa juga: modul tidak bertabrakan (silkscreen), port USB/U.fl/konektor menghadap tepi yang benar, lubang baut cocok, tinggi modul tidak menabrak yang lain.
+4. Foto hasil dan simpan di `docs/screenshots/`; catat angka di bagian 2.
+
+## 5. Jalur tembaga (permintaan dosen) dan aturan DRC
+- Lebar default semua net sinyal **16 mil**; net daya diusahakan lebih lebar (25 mil untuk `VBAT_RAW`, `VBAT_POS`, `VBOOST_5V`, 5V, jalur motor/sirine) bila clearance memungkinkan. Pelebaran dengan menimpa jalur (bulk) memicu 188 pelanggaran: pakai Unroute All dan Auto Route ulang, lalu Rebuild Copper.
+- Kapasitas arus (perkiraan IPC-2221, 1 oz, kenaikan 10 °C): 16 mil sekitar 1,2 A, 25 mil sekitar 1,9 A. Arus pengisian TP4056 default sekitar 1 A (R-prog 1,2 k; audit A7 menyarankan R-prog sekitar 2 k = sekitar 580 mA untuk baterai 1200 mAh).
+- Pengecualian hanya bila fisik tidak memungkinkan (leher pad SOT-23/0603): catat net, panjang, lebar sebenarnya.
+- Verifikasi: Design Manager > aturan jalur/jarak, lalu DRC. Bandingkan lebar minimum yang benar-benar ada (kolom "Track" di Check DRC atau filter objek). Tulis hasil di laporan agen. Nilai 16 mil dari Calvin; minta konfirmasi tertulis dosen bila perlu.
+- Clearance, lebar jalur minimum, ukuran via/lubang: pastikan di atas batas pabrik. Pabrikan belum tercatat di repo (asumsi JLCPCB via EasyEDA); cek kapabilitas di situsnya saat memesan.
+- DRC: 0 masalah. Tanpa jalur menggantung, tanpa copper yang basi (jalankan Rebuild All sebelum DRC), tanpa ratline.
+- Pastikan ada: label versi di silkscreen (mis. `PANDU PCB1 v3`), orientasi pin 1, label konektor/polaritas (BAT+, BAT-, 5V, ANT, SOS), titik uji 3V3/5V/GND/BAT (P1-8), lubang baut sesuai casing.
+
+## 6. Cocokkan dengan casing (G7)
+- PCB1 107,95 x 95,25 mm; PCB2 1245 x 3900 mil = 31,6 x 99,1 mm (per 8 Okt, cek ulang); PCB3 55,88 x 77,47 mm. Casing Vest di SCAD v5: lebar PCB 108, tinggi 95,25, dinding 2 mm, celah 1 mm, standoff 9 mm.
+- Casing di laporan Pekan 11 (Tri Yoga): **55 x 65 x 23 mm** tidak muat PCB1 (Vest) dan PCB2. Putuskan dengan Tri Yoga: casing mana untuk board mana, atau kecilkan PCB (konsekuensi: rute ulang).
+- Lokasi konektor yang harus jatuh pada lubang casing: USB-C TP4056, micro/USB-C DevKit, SMA/U.fl, SW1/SW2, konektor XKC. Ekspor koordinatnya (lihat `AGENT_PLAN.md`).
+
+## 7. Keputusan yang harus dikunci sebelum memesan
+- Pabrikan dan perakitan: solder tangan semua (R/C 0603, SOT-23, SMA, tantalum case B) atau minta perakitan? Bila tangan, 0603 dan SOT-23 sulit; pertimbangkan ukuran 0805.
+- Buzzer/sirine Gateway: jenis dan arus (menentukan MOSFET). Tombol mute Gateway (P3-3) dan LED indikator (K2) masuk atau tidak.
+- Baterai Helmet: 18650 + holder (sama dengan Vest) atau LiPo; cara menyambung.
+- Cadangan daya Gateway (K5), pembagi baterai Helmet (K4).
+- Jumlah PCB per board dan cadangan (modul fisik tidak bisa diperbaiki bila PCB salah).
+
+## 8. Tanda tangan sebelum memesan (isi)
+| Board | Gerber diekspor | DRC 0 | netlist OK | cetak 1:1 lulus | casing cocok | Calvin | Rafif |
+|---|---|---|---|---|---|---|---|
+| PCB1 | | | | | | | |
+| PCB2 | | | | | | | |
+| PCB3 | | | | | | | |
+
+## 9. Catatan status teknis (per 5 Nov, salinan EasyEDA `Pandu-Capstone-v3-footprint-fix`)
+- PCB1: DevKit V1 30 pin + Ra-02 breakout terpasang, H1 dihapus, rute ulang 16 mil, DRC 0, ratline 0, 27 net, papan 107,95 x 95,25 mm.
+- PCB3: Ra-02 breakout (pad 1 = GND), Q1 = 2N7002, H2 dihapus, 16 mil, DRC 0, ratline 0, papan 55,88 x 77,47 mm. **Skematik PCB3 belum disamakan** (U1 masih footprint lama, H2 masih ada); Import Changes akan mengembalikan perubahan, jangan diterapkan tanpa mencentang.
+- PCB2: belum disentuh di salinan; semua koreksi 8 Okt (SAW1, BAT_NEG, TTP223, LiPo+TP4056) ada di proyek tim, belum diaudit terhadap modul fisik.
+- Footprint TP4056 (PCB2) cocok dalam toleransi 0,5 mm per audit 5 Nov, perlu ukur ulang dengan jangka sorong.
+- Sisa item personal library di salinan (jangan dipakai): device kosong `ESP32_DevKitV1_30P_J2J3`, device `ESP32-DevKitV1-30P`, footprint `ESP32_DevKitV1_30P` dan `ESP32_DevKitV1_30P_25.4mm` (setengah ternomori).
