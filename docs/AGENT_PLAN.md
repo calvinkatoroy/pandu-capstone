@@ -56,13 +56,13 @@ Tugas:
 5. Tandai ke Calvin: keputusan baterai Helmet (18650 + holder atau LiPo), pin 5V vs regulator, K4 (pembagi baterai).
 
 ## Agen 3: PCB3 Edge Gateway (M)
-Kondisi awal (T, 5 Nov di salinan Calvin): PCB Ra-02 breakout, Q1 = 2N7002, H2 dihapus, 16 mil, DRC 0, papan 55,88 x 77,47 mm; **skematik belum disamakan**.
+Kondisi awal (T, 5 Nov di salinan Calvin; sirine baru dihapus kemudian): PCB Ra-02 breakout, Q1 = 2N7002, H2 dihapus, 16 mil, DRC 0, papan 55,88 x 77,47 mm; **skematik belum disamakan**.
 Tugas:
 1. Samakan skematik dengan PCB: `U1` footprint Ra-02 breakout, hapus `H2`, label `LORA_ANT` di pin 1 -> GND (pad 1 breakout = GND). Setelah itu Import Changes di PCB3 **tidak boleh** menunjukkan perubahan tak terduga (centang hanya yang disengaja).
-2. Verifikasi Q1 (2N7002 SOT-23) G/S/D terhadap datasheet; cek arus buzzer/sirine (< 100 mA) dengan Calvin; bila lebih, usulkan MOSFET lain (jangan pesan).
-3. Validasi DevKit 38 pin (jarak deret, 19 pin/sisi, pad J2/J3) terhadap modul fisik; urutan header microSD `H1` (1x6); terminal sirine; tombol mute (P3-3) dan dioda flyback (P3-4): masuk atau tidak sesuai keputusan Calvin.
-4. Ukuran papan: boleh membesar seminimal mungkin bila perlu; catat alasan.
-5. Jalur 16 mil, DRC 0, ekspor `PCB3.tel` dan `check_netlist.py` (pin map SD SCK=IO25, MISO=IO35, MOSI=IO32, CS=IO33; LoRa IO18/19/23, CS IO5, RST IO14, DIO0 IO26; SIREN_DRV=IO4), Gerber, cetak 1:1, STEP/outline, koordinat.
+2. **Hapus rangkaian sirine** (keputusan 11 Nov, Gateway = pure gateway): `Q1`, `R1`, `R3`, terminal `U2`, net `SIREN_DRV` (IO4) di skematik dan PCB; pertahankan `R2` (pull-up SD_CS). Tanpa Q1, item G/S/D dan arus sirine tidak berlaku. Tombol mute dan dioda flyback batal.
+3. Validasi DevKit 38 pin (jarak deret, 19 pin/sisi, pad J2/J3) terhadap modul fisik dan urutan header microSD `H1` (1x6).
+4. Ukuran papan: boleh membesar seminimal mungkin bila perlu; dengan sirine dihapus, usulkan apakah papan bisa mengecil (jangan ubah tanpa Calvin); catat alasan.
+5. Jalur 16 mil, DRC 0, ekspor `PCB3.tel` dan `check_netlist.py` (pin map SD SCK=IO25, MISO=IO35, MOSI=IO32, CS=IO33; LoRa IO18/19/23, CS IO5, RST IO14, DIO0 IO26; `SIREN_DRV` dihapus dari ekspektasi `pcb3` di skrip), Gerber, cetak 1:1, STEP/outline, koordinat.
 
 ## Prompt awal (tempel ke tiap agen; ganti N)
 ```

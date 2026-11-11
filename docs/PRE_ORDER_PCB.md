@@ -7,7 +7,7 @@ Status tiap angka: **T** = TERBUKTI (diukur/dijalankan), **D** = DUGAAN (listing
 ## 1. Gerbang (urut; semua harus lulus)
 | # | Gerbang | Penanggung jawab | Status |
 |---|---|---|---|
-| G1 | Semua modul fisik sudah ada di tangan (termasuk TP4056 kedua dan boost MT3608, yang per 28 Okt **belum ada**; tact switch 3 pcs; buzzer/sirine Gateway) | Rafif/Gibran | B |
+| G1 | Semua modul fisik sudah ada di tangan (termasuk TP4056 kedua dan boost MT3608, yang per 28 Okt **belum ada**; tact switch 3 pcs) | Rafif/Gibran | B |
 | G2 | Semua ukuran di bagian 2 terisi hasil jangka sorong (T), selisih terhadap footprint <= 0,2 mm | Calvin | B |
 | G3 | Footprint PCB1/2/3 sama dengan modul (bagian 3), semua pin/pad tervalidasi | Agen 1-3 + Calvin | sebagian |
 | G4 | Skematik = PCB (Import Changes tanpa perubahan tak terduga), netlist diekspor ulang dan `check_netlist.py` OK | Agen 1-3 | B |
@@ -47,15 +47,12 @@ Pengukuran 5 dan 28 Okt memakai penggaris (akurasi sekitar 0,5 mm). Ukur ulang s
 | Holder 18650 | 76,5 x 20,5 mm; jarak pin/pad terminal; tinggi dengan sel | belum dicek terhadap footprint BT1 | | ____ |
 | Tact switch (3 pcs: SOS, power Vest, on/off Helmet) | ukuran 6 x 6 mm (BOM 28 Okt), jarak kaki, THT atau SMD | **PCB memakai SMD TS-1088; yang dibeli beda** | | ____ |
 | Konektor sensor air XKC-Y25-V | header XH 2,54 mm 4 pin, urutan (coklat VCC, kuning sinyal, biru GND, hitam opsi) | | | ____ |
-| Terminal sirine PCB3 | pitch 3,81 mm, kawat sirine | | | ____ |
-| Buzzer/sirine Gateway | jenis (aktif/pasif), tegangan, **arus (mA)** | | belum dibeli | ____ |
 
 ## 3. Validasi footprint dan netlist (tiap board)
 Untuk setiap komponen: nomor pad = nomor pin simbol = nomor pin fisik. Cara: (a) dari modul ke tabel pin (bagian 2), (b) tabel pin ke simbol, (c) simbol ke net di `.tel`.
 - [ ] **DevKit V1 (PCB1 U3)**: 30 pad dinamai `J2-n`/`J3-n`. Pemetaan: VIN=J2-19, GND=J2-14, IO13=J2-15, IO12=J2-13, IO14=J2-12, IO27=J2-11, IO26=J2-10, IO25=J2-9, IO33=J2-8, IO32=J2-7, IO35=J2-6, IO34=J2-5, VN=J2-4, VP=J2-3, EN=J2-2, 3V3=J2-1 | GND=J3-1, IO15=J3-16, IO2=J3-15, IO4=J3-13, IO16=J3-12, IO17=J3-11, IO5=J3-10, IO18=J3-9, IO19=J3-8, IO21=J3-6, RX0=J3-5, TX0=J3-4, IO22=J3-3, IO23=J3-2. Bandingkan dengan silkscreen papan fisik.
 - [ ] **Ra-02 (PCB1 U6, PCB3 U1)**: pad 1 = GND, 16 pad nomor unik, 26,0 mm. Net: 3V3, 4x GND, NSS=IO5, SCK=IO18, MISO=IO19, MOSI=IO23, RST (Vest IO25, Gateway IO14), DIO0=IO26, DIO1-5 NC. Pin `LORA_ANT`/header antena tidak ada lagi (antena via U.fl di breakout).
-- [ ] **Q1 PCB3 = 2N7002 (SOT-23)**: pastikan pin G/S/D simbol dan footprint sesuai datasheet (SOT-23 biasanya 1=G, 2=S, 3=D; **cek datasheet part LCSC C50176485, status B**). Gate ke `SIREN_DRV` (IO4), source ke GND, drain ke sirine. Pull-down gate R3 ada.
-- [ ] **Arus 2N7002**: batas sekitar 115 mA (BOM). Pastikan arus buzzer/sirine < 100 mA. Kalau lebih, ganti MOSFET sebelum memesan.
+- [ ] **PCB3 tanpa sirine (keputusan 11 Nov)**: hapus rangkaian sirine dari skematik dan PCB: `Q1` (2N7002), `R1` 220 ohm (gate), `R3` 100 k (pull-down gate), terminal `U2` 3,81 mm, net `SIREN_DRV` (IO4). Pertahankan `R2` 10 k (pull-up SD_CS). Pastikan tidak ada net yatim (IO4 bebas) dan tidak ada ratline setelah penghapusan. Rute ulang, DRC.
 - [ ] **PCB1 Q1/Q2 = AO3401A (P-ch)**, Q5 = 2N7002: G/S/D benar; gating GPS (`GPS_EN`=IO4) dan XKC (`XKC_EN`=IO32) aktif sesuai logika.
 - [ ] **TP4056 (PCB1, PCB2)**: baterai negatif hanya ke `B-` (net `BAT_NEG`); `OUT-` dan `IN-` ke GND sistem (agar proteksi DW01 tidak terlewati, temuan A2). Verifikasi di `.tel`.
 - [ ] **XKC-Y25-V**: pembagi `R8` 10 k / `R9` 20 k ke `WATER_SIG` (IO34); `R1` dihapus. Tegangan OUT kering/basah belum diukur (K1).
@@ -72,7 +69,7 @@ Untuk setiap komponen: nomor pad = nomor pin simbol = nomor pin fisik. Cara: (a)
 4. Foto hasil dan simpan di `docs/screenshots/`; catat angka di bagian 2.
 
 ## 5. Jalur tembaga (permintaan dosen) dan aturan DRC
-- Lebar default semua net sinyal **16 mil**; net daya diusahakan lebih lebar (25 mil untuk `VBAT_RAW`, `VBAT_POS`, `VBOOST_5V`, 5V, jalur motor/sirine) bila clearance memungkinkan. Pelebaran dengan menimpa jalur (bulk) memicu 188 pelanggaran: pakai Unroute All dan Auto Route ulang, lalu Rebuild Copper.
+- Lebar default semua net sinyal **16 mil**; net daya diusahakan lebih lebar (25 mil untuk `VBAT_RAW`, `VBAT_POS`, `VBOOST_5V`, 5V) bila clearance memungkinkan. Pelebaran dengan menimpa jalur (bulk) memicu 188 pelanggaran: pakai Unroute All dan Auto Route ulang, lalu Rebuild Copper.
 - Kapasitas arus (perkiraan IPC-2221, 1 oz, kenaikan 10 °C): 16 mil sekitar 1,2 A, 25 mil sekitar 1,9 A. Arus pengisian TP4056 default sekitar 1 A (R-prog 1,2 k; audit A7 menyarankan R-prog sekitar 2 k = sekitar 580 mA untuk baterai 1200 mAh).
 - Pengecualian hanya bila fisik tidak memungkinkan (leher pad SOT-23/0603): catat net, panjang, lebar sebenarnya.
 - Verifikasi: Design Manager > aturan jalur/jarak, lalu DRC. Bandingkan lebar minimum yang benar-benar ada (kolom "Track" di Check DRC atau filter objek). Tulis hasil di laporan agen. Nilai 16 mil dari Calvin; minta konfirmasi tertulis dosen bila perlu.
@@ -87,7 +84,7 @@ Untuk setiap komponen: nomor pad = nomor pin simbol = nomor pin fisik. Cara: (a)
 
 ## 7. Keputusan yang harus dikunci sebelum memesan
 - Pabrikan dan perakitan: solder tangan semua (R/C 0603, SOT-23, SMA, tantalum case B) atau minta perakitan? Bila tangan, 0603 dan SOT-23 sulit; pertimbangkan ukuran 0805.
-- Buzzer/sirine Gateway: jenis dan arus (menentukan MOSFET). Tombol mute Gateway (P3-3) dan LED indikator (K2) masuk atau tidak.
+- Gateway tanpa sirine: tombol mute (P3-3) dan dioda flyback (P3-4) tidak diperlukan lagi. LED status Gateway (pakai LED onboard DevKit atau tidak) dan LED indikator Vest (K2) masuk atau tidak. Peringatan alarm hanya di dashboard; firmware Gateway masih memuat kode sirine (IO4) dan perlu disesuaikan.
 - Baterai Helmet: 18650 + holder (sama dengan Vest) atau LiPo; cara menyambung.
 - Cadangan daya Gateway (K5), pembagi baterai Helmet (K4).
 - Jumlah PCB per board dan cadangan (modul fisik tidak bisa diperbaiki bila PCB salah).
@@ -101,7 +98,7 @@ Untuk setiap komponen: nomor pad = nomor pin simbol = nomor pin fisik. Cara: (a)
 
 ## 9. Catatan status teknis (per 5 Nov, salinan EasyEDA `Pandu-Capstone-v3-footprint-fix`)
 - PCB1: DevKit V1 30 pin + Ra-02 breakout terpasang, H1 dihapus, rute ulang 16 mil, DRC 0, ratline 0, 27 net, papan 107,95 x 95,25 mm.
-- PCB3: Ra-02 breakout (pad 1 = GND), Q1 = 2N7002, H2 dihapus, 16 mil, DRC 0, ratline 0, papan 55,88 x 77,47 mm. **Skematik PCB3 belum disamakan** (U1 masih footprint lama, H2 masih ada); Import Changes akan mengembalikan perubahan, jangan diterapkan tanpa mencentang.
+- PCB3: Ra-02 breakout (pad 1 = GND), Q1 = 2N7002, H2 dihapus, 16 mil, DRC 0, ratline 0, papan 55,88 x 77,47 mm. **Rangkaian sirine (Q1, R1, R3, U2) kini harus dihapus (11 Nov)**, sehingga DRC dan routing PCB3 perlu diulang. **Skematik PCB3 belum disamakan** (U1 masih footprint lama, H2 masih ada); Import Changes akan mengembalikan perubahan, jangan diterapkan tanpa mencentang.
 - PCB2: belum disentuh di salinan; semua koreksi 8 Okt (SAW1, BAT_NEG, TTP223, LiPo+TP4056) ada di proyek tim, belum diaudit terhadap modul fisik.
 - Footprint TP4056 (PCB2) cocok dalam toleransi 0,5 mm per audit 5 Nov, perlu ukur ulang dengan jangka sorong.
 - Sisa item personal library di salinan (jangan dipakai): device kosong `ESP32_DevKitV1_30P_J2J3`, device `ESP32-DevKitV1-30P`, footprint `ESP32_DevKitV1_30P` dan `ESP32_DevKitV1_30P_25.4mm` (setengah ternomori).

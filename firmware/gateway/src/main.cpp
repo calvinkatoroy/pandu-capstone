@@ -1,9 +1,9 @@
-// PANDU Edge Gateway: ESP32-DevKitC V4. Terima paket LoRa dari Vest, bunyikan sirine, log ke SD, keluarkan JSON ke serial,
+// PANDU Edge Gateway: ESP32-DevKitC V4. Terima paket LoRa dari Vest (pure gateway, tanpa sirine), log ke SD, keluarkan JSON ke serial,
 // dan unggah ke dashboard (HTTPS POST ke Edge Function ingest) dengan antrean microSD (store-and-forward).
-// Pin (PCB3 v3): LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SPI LoRa=IO23/19/18, SD: SCK=IO25 MISO=IO35 MOSI=IO32 CS=IO33, SIREN_DRV=IO4 (HIGH = sirine ON via IRLZ44N).
+// Pin (PCB3 v3): LORA_CS=IO5, LORA_RST=IO14, LORA_DIO0=IO26, SPI LoRa=IO23/19/18, SD: SCK=IO25 MISO=IO35 MOSI=IO32 CS=IO33.
 // Paket Vest v2: PANDU,V2,<vest_id>,<seq>,<jenis>,<lat>,<lon>,<mV>,<helm>,<usia posisi detik>   (v1 tanpa vest_id/seq tetap diterima)
 //   jenis: HB|SOS|FALL|MOB|OFF   helm: 1 dipakai, 0 tidak, 2 tidak terjangkau.   Kontrak: pandu-dashboard/docs/DATA_CONTRACT.md
-// Arsitektur: loop() hanya LoRa + sirine (tidak boleh terblok). Task netTask() satu-satunya pengguna SD dan jaringan.
+// Arsitektur: loop() hanya LoRa (tidak boleh terblok). Task netTask() satu-satunya pengguna SD dan jaringan.
 #include <Arduino.h>
 #include <SPI.h>
 #include <LoRa.h>
@@ -17,13 +17,11 @@
 #include "config.h"
 #endif
 
-constexpr int PIN_LORA_CS = 5, PIN_LORA_RST = 14, PIN_LORA_DIO0 = 26, PIN_SIREN = 4;
+constexpr int PIN_LORA_CS = 5, PIN_LORA_RST = 14, PIN_LORA_DIO0 = 26;
 constexpr int PIN_SD_CS = 33, PIN_SD_SCK = 25, PIN_SD_MISO = 35, PIN_SD_MOSI = 32;   // SD di bus SPI sendiri (PCB3 v3), terpisah dari LoRa
 SPIClass sdSpi(HSPI);
 constexpr long LORA_FREQ = 433E6;                 // Ra-02 SX1278, harus sama dengan Vest
-constexpr uint32_t SIREN_MAX_MS   = 60000;        // sirine otomatis berhenti jika tidak ada alert baru selama ini (KALIBRASI)
 constexpr uint32_t VEST_LOST_MS   = 90000;        // tidak ada paket sama sekali selama ini = peringatan "VEST LOST" (serial saja)
-constexpr bool     SIREN_ON_LOST  = false;        // false: jangan bunyikan sirine hanya karena sinyal hilang (rawan alarm palsu)
 constexpr uint32_t DUP_WINDOW_MS  = 60000;        // paket ulang (vest_id, seq) sama dalam jendela ini = duplikat radio, tidak diunggah ulang
 constexpr int      UPLOAD_BATCH   = 20;           // maks event per POST (server menerima <= 100)
 constexpr uint32_t RETRY_MS       = 30000;        // jeda setelah unggah gagal
@@ -41,8 +39,8 @@ constexpr bool NET_ENABLED = false;
 #define DEVICE_KEY ""
 #endif
 
-bool loraOk = false, sdOk = false, sirenOn = false;
-uint32_t lastAlertAt = 0, lastRxAt = 0, sirenPhaseAt = 0, rxCount = 0;
+bool loraOk = false, sdOk = false;
+uint32_t lastRxAt = 0, rxCount = 0;
 bool lostReported = false;
 uint32_t bootId;                                   // membedakan millis() antar boot pada antrean SD
 int v1Seq = 0;                                     // seq buatan untuk paket v1
@@ -52,7 +50,6 @@ struct Ev { Pkt p; time_t epoch; uint32_t ms; };  // epoch = 0 bila jam belum te
 QueueHandle_t evQ;                                 // loop() -> netTask()
 
 bool validType(const char *t) { return !strcmp(t, "HB") || !strcmp(t, "SOS") || !strcmp(t, "FALL") || !strcmp(t, "MOB") || !strcmp(t, "OFF"); }
-bool isAlert(const char *t) { return !strcmp(t, "SOS") || !strcmp(t, "MOB") || !strcmp(t, "FALL"); }
 
 bool parse(const String &s, Pkt &p) {
   char buf[160];
@@ -73,15 +70,6 @@ bool parse(const String &s, Pkt &p) {
   p.age = n > i + 5 ? atoi(tok[i + 5]) : 0;       // usia posisi (detik); 0 = baru atau tidak ada
   return true;
 }
-
-// ---- Sirine ----
-// Pola: SOS/MOB = 500 ms ON/500 ms OFF terus; FALL = 200 ms ON/200 ms OFF lebih cepat.
-void sirenTick(const char *kind) {
-  uint32_t period = !strcmp(kind, "FALL") ? 200 : 500;
-  if (millis() - sirenPhaseAt >= period) { sirenPhaseAt = millis(); sirenOn = !sirenOn; digitalWrite(PIN_SIREN, sirenOn); }
-}
-void sirenOff() { sirenOn = false; digitalWrite(PIN_SIREN, LOW); }
-char activeKind[8] = "";
 
 // ---- Waktu ----
 bool timeSynced() { return time(nullptr) > 1700000000; }
@@ -212,8 +200,6 @@ void netTask(void *) {
 void setup() {
   Serial.begin(115200);
   bootId = esp_random();
-  pinMode(PIN_SIREN, OUTPUT);
-  digitalWrite(PIN_SIREN, LOW);                   // pull-down R3 menjaga LOW saat boot
   pinMode(PIN_LORA_CS, OUTPUT); digitalWrite(PIN_LORA_CS, HIGH);
   pinMode(PIN_SD_CS, OUTPUT);   digitalWrite(PIN_SD_CS, HIGH);
 
@@ -257,7 +243,6 @@ void loop() {
         Ev e = { p, timeSynced() ? time(nullptr) : 0, now };
         if (xQueueSend(evQ, &e, 0) != pdTRUE) Serial.println("{\"warning\":\"queue_full_event_dropped\"}");
       }
-      if (isAlert(p.type)) { lastAlertAt = now; strlcpy(activeKind, p.type, sizeof activeKind); }
     } else Serial.printf("{\"ignored\":\"bad_packet\",\"rssi\":%d}\n", p.rssi);
   }
 
@@ -269,18 +254,10 @@ void loop() {
                   loraOk, sdOk, (unsigned long)rxCount, rxCount ? (long)((now - lastRxAt) / 1000) : -1L, NET_ENABLED && WiFi.status() == WL_CONNECTED, timeSynced());
   }
 
-  // Sirine: bunyi selama masih ada alert baru dalam SIREN_MAX_MS
-  if (activeKind[0] && now - lastAlertAt < SIREN_MAX_MS) sirenTick(activeKind);
-  else if (activeKind[0]) { sirenOff(); activeKind[0] = 0; Serial.println("{\"siren\":\"timeout\"}"); }
-
-  // Perintah serial: 'M' = mute sirine sekarang
-  if (Serial.available() && Serial.read() == 'M') { sirenOff(); activeKind[0] = 0; Serial.println("{\"siren\":\"muted\"}"); }
-
   // Vest hilang sinyal
   if (!lostReported && now - lastRxAt > VEST_LOST_MS) {
     lostReported = true;
     Serial.println("{\"warning\":\"vest_lost\"}");
-    if (SIREN_ON_LOST) { strlcpy(activeKind, "SOS", sizeof activeKind); lastAlertAt = now; }
   }
   delay(5);
 }

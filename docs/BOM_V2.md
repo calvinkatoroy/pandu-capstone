@@ -1,4 +1,6 @@
-# BOM PANDU (desain v2, per 8 Okt 2026)
+# BOM PANDU (desain v2, per 8 Okt 2026; Gateway diperbarui 11 Nov 2026)
+
+**11 Nov 2026: Edge Gateway = pure gateway, tanpa sirine/buzzer.** Dihapus dari PCB3 dan BOM: Q1 (IRLZ44N, lalu 2N7002), R1 220 ohm, R3 100 k, terminal sirine U2, sirine/strobo, H2. Firmware Gateway tanpa kode sirine.
 
 Sumber: netlist `hardware/netlist/PCB1.tel`, `PCB2.tel`, `PCB3.tel`, firmware, dan hasil tes sesi ini. Tanpa harga (harga final ikut invoice di sheet "Bills of Materials").
 Kolom **Status** diambil dari checklist sheet BOM (6 Okt) dan percakapan; belum tentu terkini, cek ulang dengan Rafif/Gibran.
@@ -49,13 +51,7 @@ Tanda **PERLU DIPERBAIKI** = item di desain/EasyEDA yang salah atau belum cocok 
 | U1 | Modul LoRa Ra-02 SX1278 433 MHz (breakout) | 1 | **Sudah dibeli (modul kedua dari sepasang).** Footprint: female header 2x8 |
 | H1 | Header 1x6 + modul microSD (SPI) | 1 | Ada. Urutan pin dan level logika perlu dicek |
 | - | Kartu microSD 16/32 GB (FAT32) | 1 | Ada |
-| Q1 | MOSFET IRLZ44N (TO-220) | 1 | Belum ada |
-| R1 | Resistor 220 ohm (0603) | 1 | |
 | R2 | Resistor 10 k (0603) | 1 | Pull-up CS SD |
-| R3 | Resistor 100 k (0603) | 1 | Pull-down gate |
-| U2 | Terminal block 2 pin 3,81 mm | 1 | Untuk sirine |
-| - | Sirine/strobo 5 V (>= 85 dB) | 1 | Belum ada. Perlu dioda flyback jika sirine berkoil/motor |
-| H2 | Header 2 pin | 1 | Pigtail antena |
 | - | Antena pegas 433 MHz U.fl 3 dBi | 1 | **Sudah dibeli** |
 | - | Adaptor 5 V 2 A + kabel | 1 | Ada |
 | - | Box enclosure gateway | 1 | Belum ada |
@@ -77,7 +73,7 @@ VL53L0X x2 (Rp80 rb), BME680 (Rp170 rb), AMS1117/step-down, CR2032 + holder, XKC
 ## 6. Minimum untuk prototipe breadboard (tanpa PCB, power bank/USB)
 Vest: ESP32 DevKit, GY-521, GPS NEO-6M, sensor air, 2 tact, 1 resistor 10 k, kabel jumper, LoRa (setelah disolder + antena).
 Helmet: SuperMini, 1 tact (opsional), kabel USB (LiPo + TP4056 + saklar nanti).
-Gateway: ESP32 DevKit, LoRa + antena, modul microSD + kartu, LED + 330 ohm (pengganti sirine), kabel USB.
+Gateway: ESP32 DevKit, LoRa + antena, modul microSD + kartu, kabel USB (LED + 330 ohm opsional sebagai indikator uji).
 
 ## 7. Ukuran komponen (diukur tim, 28 Okt 2026; p x l, tinggi belum diukur)
 | Komponen | Ukuran (cm) | Catatan |
@@ -95,7 +91,6 @@ Gateway: ESP32 DevKit, LoRa + antena, modul microSD + kartu, LED + 330 ohm (peng
 | Tact switch 2 pin | 0,6 x 0,6 | Jumlah 3: SOS, on/off Vest, on/off Helmet. BOM lama memakai SMD TS-1088 (bukan ini); sesuaikan footprint |
 | XKC-Y25-V | belum ada | Kabel 50 cm; warna: coklat VCC, kuning sinyal, biru GND, hitam opsi |
 | Antena pegas U.FL 433 MHz | sudah dibeli (2) | |
-| Buzzer | "standar" | Pastikan aktif atau pasif (firmware butuh tahu) dan dB-nya |
 
 Belum ada: MOSFET, dioda, resistor, kapasitor. Tinggi komponen (untuk casing) belum diukur.
 
@@ -108,7 +103,7 @@ Sumber jumlah: netlist PCB1-3 (bisa tertinggal dari EasyEDA) dan TUTORIAL_BREADB
 | Resistor 10 k | 1/4 W, 5%, THT | 5 | SOS pull-down, pembagi XKC (seri), CS microSD |
 | Resistor 20 k | 1/4 W, 5%, THT | 3 | Pembagi XKC ke IO34 |
 | Resistor 100 k | 1/4 W, 5%, THT | 5 | Pembagi baterai (2) + cadangan |
-| Resistor 330 ohm | 1/4 W, 5%, THT | 5 | LED pengganti sirine, uji kabel LoRa |
+| Resistor 330 ohm | 1/4 W, 5%, THT | 5 | LED indikator uji, uji kabel LoRa |
 | LED 5 mm | merah/hijau | 5 | LED uji |
 Tanpa MOSFET dan tanpa dioda di breadboard (daya lewat USB/power bank). Opsi praktis: satu paket assorted resistor 1/4 W.
 
@@ -116,10 +111,9 @@ Tanpa MOSFET dan tanpa dioda di breadboard (daya lewat USB/power bank). Opsi pra
 | Item | Spesifikasi | Perlu | Beli |
 |---|---|---|---|
 | MOSFET P-ch AO3401A, SOT-23 | -30 V, -4 A | 2 (PCB1 Q1, Q2) | 4 |
-| MOSFET N-ch 2N7002, SOT-23 | 60 V, 115 mA | 2 (PCB1 Q5, PCB3 buzzer) | 4 |
+| MOSFET N-ch 2N7002, SOT-23 | 60 V, 115 mA | 1 (PCB1 Q5) | 3 |
 | Dioda Schottky SS14, SMA | 40 V, 1 A | 1 (PCB1 D1) | 3 |
-| Resistor 100 k, 0603, 1% | | 7 | 15 |
+| Resistor 100 k, 0603, 1% | | 6 | 14 |
 | Resistor 10 k, 0603, 1% | | 3 | 8 |
 | Resistor 20 k, 0603, 1% | | 1 | 4 |
-| Resistor 220 ohm, 0603, 1% | | 1 | 4 |
-Keputusan: IRLZ44N tidak dibeli; PCB3 Q1 diganti 2N7002 (SOT-23) karena beban hanya buzzer 5 V aktif. Hapus R1 10 k PCB1 (XKC digital). Tambah R8 10 k dan R9 20 k di PCB1.
+Keputusan: IRLZ44N dan MOSFET sirine tidak dibeli (Gateway tanpa sirine, 11 Nov). Hapus R1 10 k PCB1 (XKC digital). Tambah R8 10 k dan R9 20 k di PCB1.
