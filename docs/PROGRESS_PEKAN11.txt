@@ -1,0 +1,112 @@
+PROGRESS MINGGU KE-11 - PANDU (Kelompok 13)
+Periode: 2 - 7 November 2026
+Anggota: Calvin Wirathama Katoroy, Gibran, Rafif, Rifat
+(DRAFT - cek dan sesuaikan sebelum dikumpulkan. Senin-Rabu tidak punya jejak di file/commit,
+ isi manual bila ada kegiatan, mis. integrasi baterai.)
+
+==================================================
+1. RINGKASAN
+==================================================
+Minggu ini fokus pada pencocokan desain PCB dengan modul yang benar-benar dibeli.
+Audit footprint terhadap modul fisik menemukan dua ketidakcocokan: modul LoRa Ra-02
+yang dibeli adalah breakout 2,54 mm (bukan modul SMD telanjang) dan ESP32 DevKit V1
+pada Vest Node adalah versi 30 pin (bukan DevKitC 38 pin). Keduanya sudah diperbaiki
+pada salinan kerja EasyEDA untuk PCB1 (Vest) dan PCB3 (Gateway): DRC 0, semua net
+terhubung, ukuran papan tidak berubah, jalur 16 mil sesuai permintaan dosen.
+Proyek tim belum disentuh; adopsi perubahan menunggu persetujuan tim.
+
+==================================================
+2. YANG SUDAH DICAPAI
+==================================================
+a. Audit footprint terhadap modul fisik
+   - Ukuran modul diukur langsung (Ra-02 breakout: jarak antar deret 26 mm,
+     pitch 2,54 mm; DevKit V1: jarak antar deret 25,4 mm; TP4056 Type-C:
+     28,5 x 17 mm, OUT-/OUT+ 14,5 mm, B-/B+ 8 mm).
+   - Temuan: Ra-02 (PCB1 dan PCB3) dan DevKit Vest (PCB1) tidak cocok dengan modul;
+     footprint TP4056 (PCB2) cocok dalam toleransi sekitar 0,5 mm; DevKit Gateway
+     (PCB3) 19 pin per sisi dan jumlah pin cocok.
+   - Spesifikasi dan hasil ada di docs/FOOTPRINT_SPEC_V3.md.
+
+b. Perbaikan PCB3 (Gateway) di salinan EasyEDA
+   - Ra-02 diganti footprint breakout, MOSFET Q1 diganti 2N7002 (SOT-23) sesuai BOM,
+     header antena H2 dihapus, jalur 16 mil, auto-route, copper di-rebuild.
+   - DRC 0, ratline 0, ukuran papan tetap 55,88 x 77,47 mm.
+
+c. Perbaikan PCB1 (Vest) di salinan EasyEDA
+   - Ra-02 breakout terpasang (pad 1 = GND), header antena H1 dihapus.
+   - Footprint DevKit V1 30 pin yang benar (dari repo sumber terbuka, MIT) diimpor;
+     pad dinamai sama dengan pin simbol sehingga skematik tidak perlu diubah.
+   - Rute ulang jalur 16 mil, copper di-rebuild: DRC "No issues", ratline 0, 27 net,
+     ukuran papan tetap 107,95 x 95,25 mm.
+   - Skematik disamakan (footprint U6, H1 dihapus, label LORA_ANT menjadi GND).
+
+d. Riset alat
+   - Perbandingan EasyEDA Pro dan KiCad (library, integrasi LCSC/JLCPCB, format file):
+     tetap memakai EasyEDA untuk proyek ini; library KiCad tidak lebih lengkap untuk
+     modul-modul yang dibeli.
+
+e. Status uji yang sudah terkonfirmasi tim
+   - GPS sudah diuji di luar ruangan.
+   - Deteksi jatuh sudah terbukti berfungsi; yang belum hanya nilai saat diam
+     (g = 4,8, seharusnya sekitar 1,0) karena belum dikalibrasi.
+   - microSD Gateway (sd:0): kartu memang belum dimasukkan, bukan kerusakan.
+   - Software: kemajuan pekan ini hanya sekitar 10 persen.
+
+==================================================
+3. KENDALA DAN SOLUSI
+==================================================
+- Footprint di dokumen dan PCB tidak sesuai modul yang dibeli (klaim "sudah diganti"
+  di dokumen lama ternyata belum): audit fisik terhadap ukuran modul, lalu footprint
+  diganti dan dicek DRC.
+- Library EasyEDA tidak punya DevKit V1 30 pin maupun breakout Ra-02: footprint
+  dibuat/diambil dari sumber terbuka dan diimpor sebagai file; nama pad bertanda hubung
+  tidak bisa diketik lewat antarmuka, sehingga dibuat lewat file impor.
+- Impor perubahan dari skematik ke PCB berusaha mengembalikan footprint lama dan
+  menambah header antena: tidak diterapkan, lalu skematik disamakan dengan PCB.
+- Antarmuka EasyEDA di browser tidak stabil untuk edit massal (klik canvas bergeser,
+  screenshot timeout): dikerjakan per langkah dengan verifikasi.
+
+==================================================
+4. MASALAH YANG MASIH TERBUKA
+==================================================
+- Skematik PCB3 belum disamakan dengan PCB-nya (Import Changes di PCB3 akan
+  mengembalikan footprint Ra-02 lama dan menambah H2 bila tidak dicentang).
+- Pin D/S MOSFET Q1 (2N7002) di PCB3 belum diverifikasi.
+- Cetak 1:1 di kertas untuk mencocokkan Ra-02, DevKit V1, dan TP4056 dengan modul
+  fisik belum dilakukan (ukuran penggaris akurat sekitar 0,5 mm).
+- Ukuran lubang pad DevKit (1,0 mm) belum dicek terhadap pin header fisik.
+- Salinan perbaikan belum dipindahkan ke proyek tim.
+- Kalibrasi nilai diam MPU6050 (g = 4,8) belum dikerjakan.
+- Temuan kritis audit (K1-K4) belum diperbaiki: alarm bisa ditolak server, LoRa
+  tanpa CRC/sync word, SOS saat bangun deep sleep tanpa posisi, deteksi jatuh gagal
+  diam-diam (lihat docs/AUDIT_V3.md).
+- Timeout upload Gateway (8 s) belum dinaikkan ke 15-20 s.
+- Uji basah sensor air, uji SD setelah kartu dimasukkan, dan uji SOS/man-overboard
+  dari hardware ke dashboard belum dilakukan penuh.
+- TP4056 kedua dan boost MT3608 untuk daya baterai Vest perlu dipastikan.
+- Project Supabase bersama (hosted) belum dibuat.
+
+==================================================
+5. PEMBAGIAN TUGAS
+==================================================
+- Calvin : audit footprint terhadap modul fisik, perbaikan PCB1 dan PCB3 di EasyEDA,
+           riset EasyEDA vs KiCad, dokumentasi (FOOTPRINT_SPEC_V3), laporan.
+- Gibran, Rafif, Rifat : isi manual sesuai kegiatan pekan ini.
+
+==================================================
+6. RENCANA MINGGU DEPAN (MINGGU KE-12)
+==================================================
+- Samakan skematik PCB3 dengan PCB-nya, verifikasi D/S Q1, DRC ulang PCB1-PCB3.
+- Cetak 1:1 dan cocokkan dengan modul fisik; konfirmasi lubang pad.
+- Putuskan dan lakukan adopsi salinan ke proyek tim, lalu ekspor Gerber dan pesan PCB
+  setelah integrasi baterai terbukti.
+- Firmware: kalibrasi nilai diam MPU6050, perbaikan K1-K4, naikkan timeout upload.
+- Uji lapangan: sensor air basah, SD setelah kartu dimasukkan, SOS dan man-overboard.
+- Dashboard: buat/konfirmasi project Supabase bersama.
+- Commit dan push seluruh perubahan.
+
+==================================================
+7. DOKUMEN PENDUKUNG
+==================================================
+docs/FOOTPRINT_SPEC_V3.md, hardware/footprints/ (make_ra02.py, make_devkit_zip_j2j3.py),
+docs/AUDIT_V3.md, docs/BOM_V2.md
