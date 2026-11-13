@@ -41,7 +41,7 @@ Urutan menurut ketergantungan: tahap 1 menentukan apakah tahap 3 perlu diulang; 
 - [ ] Cetak skala 100% (matikan "fit to page"), cek dengan penggaris, pasang semua modul asli di atas cetakan. Pin harus pas tanpa dipaksa; kalau tidak, kembali ke tahap 3. Lulus tahap ini = ukuran naik dari D ke T.
 
 **Tahap 6. Pemeriksaan akhir desain**
-- [ ] Skematik: tidak ada pin mengambang (selain 8 pin DevKit tanpa pad); DRC 0.
+- [x] Skematik **Vest (PCB1)**, 13 Nov, DRC skematik EasyEDA: peringatan "pin mengambang" hilang setelah No Connect dipasang di 27 pin yang memang kosong (`U6` DIO1-5 Ra-02, `U7.5` IN+ TP4056, `U8.1`-`U8.4` GY-521 INT/AD0/XCL/XDA, dan 17 pin `U3` DevKit yang tidak dipakai atau tidak punya pad); kabel sisa `LORA_ANT` yang tidak terhubung ke pin dihapus. Hasil terakhir: Fatal 0, Error 1 (8 pin simbol DevKit tanpa pad, sudah diketahui), Warn 3 (dua label `BAT_SENSE` ganda pada kabel yang sama, dan "part tidak cocok dengan Supplier Part" untuk `U6`/`U2`/`U3`), Info 2. Import Changes ke PCB1 kosong (PCB tidak berubah, tidak perlu rute ulang). `AD0` GY-521 dibiarkan kosong: dugaan modul punya pull-down sendiri (alamat 0x68), belum dicek di modul. Skematik **Helmet (PCB2)** dan **Gateway (PCB3)** belum dibersihkan dengan cara ini.
 - [ ] Netlist cocok dengan pin map firmware (`HANDOVER.md`); tidak memakai IO6-11.
 - [ ] Silkscreen: tanda pin 1, polaritas, nama board; lebar jalur sesuai (16 mil, daya 25 mil).
 - [ ] Ditinjau oleh reviewer kedua (Calvin atau Rafif).
