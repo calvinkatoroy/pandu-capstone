@@ -56,7 +56,7 @@ Label status: **T** terbukti (ada log/DRC/netlist), **D** dugaan, **B** belum di
 3. Beri tahu Tri Yoga urutan baru (PCB dan modul fix dulu, casing mengikuti).
 
 **B. Butuh keputusan**
-4. Pesan dengan perakitan (PCBA) JLCPCB atau tidak. Bila ya, `R2`/`R8`/`R9` perlu part pabrikan/LCSC.
+4. ~~PCBA atau tidak~~: diputuskan **PCB saja tanpa PCBA** (14 Nov), `R2`/`R8`/`R9` tidak butuh nomor LCSC. Tinggal konfirmasi ke Calvin dan pastikan ada yang bisa menyolder 0603/SOT-23/SMA.
 5. Posisi `R8`/`R9` di PCB1: tetap di sudut kiri bawah atau dekat `U10`/IO34 (memindah berarti rute ulang).
 6. Setujui pendekatan microSD PCB3 (kabel di luar PCB) atau pilih memperbesar PCB3.
 
