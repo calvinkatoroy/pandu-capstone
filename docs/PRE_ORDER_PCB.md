@@ -150,6 +150,7 @@ Sumber: teks layanan pabrik. Berlaku untuk PCB FR4 double layer. Jalur yang shor
 - Unroute All, Auto Route, Rebuild Copper (GND bawah), DRC: **PCB1 100% terhubung, 241 jalur, 15 via, DRC 0 (papan tetap 107,95 x 95,25 mm); PCB2 100%, 55 jalur, DRC 0 (31,623 x 99,06 mm); PCB3 100%, 64 jalur, 3 via, DRC 0, tetapi papan DIBESARKAN menjadi 54,61 x 100,33 mm** (sebelumnya 55,88 x 77,47): dengan clearance 0,5 mm jalur tidak bisa lewat di antara pin DevKit, auto-route hanya menyelesaikan 53,85% pada tata letak lama. Tata letak PCB3 baru: H1 (microSD) di kiri DevKit, Ra-02 di bawah DevKit, outline Start X -650 mil, lebar 2150 mil, tinggi 3950 mil, GND pour bawah digambar ulang (POUR1).
 - Belum diekspor ulang: netlist (konektivitas tidak berubah, jadi `.tel` di repo masih berlaku untuk net, tapi posisi/outline berubah), Gerber, dan cetak 1:1. Posisi komponen PCB3 berubah: cek ulang casing dan cetak 1:1 PCB3.
 - DRC EasyEDA tidak menandai pad SOT-23 yang celahnya 0,3 mm (antar pad satu komponen); tetap tanyakan ke pabrik.
+- Pertanyaan ke pabrik dan daftar verifikasi lengkap (status T/B per 16 Nov): `docs/PERTANYAAN_PABRIK_INDOMAKER.md`.
 - PCB3 (100,33 mm) kini sedikit melebihi 10 x 10 cm; PCB2 (31,6 x 99,1) dan PCB3 tidak bisa digabung dalam satu panel 10 x 10 cm kecuali PCB3 dipendekkan sekitar 0,4 mm dan ada celah potong.
 
 Konsekuensi (catatan sebelum 15 Nov malam, sebagian sudah teratasi di atas):
