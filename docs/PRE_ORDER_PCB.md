@@ -144,7 +144,15 @@ Sumber: teks layanan pabrik. Berlaku untuk PCB FR4 double layer. Jalur yang shor
 | Lubang via (hanya via) | **1,0 mm** drill (= 39,4 mil) | via 12 mil (0,3 mm) drill, pad 24 mil (0,6 mm) | **TIDAK LOLOS** |
 | Lubang yang dimasuki kaki komponen (THT) | **1,1 mm** drill (= 43,3 mil) | DevKit V1 memakai 1,0 mm; footprint lain belum dicek | **harus diganti ke 1,1 mm** (cek semua footprint THT) |
 
-Konsekuensi:
+**Update 15 Nov malam: desain sudah disesuaikan ke aturan Indomaker di salinan EasyEDA (dikerjakan Calvin lewat Claude; DRC dijalankan sendiri):**
+- Design Rule di ketiga PCB: clearance semua pasangan **20 mil** (0,508 mm), lebar jalur minimum **16 mil** (aturan `copperThickness1oz` dan `power25mil`; default tetap 16 dan 25 mil), via **drill 39,4 mil (1,0 mm), pad 63 mil (1,6 mm)**. Catatan: di PCB2 satuan dialog sempat mm; sudah dikoreksi ke mil.
+- Semua pad Multi-Layer (lubang kaki komponen) diubah ke **43,3 mil (1,1 mm)**: PCB1 74 pad, PCB2 10 pad, PCB3 60 pad. Diubah di PCB (bukan di library footprint): bila footprint di-update dari library lewat Import Changes, lubang bisa kembali ke nilai lama, jadi cek ulang sebelum ekspor.
+- Unroute All, Auto Route, Rebuild Copper (GND bawah), DRC: **PCB1 100% terhubung, 241 jalur, 15 via, DRC 0 (papan tetap 107,95 x 95,25 mm); PCB2 100%, 55 jalur, DRC 0 (31,623 x 99,06 mm); PCB3 100%, 64 jalur, 3 via, DRC 0, tetapi papan DIBESARKAN menjadi 54,61 x 100,33 mm** (sebelumnya 55,88 x 77,47): dengan clearance 0,5 mm jalur tidak bisa lewat di antara pin DevKit, auto-route hanya menyelesaikan 53,85% pada tata letak lama. Tata letak PCB3 baru: H1 (microSD) di kiri DevKit, Ra-02 di bawah DevKit, outline Start X -650 mil, lebar 2150 mil, tinggi 3950 mil, GND pour bawah digambar ulang (POUR1).
+- Belum diekspor ulang: netlist (konektivitas tidak berubah, jadi `.tel` di repo masih berlaku untuk net, tapi posisi/outline berubah), Gerber, dan cetak 1:1. Posisi komponen PCB3 berubah: cek ulang casing dan cetak 1:1 PCB3.
+- DRC EasyEDA tidak menandai pad SOT-23 yang celahnya 0,3 mm (antar pad satu komponen); tetap tanyakan ke pabrik.
+- PCB3 (100,33 mm) kini sedikit melebihi 10 x 10 cm; PCB2 (31,6 x 99,1) dan PCB3 tidak bisa digabung dalam satu panel 10 x 10 cm kecuali PCB3 dipendekkan sekitar 0,4 mm dan ada celah potong.
+
+Konsekuensi (catatan sebelum 15 Nov malam, sebagian sudah teratasi di atas):
 - Aturan clearance 0,5 mm sangat berat untuk PCB1 (papan 107,95 x 95,25 mm, 223 jalur, padat). Kemungkinan auto-route gagal atau butuh jalur lebih sedikit/papan lebih besar; PCB1 dan PCB2 tadinya tidak boleh dibesarkan (keputusan 14 Nov). Perlu keputusan Calvin: perbesar papan, atau cari pabrik lain dengan aturan lebih longgar (mis. JLCPCB: clearance sekitar 0,127 mm).
 - Via 1,0 mm drill butuh pad via sekitar 1,6-2,0 mm; ruangnya besar. Saat ini PCB1 memakai 14 via, PCB2 4, PCB3 4. Kurangi via (pindahkan ke jalur sisi yang sama) atau terima ruang besar.
 - SOT-23 (AO3401A, 2N7002) berjarak pad rapat (pitch 0,95 mm): celah antar pad sekitar 0,3 mm, di bawah 0,5 mm; kemungkinan tidak terkena aturan "jarak antar jalur" tetapi **harus ditanyakan ke pabrik** (WA di situs mereka) sebelum memesan.
