@@ -29,6 +29,7 @@ Proyek: P.A.N.D.U (Perangkat Alarm Nirkabel Deteksi Urgensi), wearable keselamat
 
 ## Syarat PCB dari dosen
 - **Lebar jalur tembaga diperlebar: 16 mil** (aturan default semua net sinyal) dan jalur daya sebaiknya lebih lebar (`VBAT_RAW`, `VBAT_POS`, `VBOOST_5V`, 5V: 25 mil bila muat). Pelebaran massal pernah memicu 188 pelanggaran DRC; kerjakan dengan rute ulang, bukan menimpa jalur.
+- **Pabrik: Indomaker (keputusan Calvin 15 Nov).** Aturan: jalur min 0,4 mm, clearance min 0,5 mm, via 1,0 mm drill, lubang kaki komponen 1,1 mm, ukuran PCB min 10 x 10 cm. Aturan EasyEDA sekarang (clearance 6-7,9 mil, via 0,3 mm, THT 1,0 mm) **tidak lolos**; detail dan tindakan di `docs/PRE_ORDER_PCB.md` bagian 5a. Desain harus diubah ke aturan ini sebelum memesan; jangan memesan sebelum bagian 5a selesai.
 - Ukuran papan jangan membesar kecuali perlu; PCB3 boleh membesar seminimal mungkin.
 
 ## Alur EasyEDA (UI rapuh, dikendalikan lewat Claude-in-Chrome, tidak bisa dari sesi cloud)
