@@ -24,11 +24,16 @@ Dibuat 16 Nov 2026. Ketentuan pabrik yang sudah diketahui (dari situs mereka, di
 | Skematik dan PCB sinkron (tidak ada perubahan tersisa di Import Changes) | **T**: dicek 16 Nov untuk PCB1 dan PCB3 (daftar kosong, tidak diterapkan); PCB2 tidak diubah netlistnya |
 | Pour GND PCB3 menutupi seluruh papan | **T secara visual** (tampilan EasyEDA 16 Nov, pola pour sampai ke tepi outline); belum dilihat di penampil Gerber |
 | Proyek tidak diubah orang lain sejak perubahan 15 Nov | **T**: daftar proyek menunjukkan modifikasi terakhir oleh calvinwkatoroy 15 Nov 23:46 (cek ulang sebelum ekspor) |
-| Lubang THT 1,1 mm masih berlaku setelah muat ulang | **T sebagian**: terbaca 43,3 mil pada pad DevKit PCB1 setelah perubahan; belum dicek ulang semua pad setelah memuat ulang. Cek ulang: Edit/Find > Pad > Layer = Multi-Layer > Find All, kolom Hole Diameter harus 43.3mil |
+| Lubang THT 1,1 mm masih berlaku setelah muat ulang | **T** (Gerber percobaan 16 Nov): file drill PTH hanya berisi bor 1,09982 mm untuk pad komponen (PCB1 74, PCB2 10, PCB3 60 lubang, sama dengan jumlah pad) dan 1,001 mm untuk via (PCB1 15, PCB3 3, PCB2 0) |
 | Netlist `.tel` diekspor ulang | **B**: konektivitas tidak berubah (Import Changes kosong), tetapi file di repo belum diekspor ulang dari tata letak baru |
-| Gerber dibuka di penampil | **B** (ekspor perlu izin unduh dari Calvin) |
+| Gerber percobaan | **T sebagian**: diekspor 16 Nov (izin Calvin), diperiksa dengan skrip `hardware/tools/gerber_*.py` dan dirender sendiri ke `docs/screenshots/gerber_render_pcb1..3.png` (bukan penampil Gerber resmi). Semua lapisan ada; ukuran outline PCB1 107,95 x 95,25, PCB2 31,623 x 99,06, PCB3 54,61 x 100,33 mm; lebar jalur hanya 0,406 mm (16 mil) dan 0,635 mm (25 mil), tidak ada yang lebih tipis; satu lubang NPTH 3,2 mm di PCB1 (baut/holder). File zip tidak dimasukkan ke repo. Belum dibuka di penampil Gerber pihak ketiga |
 | Uji tusuk kertas 1:1 | **B** (butuh printer dan modul fisik) |
 | Footprint cocok modul fisik (Ra-02 25,4 mm, jarak deret SuperMini dan DevKit 38 pin, pad TP4056 dan MT3608, urutan pin microSD dan GPS) | **B/D** (butuh modul fisik) |
 | Tact switch cocok footprint | **B** (PCB memakai SMD TS-1088, yang dibeli 6 x 6 mm THT/SMD belum dipastikan) |
 | Posisi konektor/U.fl/baut PCB3 vs casing Gateway | **B** (tata letak PCB3 berubah 15 Nov) |
 | Tri Yoga diberi tahu urutan "PCB dulu, casing mengikuti" | **B** |
+
+## Hasil pemeriksaan Gerber percobaan (16 Nov 2026)
+- Pour GND (lapisan bawah PCB1 dan PCB3) digambar dengan goresan 0,2032 dan 0,254 mm (8 dan 10 mil) di bagian "Copper" file Gerber; ini isi tembaga, bukan jalur, tetapi karena lebar goresannya di bawah 0,4 mm **tanyakan ke pabrik** apakah aman (tambahkan ke pertanyaan 7/8). PCB2 tidak memakai pour.
+- Lubang NPTH 3,2 mm (PCB1) tanpa tembaga; tanyakan apakah dibuat (pertanyaan 5).
+- Hasil render sendiri tidak menunjukkan jalur melintasi pad lain, jalur di luar outline, atau pour yang tidak menutupi papan. Render menggambar sudut outline membulat sebagai garis lurus (artefak render).
