@@ -151,6 +151,9 @@ Sumber: teks layanan pabrik. Berlaku untuk PCB FR4 double layer. Jalur yang shor
 - Belum diekspor ulang: netlist (konektivitas tidak berubah, jadi `.tel` di repo masih berlaku untuk net, tapi posisi/outline berubah), Gerber, dan cetak 1:1. Posisi komponen PCB3 berubah: cek ulang casing dan cetak 1:1 PCB3.
 - DRC EasyEDA tidak menandai pad SOT-23 yang celahnya 0,3 mm (antar pad satu komponen); tetap tanyakan ke pabrik.
 - Pertanyaan ke pabrik dan daftar verifikasi lengkap (status T/B per 16 Nov): `docs/PERTANYAAN_PABRIK_INDOMAKER.md`.
+- **21 Nov 2026: lubang baut M3 ditambahkan ke ketiga PCB** (keputusan Calvin; PCB dipasang ke casing dengan baut). 4 lubang tanpa tembaga (NPTH), bor 3,2 mm (125,98 mil), tanpa net, di sudut papan: PCB1 (150,5550), (4100,5550), (150,2100), (4100,2040) mil (lubang kanan-bawah digeser ke Y 2040 agar 20 mil dari pad Ra-02 `U6.1`); PCB2 (815,-595), (1760,-595), (815,-4195), (1760,-4195) mil; PCB3 (-500,-430), (1350,-430), (-500,-4080), (1350,-4080) mil. Pour GND dibangun ulang, DRC 0 ketiganya. Ukuran papan tidak berubah. Gerber percobaan 21 Nov (`Gerber_PCB1..3_2026-11-21.zip`, tidak di repo) memuat 4 lubang NPTH 3,2 mm di tiap papan (PCB1 total 5 dengan lubang holder BT1), lubang PTH komponen tetap 1,1 mm (74/10/60) dan via 1,0 mm (15/0/3).
+- **Keputusan 21 Nov:** USB DevKit di PCB1 tetap di dalam papan (kabel ekstensi USB ke tepi casing), layout tidak diubah.
+- Footprint tact switch (SMD 3,9 x 3,0 mm, 2 pad, jarak 4,45 mm) **belum diganti**: menunggu data tact yang dibeli (jumlah kaki dan jarak antar kaki).
 - PCB3 (100,33 mm) kini sedikit melebihi 10 x 10 cm; PCB2 (31,6 x 99,1) dan PCB3 tidak bisa digabung dalam satu panel 10 x 10 cm kecuali PCB3 dipendekkan sekitar 0,4 mm dan ada celah potong.
 
 Konsekuensi (catatan sebelum 15 Nov malam, sebagian sudah teratasi di atas):
