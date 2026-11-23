@@ -1,0 +1,202 @@
+(footprint "MicroSD-Card-Adapter"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0.5 -2.25 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "913bc69e-4f09-4552-8681-20096be36c71")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "MicroSD-Card-Adapter"
+		(at 0 -6 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "18b0e7b6-c946-46bc-b00e-ac0e804bfbd4")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" "https://components101.com/modules/micro-sd-card-module-pinout-features-datasheet-alternatives"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "049c66f2-f707-44c0-98fa-002d9b9e5c35")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "b926ca6b-bab1-4e92-9ddf-feb5526904d4")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_line
+		(start -12.595223 -8)
+		(end 12.404777 -8)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "362a78c5-7f50-4b96-8900-c7f99ea093ec")
+	)
+	(fp_line
+		(start -12.595223 2)
+		(end -12.595223 -8)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "ef8eba67-a81b-478b-874d-1985bbc4e47a")
+	)
+	(fp_line
+		(start 12.404777 -8)
+		(end 12.404777 2)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "9ebdcb3b-959c-4976-82ff-14ffe199f2b7")
+	)
+	(fp_line
+		(start 12.404777 2)
+		(end -12.595223 2)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "e5339ec4-3cd0-4d68-afc2-039233f7ce3f")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 -4 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "477e7d3e-d37a-456b-8997-53458d73fb30")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole roundrect
+		(at 6.2992 0)
+		(size 1.905 1.905)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(roundrect_rratio 0.15)
+		(uuid "302fddab-2dbb-46e7-b3ca-46fe463f6237")
+	)
+	(pad "2" thru_hole circle
+		(at 3.7592 0)
+		(size 1.905 1.905)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "365c9ef2-f88c-484e-8db2-c7b805810c9e")
+	)
+	(pad "3" thru_hole circle
+		(at 1.2192 0)
+		(size 1.905 1.905)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "e632a93a-748e-416b-be63-849caff5d3c9")
+	)
+	(pad "4" thru_hole circle
+		(at -1.3208 0)
+		(size 1.905 1.905)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "0eb34498-eb1f-4c3e-bbe2-40e18adeb46a")
+	)
+	(pad "5" thru_hole circle
+		(at -3.8608 0)
+		(size 1.905 1.905)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "c472b806-8934-44bc-9e40-3e24f71a3b98")
+	)
+	(pad "6" thru_hole circle
+		(at -6.4008 0)
+		(size 1.905 1.905)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "81310315-ab59-44bd-a636-903170c31eee")
+	)
+	(zone
+		(net 0)
+		(net_name "")
+		(layer "F.SilkS")
+		(uuid "a9cf1d49-eea4-4117-826d-56e8b136cea4")
+		(hatch edge 0.5)
+		(connect_pads
+			(clearance 0)
+		)
+		(min_thickness 0.25)
+		(filled_areas_thickness no)
+		(keepout
+			(tracks allowed)
+			(vias allowed)
+			(pads allowed)
+			(copperpour not_allowed)
+			(footprints not_allowed)
+		)
+		(placement
+			(enabled no)
+			(sheetname "")
+		)
+		(fill
+			(thermal_gap 0.5)
+			(thermal_bridge_width 0.5)
+		)
+		(polygon
+			(pts
+				(xy -12.595223 -8) (xy 12.404777 -8) (xy 12.404777 2) (xy -12.595223 2)
+			)
+		)
+	)
+	(embedded_fonts no)
+	(model "/home/josejacomeb/Documents/tinypico-cycling-tracker/Schematics/kicad-libraries/MicroSD-Card-Adapter/micro_sdCard.step"
+		(offset
+			(xyz 0 -7 3.5)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -180)
+		)
+	)
+)
