@@ -73,9 +73,11 @@ if "pcb3" in want:
 # PCB2: tidak ada TTP223/TOUCH_SIG, negatif baterai terpisah dari GND (proteksi TP4056)
 if "pcb2" in want:
     print("PCB2"); n2 = parse("PCB2.tel"); bad2 = 0
-    for name, must in {"BAT_NEG": {"H2.2", "U7.3"}, "VBAT_RAW": {"J1.1", "U7.1"}, "VBAT_SW": {"J1.2", "U1.16"}}.items():
+    # 23 Nov: J1 (jumper baterai) dihapus; VBAT_RAW (TP4056 OUT+) langsung ke U1.16 (5V SuperMini), net VBAT_SW tidak ada lagi
+    for name, must in {"BAT_NEG": {"H2.2", "U7.3"}, "VBAT_RAW": {"U7.1", "U1.16"}}.items():
         ok = must <= set(n2.get(name, [])); bad2 += not ok
         print(f"  {'OK ' if ok else 'ERR'} {name} {sorted(n2.get(name, []))}")
+    if "VBAT_SW" in n2 or any(p.startswith("J1.") for ps in n2.values() for p in ps): bad2 += 1; print("  ERR J1/VBAT_SW masih ada")
     if "TOUCH_SIG" in n2: bad2 += 1; print("  ERR TOUCH_SIG masih ada")
     if {"H2.2", "U7.3"} & set(n2.get("GND", [])): bad2 += 1; print("  ERR B- atau baterai negatif masih di GND")
     # stub net satu pin (mis. $1N31 di U1.11) tidak boleh ada

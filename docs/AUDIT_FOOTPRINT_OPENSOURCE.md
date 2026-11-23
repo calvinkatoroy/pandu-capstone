@@ -37,7 +37,7 @@ File open source yang diunduh ada di `hardware/footprints/opensource/` (hanya di
 - Uji tanpa jangka sorong: cetak PCB 1:1 (skala 100%, bukan "fit to page"), taruh tiap modul di atas kertas dan tusuk lubang pinnya. Itu bukti T yang paling murah.
 
 ## 4. J1 dan H1
-- **J1 (PCB2)**: 2 pin, pin 1 = `VBAT_RAW` (keluaran OUT+ TP4056), pin 2 = `VBAT_SW` (pin 5V SuperMini, `U1.16`). Fungsinya jumper atau saklar daya Helmet: dilepas, baterai terputus dari ESP32-C3. Tanpa J1 atau jembatan solder, Helmet selalu hidup selama baterai tersambung. Pilihan: (a) dua lubang kosong untuk kabel atau slide switch (tanpa header), (b) jembatan tembaga permanen.
+- **J1 (PCB2)**: 2 pin, pin 1 = `VBAT_RAW` (keluaran OUT+ TP4056), pin 2 = `VBAT_SW` (pin 5V SuperMini, `U1.16`). Fungsinya jumper atau saklar daya Helmet. **Lubang dibiarkan kosong: Helmet mati total** (baterai tidak terhubung ke ESP32-C3). **Disambung kabel atau jembatan solder: selalu hidup** selama baterai terpasang. (Versi pertama dokumen ini menulis kebalikannya; dikoreksi 23 Nov.) SW1 di PCB2 hanya tombol software (GPIO4), bukan saklar daya. Pilihan: (a) slide switch disolder ke dua lubang (disarankan), (b) kabel atau jembatan solder permanen, (c) header + jumper.
 - **H1 (PCB3)**: 6 pin ke modul microSD (42 x 24 mm, D). Menempel langsung berarti badan modul duduk di atas PCB dan butuh area kosong 42 x 24 mm di luar DevKit dan Ra-02, serta slot kartu harus menghadap tepi. Itu perubahan tata letak PCB3.
 
 ## 5. Hasil DFM JLC (jlcdfm.com, Gerber 23 Nov, T)
@@ -56,3 +56,9 @@ File open source yang diunduh ada di `hardware/footprints/opensource/` (hanya di
 5. J1 PCB2: header dihapus, jadi dua lubang kosong (atau jembatan), sesuai pilihan.
 6. H1 PCB3: ditunda sampai diputuskan modul microSD menempel atau tetap kabel.
 7. Setiap perubahan: rute ulang, DRC 0, ekspor Gerber/BOM/CPL baru, ganti baris di keranjang JLC, lalu DFM ulang.
+
+## 7. Pembaruan 24 Nov (dini hari): J1 disambung, DFM semua papan, keranjang
+- **PCB2: J1 dihapus**, `VBAT_RAW` (TP4056 OUT+) langsung ke U1.16; net `VBAT_SW` hilang. DRC 0. `check_netlist.py` diubah (PCB2 tidak lagi mengharapkan J1/VBAT_SW) dan lolos untuk PCB1-3. Berkas: `Gerber_PCB2_j1sambung_2026-11-23.zip`, `CPL_PCB2_j1sambung_2026-11-23.xlsx`, `PCB2.tel`.
+- **DFM PCB JLC (jlcdfm.com, T)**: PCB1 modul, PCB2 j1sambung dan PCB3 sudah dijalankan. PCB2 j1sambung: tidak ada merah di jalur, pad, drill, annular ring; hanya silkscreen ke pad 54 dan silkscreen ke lubang 18 (kosmetik); peringatan: silk line width 9+1, PTH without pad 10, tht to smd 1.
+- **DFM SMT (rotasi/polaritas) BELUM bisa dijalankan**: dialog "BOM Matching" di jlcdfm.com tidak terbuka lewat otomasi browser (dialog tetap tersembunyi). Penggantinya: pencocokan BOM JLC (PCB1 9/9, PCB2 4/4, PCB3 1/1) dan tampilan 3D di halaman Component Placements. Review insinyur JLC setelah order tetap jadi pemeriksaan rotasi/polaritas pertama.
+- **Keranjang JLC**: PCB1 modul (Y5) 5/5 $10,30 + $19,90; PCB2 j1sambung (Y6) 5/5 $5,20 + $15,41; PCB3 (Y4) 5/5 $5,20 + $10,73; total barang $66,74. Baris PCB1 lama (Y2) dan PCB2 lama (Y3) dihapus. Belum ada yang dibayar.
